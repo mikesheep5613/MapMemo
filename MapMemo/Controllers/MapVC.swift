@@ -55,7 +55,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         
         mapView.delegate = self
         // Insert pin based on data from Post Array
-        self.placePin_2()
+        self.placePin()
     }
     
     
@@ -85,17 +85,8 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
     
     
     
-//    func plcaePin(){
-//        for item in Posts {
-//            let annotation = MKPointAnnotation()
-//            annotation.coordinate.latitude = item.latitude
-//            annotation.coordinate.longitude = item.longtitude
-//            annotation.title = item.title
-//            mapView.addAnnotation(annotation)
-//        }
-//    }
     
-    func placePin_2(){
+    func placePin(){
         
         for item in Posts {
             let myAnnotation = MyAnnotation(coordinate: CLLocationCoordinate2D(latitude: item.latitude, longitude: item.longtitude))

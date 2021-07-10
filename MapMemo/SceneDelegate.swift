@@ -19,7 +19,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let _ = (scene as? UIWindowScene) else { return }
         
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            
+        
+        if let loggedUsername = UserDefaults.standard.string(forKey: "username"){
+            let mainTabbarController = storyboard.instantiateViewController(identifier: "TabbarControllerVC")
+            window?.rootViewController = mainTabbarController
+        } else {
+            let loginNavigationController = storyboard.instantiateViewController(identifier: "LoginNavigationVC")
+            window?.rootViewController = loginNavigationController
+        }
+        
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -58,6 +66,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
         
         window.rootViewController = vc
+        
+        // add animation
+        UIView.transition(with: window,
+                          duration: 0.5,
+                          options: [.transitionFlipFromLeft],
+                          animations: nil,
+                          completion: nil)
+
     }
     
 }
