@@ -13,10 +13,47 @@ import FBSDKLoginKit
 
 class LoginVC: UIViewController {
 
+    @IBOutlet weak var emailTextfield: UITextField!
+    
+    @IBOutlet weak var passwordTextfield: UITextField!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
     }
+    
+    
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.isNavigationBarHidden = true
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.isNavigationBarHidden = false
+    }
+
+    // Email signin method
+    @IBAction func signinBtnPressed(_ sender: UIButton) {
+    
+        if let email = emailTextfield.text, let password = passwordTextfield.text {
+            Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+                if let error = error {
+                    print("Sign in error : \(error)")
+                } else {
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    let mainTabbarVC = storyboard.instantiateViewController(identifier: "TabbarControllerVC")
+                    // This is to get the SceneDelegate object from your view controller
+                    // then call the change root view controller function to change to main tab bar
+                    (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(mainTabbarVC)
+
+                }
+            }
+        }
+    
+    }
+    
     
     @IBAction func googleLoginBtn(_ sender: Any) {
         GIDSignIn.sharedInstance()?.presentingViewController = self
