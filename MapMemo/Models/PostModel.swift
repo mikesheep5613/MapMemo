@@ -8,18 +8,18 @@
 import Foundation
 import UIKit
 
-class Post : Decodable  {
+
+
+class PostModel : Decodable  {
     
-    let title : String
-    let text : String
-    let date : String
-    let image : String
-    let latitude : Double
-    let longtitude : Double
+    var title : String?
+    var text : String?
+    var date : String?
+    var image : String?
+    var latitude : Double?
+    var longtitude : Double?
+    var type : String?
     
-    
-    
-//    let coordinate : CLLocationCoordinate2D?
     
     
     
