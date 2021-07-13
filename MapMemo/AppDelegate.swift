@@ -7,13 +7,14 @@
 
 import UIKit
 import Firebase
-import GoogleSignIn
-import FBSDKCoreKit
+//import GoogleSignIn
+//import FBSDKCoreKit
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
     
 
+    var window: UIWindow?
     
         
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -23,23 +24,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
     
         
         // Google Sign In
-        GIDSignIn.sharedInstance().clientID = "80663940915-lpi1u5605adqmckb5ccid7m5dhnd0cvt.apps.googleusercontent.com"
-        GIDSignIn.sharedInstance()?.delegate = self
+//        GIDSignIn.sharedInstance().clientID = "80663940915-lpi1u5605adqmckb5ccid7m5dhnd0cvt.apps.googleusercontent.com"
+//        GIDSignIn.sharedInstance()?.delegate = self
         
         
         // Override point for customization after application launch.
         return true
     }
+    
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        if let window = self.window {
+            checkLogin(window : window)
+        }
+    }
+    
+
+
 
     //MARK: - Google Sign In
-    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
-        print("User email: \(user.profile.email ?? "No Email")")
-    }
-
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        return GIDSignIn.sharedInstance().handle(url) ?? false
-        || ApplicationDelegate.shared.application( app, open: url, sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String, annotation: options[UIApplication.OpenURLOptionsKey.annotation] )
-    }
+//    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+//        print("User email: \(user.profile.email ?? "No Email")")
+//    }
+//
+//    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+//        return GIDSignIn.sharedInstance().handle(url) ?? false
+//        || ApplicationDelegate.shared.application( app, open: url, sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String, annotation: options[UIApplication.OpenURLOptionsKey.annotation] )
+//    }
     
     // MARK: UISceneSession Lifecycle
 

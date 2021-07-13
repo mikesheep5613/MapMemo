@@ -8,29 +8,16 @@
 import UIKit
 import MapKit
 import CoreLocation
-
-
-class MyAnnotation: NSObject, MKAnnotation {
-    
-    var title: String?
-    var text : String?
-    var date : String?
-    var image : String?
-    var latitude : Double?
-    var longtitude : Double?
-    var coordinate: CLLocationCoordinate2D
-    
-    init(coordinate : CLLocationCoordinate2D) {
-        self.coordinate = coordinate
-    }
-}
-
+import FirebaseFirestore
+import FirebaseAuth
+import FirebaseStorage
 
 
 class MapVC: UIViewController, CLLocationManagerDelegate {
     
-    var Posts : [Post] = ItemListHelper().decodeItem()
-    var getSelectedPin : MyAnnotation?
+    var data : [PostModel] = []
+
+    var db : Firestore!
     
     @IBOutlet weak var mapView: MKMapView!
     
@@ -54,11 +41,47 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         }
         
         mapView.delegate = self
+        
+        queryFromFireStore()
+        
         // Insert pin based on data from Post Array
         self.placePin()
     }
     
     
+    func queryFromFireStore() {
+        
+        let setting = FirestoreSettings()
+        Firestore.firestore().settings = setting
+        db = Firestore.firestore()
+        
+        if let userID = Auth.auth().currentUser?.uid{
+            db.collection(userID).getDocuments { (querySnapshot, error) in
+                if let error = error {
+                    print("Query error : \(error)")
+                }
+                guard let snapshot = querySnapshot else {return}
+                for document in snapshot.documents{
+                    let post = PostModel()
+                    post.title = document.data()["title"] as? String
+                    post.text = document.data()["text"] as? String
+                    post.date = document.data()["date"] as? Date
+                    post.image = document.data()["image"] as? String
+                    post.type = document.data()["type"] as? String
+                    
+                    if let geopoint = document.data()["coords"] as? GeoPoint {
+                        post.coordinate?.latitude = geopoint.latitude
+                        post.coordinate?.longitude = geopoint.longitude
+                    }
+
+                    self.data.append(post)
+                }
+            }
+        }
+    
+    }
+    
+
     
     //MARK: - CLLocationManagerDelegate
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -88,15 +111,9 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
     
     func placePin(){
         
-        for item in Posts {
-            let myAnnotation = MyAnnotation(coordinate: CLLocationCoordinate2D(latitude: item.latitude, longitude: item.longtitude))
-            
-            myAnnotation.title = item.title
-            myAnnotation.text = item.text
-            myAnnotation.date = item.date
-            myAnnotation.image = item.image
-            
-            mapView.addAnnotation(myAnnotation)
+        for item in self.data {
+            print(item.coordinate)
+            mapView.addAnnotation(item as! MKAnnotation)
         }
         
     }

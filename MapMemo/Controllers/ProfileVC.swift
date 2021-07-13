@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Firebase
 
 class ProfileVC: UIViewController {
 
@@ -16,11 +17,22 @@ class ProfileVC: UIViewController {
     }
     
     @IBAction func signoutBtnPressed(_ sender: Any) {
-    
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let loginNavigationController = storyboard.instantiateViewController(identifier: "LoginNavigationVC")
         
-        (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(loginNavigationController)
+        let firebaseAuth = Auth.auth()
+        
+        do {
+            try firebaseAuth.signOut()
+            UserDefaults.standard.removeObject(forKey: "username")
+            UserDefaults.standard.synchronize()
+            if let window = self.view.window {
+                checkLogin(window : window)
+            }
+        } catch let signOutError as NSError {
+            print("Signing out error : \(signOutError)")
+        }
+            
+
+    
 
     }
     

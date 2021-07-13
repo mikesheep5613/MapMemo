@@ -6,58 +6,57 @@
 //
 
 import Foundation
-import UIKit
+import Firebase
+import MapKit
+import CoreLocation
 
 
-
-class PostModel : Decodable  {
+class PostModel  {
     
     var title : String?
     var text : String?
-    var date : String?
-    var image : String?
-    var latitude : Double?
-    var longtitude : Double?
     var type : String?
+    var date : Date?
+    var image: String?
+    var coordinate : CLLocationCoordinate2D?
+
     
     
-    
-    
-    
-    
-    
-    func imageGet() -> UIImage? {
-        
-        guard let imagePath = Bundle.main.path(forResource: self.image, ofType: nil ) else {
-            return nil
+    func imageDownloadFromStorage() -> UIImage? {
+       
+        var imageFromFS : UIImage?
+
+        if let imageURL = self.image {
+            let imageRef = Storage.storage().reference(forURL: "gs://mapmemo-17e75.appspot.com/\(imageURL)")
+            imageRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
+                if let error = error {
+                    print("getImage error :\(error)")
+                }
+                guard let data = data else {
+                    return
+                }
+                imageFromFS = UIImage(data: data)
+            }
         }
-        return UIImage(contentsOfFile: imagePath)
+        return imageFromFS
     }
+
+//        // Create local filesystem URL
+//        let localURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+//
+//        // Download to the local filesystem
+//        let downloadTask = imageRef.write(toFile: localURL) { url, error in
+//          if let error = error {
+//            // Uh-oh, an error occurred!
+//            print("Download image errpr :\(error)")
+//          } else {
+//            // Local file URL for "images/island.jpg" is returned
+//            return  UIImage(contentsOfFile: localURL.pa)
+//          }
+//        }
+//
+//        return nil
     
-    
-    func thumbnailImage() -> UIImage? {
-        if let image = self.imageGet() {
-        let thumbnailSize = CGSize(width:50, height: 50); //設定縮圖大小
-        let scale = UIScreen.main.scale //找出目前螢幕的scale，視網膜技術為2.0 //產生畫布，第一個參數指定大小,第二個參數true:不透明(黑色底),false表示透明背景,scale為螢幕scale
-        UIGraphicsBeginImageContextWithOptions(thumbnailSize,false,scale)
-        //計算長寬要縮圖比例，取最大值MAX會變成UIViewContentModeScaleAspectFill //最小值MIN會變成UIViewContentModeScaleAspectFit
-        let widthRatio = thumbnailSize.width / image.size.width;
-        let heightRadio = thumbnailSize.height / image.size.height;
-        let ratio = max(widthRatio,heightRadio);
-        let imageSize = CGSize(width:image.size.width*ratio,height: image.size.height*ratio);
-            
-        let circlePath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: thumbnailSize.width, height: thumbnailSize.height))
-        circlePath.addClip();
-            
-        image.draw(in:CGRect(x: -(imageSize.width-thumbnailSize.width)/2.0,y: -(imageSize.height-thumbnailSize.height)/2.0,
-        width: imageSize.width,height: imageSize.height)) //取得畫布上的縮圖
-        let smallImage = UIGraphicsGetImageFromCurrentImageContext(); //關掉畫布
-        UIGraphicsEndImageContext();
-            return smallImage
-        }else{
-            return nil;
-        }
-    }
 
     
 }

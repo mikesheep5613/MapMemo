@@ -17,30 +17,30 @@ class PostVC: UIViewController {
     
     @IBOutlet weak var imageView: UIImageView!
     
-    var currentPost : Post?
+    var currentPost : PostModel?
     
     var currentAnnotation : MyAnnotation?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.dataLabel.text = currentPost?.date
+        self.dataLabel.text = currentPost?.date?.description
         self.titleLabel.text = currentPost?.title
         self.textView.text = currentPost?.text
-        self.imageView.image = currentPost?.imageGet()
+//        self.imageView.image = currentPost?.imageGet()
+//        
         
-        
-        guard let imagePath = Bundle.main.path(forResource: self.currentAnnotation?.image, ofType: nil ) else {
-            return
-        }
-
-        self.dataLabel.text = currentAnnotation?.date
-        self.titleLabel.text = currentAnnotation?.title
-        self.textView.text = currentAnnotation?.text
-        self.imageView.image = UIImage(contentsOfFile: imagePath)
-
-        
-        print("post did load")
+//        guard let imagePath = Bundle.main.path(forResource: self.currentAnnotation?.image, ofType: nil ) else {
+//            return
+//        }
+//
+//        self.dataLabel.text = currentAnnotation?.date
+//        self.titleLabel.text = currentAnnotation?.title
+//        self.textView.text = currentAnnotation?.text
+//        self.imageView.image = UIImage(contentsOfFile: imagePath)
+//
+//        
+//        print("post did load")
         // Do any additional setup after loading the view.
     }
     

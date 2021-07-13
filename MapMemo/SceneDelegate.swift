@@ -10,6 +10,7 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
@@ -18,16 +19,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let _ = (scene as? UIWindowScene) else { return }
         
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        
-        if let loggedUsername = UserDefaults.standard.string(forKey: "username"){
-            let mainTabbarController = storyboard.instantiateViewController(identifier: "TabbarControllerVC")
-            window?.rootViewController = mainTabbarController
-        } else {
-            let loginNavigationController = storyboard.instantiateViewController(identifier: "LoginNavigationVC")
-            window?.rootViewController = loginNavigationController
+        if let window = self.window {
+            checkLogin(window: window)
         }
-        
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -56,24 +50,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
-    }
-
-
-    // switch rootVC to mainVC
-    func changeRootViewController(_ vc : UIViewController, animated: Bool = true){
-        guard let window = self.window else {
-            return
-        }
-        
-        window.rootViewController = vc
-        
-        // add animation
-        UIView.transition(with: window,
-                          duration: 0.5,
-                          options: [.transitionFlipFromLeft],
-                          animations: nil,
-                          completion: nil)
-
     }
     
 }

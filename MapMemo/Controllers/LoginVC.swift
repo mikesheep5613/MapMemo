@@ -7,9 +7,9 @@
 
 import UIKit
 import FirebaseAuth
-import GoogleSignIn
-import FBSDKCoreKit
-import FBSDKLoginKit
+//import GoogleSignIn
+//import FBSDKCoreKit
+//import FBSDKLoginKit
 
 class LoginVC: UIViewController {
 
@@ -21,8 +21,6 @@ class LoginVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-    
-    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -42,12 +40,12 @@ class LoginVC: UIViewController {
                 if let error = error {
                     print("Sign in error : \(error)")
                 } else {
-                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                    let mainTabbarVC = storyboard.instantiateViewController(identifier: "TabbarControllerVC")
-                    // This is to get the SceneDelegate object from your view controller
-                    // then call the change root view controller function to change to main tab bar
-                    (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(mainTabbarVC)
-
+                    UserDefaults.standard.setValue("login", forKey: "username")
+                    UserDefaults.standard.synchronize()
+                    print(NSHomeDirectory())
+                    if let tabVC = self.storyboard?.instantiateViewController(identifier: "tabbarVC"){
+                        self.view.window?.rootViewController = tabVC
+                    }
                 }
             }
         }
@@ -56,31 +54,11 @@ class LoginVC: UIViewController {
     
     
     @IBAction func googleLoginBtn(_ sender: Any) {
-        GIDSignIn.sharedInstance()?.presentingViewController = self
-        GIDSignIn.sharedInstance()?.signIn()
 
     }
     
     
     @IBAction func facebookLoginBtn(_ sender: Any) {
-        
-        
-        
-        let loginManager = LoginManager()
-        loginManager.logOut()
-        loginManager.logIn(permissions: [.email], viewController: self) { result in
-            
-            switch result {
-                
-            case .success(granted: let granted, declined: let declined, token: let token):
-                print("login success : \(result)")
-            case .cancelled:
-                break
-            case .failed(_):
-                break
-            }
-            
-        }
     }
     
         /*
