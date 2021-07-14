@@ -6,64 +6,155 @@
 //
 
 import UIKit
+import MapKit
+import Firebase
 
-class NewPostTableVC: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, PinMapVCDelegate {
+    
     
     @IBOutlet weak var photoImageView: UIImageView!
+    @IBOutlet weak var titleTextField: RoundedTextField!
+    @IBOutlet weak var datePicker: UIDatePicker!
+    @IBOutlet weak var locationLabel: UILabel!
+    @IBOutlet weak var typeSegmentControl: UISegmentedControl!
+    @IBOutlet weak var textView: UITextView!
+//    {
+//        didSet{
+//            textTextView.layer.cornerRadius = 5.0
+//            textTextView.layer.masksToBounds = true
+//        }
+//    }
     
-    @IBOutlet weak var dateTextField: RoundedTextField!{
-        didSet{
-            dateTextField.tag = 1
-            dateTextField.becomeFirstResponder()
-            dateTextField.delegate = self
-        }
-    }
-    @IBOutlet weak var locationTextField: RoundedTextField!{
-        didSet{
-            locationTextField.tag = 2
-            locationTextField.delegate = self
-        }
-    }
-    @IBOutlet weak var typeTextField: RoundedTextField!{
-        didSet{
-            typeTextField.tag = 3
-            typeTextField.delegate = self
-        }
-    }
-    @IBOutlet weak var titleTextField: RoundedTextField!{
-        didSet{
-            titleTextField.tag = 4
-            titleTextField.delegate = self
-        }
-
-    }
-    @IBOutlet weak var textView: UITextView!{
-        didSet{
-            textView.tag = 5
-            textView.layer.cornerRadius = 5.0
-            textView.layer.masksToBounds = true
-        }
-
-    }
-    
+    var newLocation : CLLocationCoordinate2D?
+    var newType : String?
+    var newImageURL : String?
+    var db : Firestore!
+        
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.tableView.dataSource = self
+        self.tableView.delegate = self
+        self.titleTextField.delegate = self
         
+        self.textView.delegate = self
+        self.textView.layer.cornerRadius = 5.0
+        self.textView.layer.borderColor = UIColor.lightGray.cgColor
+        self.textView.layer.borderWidth = 1
+        createToolbar(textField: self.textView)
         
-
+        let settings = FirestoreSettings()
+        Firestore.firestore().settings = settings
+        db = Firestore.firestore()
     }
     
     
+
+    
+    @IBAction func uploadPost(_ sender: UIBarButtonItem) {
+            
+        //Upload to firebase
+        if let userID = Auth.auth().currentUser?.email, let title = self.titleTextField.text , let text = self.textView.text,  let location = self.newLocation, let type = self.newType  {
+            let documentID = "\(Date().timeIntervalSince1970)"
+            let date = self.datePicker.date
+
+            let ref = db.collection(userID).document(documentID)
+            let data = [
+                "title": title,
+                "text": text,
+                "date": date,
+                "latitude": location.latitude,
+                "longtitude": location.longitude,
+                "type": type
+            ] as [String : Any]
+            
+            ref.setData(data) { error in
+                if let e = error {
+                    print ("Fail to setData: \(e).")
+                } else {
+                    print("Set Data Successfully.")
+                }
+            }
+            
+            
+            
+        }
+//        if let userID = Auth.auth().currentUser?.email, let documentID = self.date {
+//                    let ref = db.collection(userID).document(documentID)
+//                    let data = ["city": city, "name": name, "address": address, "open_time": openTime,
+//                                "mrt": mrt, "url": url, "tasty": tasty, "note": note, "imageURL": photoUrl ?? defaultURL,
+//                                "date": date!, "firebaseStorageName": firebaseStorageName!, "latitude": citiesModel.latitude ?? "", "longitude": citiesModel.longitude ?? ""] as [String: Any]
+//                    ref.setData(data) { error in
+//                        if let error = error {
+//                            print("Fail to setData: (error)")
+//                        } else {
+//                            print("Successful saved data")
+
+        
+    
+    }
     //MARK: - UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if let nextTextField = view.viewWithTag(textField.tag + 1){
-            textField.resignFirstResponder()
-            nextTextField.becomeFirstResponder()
-        }
+        textField.resignFirstResponder()
         return true
     }
+    
+    
+    //MARK: - UITextViewDelegate
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        
+        if self.textView.text == "Write Something You Want To Record..." {
+            self.textView.text = nil
+            self.textView.textColor = UIColor.black
+        }
 
+    }
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if self.textView.text.isEmpty {
+            self.textView.text = ""
+            self.textView.textColor = UIColor.lightGray
+        }
+        self.textView.resignFirstResponder()
+    }
+    
+    // create toolbar for resign keyboard
+    func createToolbar(textField : UITextView) {
+        let toolbar = UIToolbar()
+        toolbar.barStyle = UIBarStyle.default
+        toolbar.sizeToFit()
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let hidekeyboard = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(hidekeyboardd))
 
+        toolbar.items = [flexSpace,hidekeyboard]
+        self.textView.inputAccessoryView = toolbar
+    }
+
+    @objc func hidekeyboardd() {
+        self.textView.resignFirstResponder()
+    }
+
+    
+    //MARK: - Input Type
+    @IBAction func typeSegmentControlPressed(_ sender: UISegmentedControl) {
+        
+        switch typeSegmentControl.selectedSegmentIndex {
+        case 0:
+            self.newType = "mountain_climbing"
+        case 1:
+            self.newType = "river_trekking"
+        case 2:
+            self.newType = "waterfall"
+        case 3:
+            self.newType = "camping"
+        case 4:
+            self.newType = "snorkeling"
+        case 5:
+            self.newType = "other"
+        default:
+            self.newType = "mountain_climbing"
+        }
+    }
+    
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -115,6 +206,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UIImagePickerC
             present(photoSourceRequestController, animated: true, completion: nil)
             
         }
+                
     }
     
     //MARK: - UIImagePickerControllerDelegate
@@ -144,7 +236,34 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UIImagePickerC
 
         }
 
-    
-    
+    //MARK: - PinMapVCDelegate
+    func didFinishUpdate(location: CLLocationCoordinate2D) {
+                
+        // Save to variable
+        self.newLocation = location
+            
+        // Present to UI
+        let geocoder = CLGeocoder()
+        let loc : CLLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
+        
+        geocoder.reverseGeocodeLocation(loc, completionHandler: { (placemarks, error) in
+            if let places = placemarks {
+                guard let subAdministrativeArea = places[0].subAdministrativeArea else {
+                    self.locationLabel.text = "Can't locate associated region"
+                    return
+                }
+                self.locationLabel.text = "\(subAdministrativeArea)"
+            }
+        })
+        self.tableView.reloadData()
+    }
 
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "pinMapSegue"{
+            if let PinMapVC = segue.destination as? PinMapVC{
+                PinMapVC.delegate = self
+            }
+        }
+    }
+    
 }

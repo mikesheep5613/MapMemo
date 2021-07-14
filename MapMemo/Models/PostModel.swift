@@ -19,6 +19,7 @@ class PostModel  {
     var date : Date?
     var image: String?
     var coordinate : CLLocationCoordinate2D?
+    var noteID : String?
 
     
     

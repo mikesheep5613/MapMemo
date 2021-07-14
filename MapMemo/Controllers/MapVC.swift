@@ -13,10 +13,10 @@ import FirebaseAuth
 import FirebaseStorage
 
 
-class MapVC: UIViewController, CLLocationManagerDelegate {
+class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDelegate {
     
     var data : [PostModel] = []
-
+    
     var db : Firestore!
     
     @IBOutlet weak var mapView: MKMapView!
@@ -37,7 +37,6 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
             locationManager.showsBackgroundLocationIndicator = true
             locationManager.delegate = self
             locationManager.startUpdatingLocation()
-            
         }
         
         mapView.delegate = self
@@ -46,11 +45,33 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
         
         // Insert pin based on data from Post Array
         self.placePin()
+        
+        self.setMapview()
+
+    }
+    func setMapview(){
+        let lpgr = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(gestureRecognizer:)))
+        lpgr.minimumPressDuration = 1.0
+        lpgr.delaysTouchesBegan = true
+        lpgr.delegate = self
+        self.mapView.addGestureRecognizer(lpgr)
+    }
+    
+    @objc func handleLongPress(gestureRecognizer : UILongPressGestureRecognizer){
+        if gestureRecognizer.state != UIGestureRecognizer.State.ended {
+            let touchLocation = gestureRecognizer.location(in: mapView)
+            let locationCoordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
+            print("Tapped at lat:\(locationCoordinate.latitude), lon:\(locationCoordinate.longitude)")
+        }
+        if gestureRecognizer.state != UIGestureRecognizer.State.began {
+            return
+        }
     }
     
     
+    
+    // Retrieve data from Firebase
     func queryFromFireStore() {
-        
         let setting = FirestoreSettings()
         Firestore.firestore().settings = setting
         db = Firestore.firestore()
@@ -73,15 +94,13 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
                         post.coordinate?.latitude = geopoint.latitude
                         post.coordinate?.longitude = geopoint.longitude
                     }
-
+                    
                     self.data.append(post)
                 }
             }
         }
-    
+        
     }
-    
-
     
     //MARK: - CLLocationManagerDelegate
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -99,7 +118,6 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
             assertionFailure("Invalid coordinate")
             return
         }
-        
         // Prepare span region
         let span = MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
         let region = MKCoordinateRegion(center: coordinate, span: span)
@@ -107,15 +125,12 @@ class MapVC: UIViewController, CLLocationManagerDelegate {
     }
     
     
-    
-    
+    //MARK: - Place Pins on MapView
     func placePin(){
-        
         for item in self.data {
             print(item.coordinate)
             mapView.addAnnotation(item as! MKAnnotation)
         }
-        
     }
 }
 
