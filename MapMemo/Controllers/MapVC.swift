@@ -27,8 +27,13 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        locationManager.requestAlwaysAuthorization()
+        let setting = FirestoreSettings()
+        Firestore.firestore().settings = setting
+        db = Firestore.firestore()
+        queryFromFireStore()// load data from Firebase
+
         
+        locationManager.requestAlwaysAuthorization()
         if !CLLocationManager.locationServicesEnabled(){
             print("Location Request Denied")
         }else {
@@ -41,12 +46,12 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
         
         mapView.delegate = self
         
-        queryFromFireStore()
         
-        // Insert pin based on data from Post Array
-        self.placePin()
         
+        // set Mapview for UI press gesture recognizer
         self.setMapview()
+        
+
 
     }
     func setMapview(){
@@ -72,11 +77,8 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     
     // Retrieve data from Firebase
     func queryFromFireStore() {
-        let setting = FirestoreSettings()
-        Firestore.firestore().settings = setting
-        db = Firestore.firestore()
         
-        if let userID = Auth.auth().currentUser?.uid{
+        if let userID = Auth.auth().currentUser?.email{
             db.collection(userID).getDocuments { (querySnapshot, error) in
                 if let error = error {
                     print("Query error : \(error)")
@@ -86,17 +88,20 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                     let post = PostModel()
                     post.title = document.data()["title"] as? String
                     post.text = document.data()["text"] as? String
-                    post.date = document.data()["date"] as? Date
-                    post.image = document.data()["image"] as? String
                     post.type = document.data()["type"] as? String
+                    post.date = document.data()["date"] as? Date
+                    post.imageURL = document.data()["imageURL"] as? String
+                    post.latitude = document.data()["latitude"] as? Double
+                    post.longitude = document.data()["longitude"] as? Double
                     
-                    if let geopoint = document.data()["coords"] as? GeoPoint {
-                        post.coordinate?.latitude = geopoint.latitude
-                        post.coordinate?.longitude = geopoint.longitude
-                    }
+                    guard let lat = post.latitude, let lon = post.longitude else {return}
+                    post.coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
                     
                     self.data.append(post)
                 }
+                
+                // Insert pin based on data from Post Array
+                self.placePin()
             }
         }
         
@@ -127,23 +132,27 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     
     //MARK: - Place Pins on MapView
     func placePin(){
+        
         for item in self.data {
-            print(item.coordinate)
-            mapView.addAnnotation(item as! MKAnnotation)
+            mapView.addAnnotation(item)
         }
+        
     }
 }
 
 
 //MARK: - MKMapViewDelegate
+
+
+
 extension MapVC : MKMapViewDelegate {
-    
+
+        
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         // 如果為自己位置，不顯示圖標
         if annotation is MKUserLocation {
             return nil
         }
-        
         
         //Handle ImageAnnotations..
         let reuseID = "pin"
@@ -159,7 +168,7 @@ extension MapVC : MKMapViewDelegate {
     
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        if let pin = view.annotation as? MyAnnotation {
+        if let pin = view.annotation as? PostModel {
             print("get pin success")
             performSegue(withIdentifier: "pinTouched", sender: pin)
         }
@@ -170,7 +179,7 @@ extension MapVC : MKMapViewDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "pinTouched"{
             if let postVC = segue.destination as? PostVC {
-                postVC.currentAnnotation = sender as? MyAnnotation
+                postVC.currentAnnotation = sender as! PostModel
             }
         }
     }

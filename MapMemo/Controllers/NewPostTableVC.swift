@@ -18,17 +18,12 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     @IBOutlet weak var locationLabel: UILabel!
     @IBOutlet weak var typeSegmentControl: UISegmentedControl!
     @IBOutlet weak var textView: UITextView!
-//    {
-//        didSet{
-//            textTextView.layer.cornerRadius = 5.0
-//            textTextView.layer.masksToBounds = true
-//        }
-//    }
     
     var newLocation : CLLocationCoordinate2D?
     var newType : String?
     var newImageURL : String?
     var db : Firestore!
+    private let storage = Storage.storage().reference()
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,46 +47,56 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     
     @IBAction func uploadPost(_ sender: UIBarButtonItem) {
             
-        //Upload to firebase
-        if let userID = Auth.auth().currentUser?.email, let title = self.titleTextField.text , let text = self.textView.text,  let location = self.newLocation, let type = self.newType  {
-            let documentID = "\(Date().timeIntervalSince1970)"
-            let date = self.datePicker.date
+        //Upload image data to firebase storage
+        guard let uploadImage = self.photoImageView.image?.jpegData(compressionQuality: 1) else {return}
+        
+        let uuid = UUID().uuidString
 
-            let ref = db.collection(userID).document(documentID)
-            let data = [
-                "title": title,
-                "text": text,
-                "date": date,
-                "latitude": location.latitude,
-                "longtitude": location.longitude,
-                "type": type
-            ] as [String : Any]
-            
-            ref.setData(data) { error in
-                if let e = error {
-                    print ("Fail to setData: \(e).")
-                } else {
-                    print("Set Data Successfully.")
+        storage.child("images/\(uuid).jpeg").putData(uploadImage, metadata: nil) { _, error
+            in
+            if let error = error {
+                assertionFailure("Fail to upload image")
+            }
+            self.storage.child("images/\(uuid).jpeg").downloadURL { url, error in
+                guard let url = url , error == nil else{
+                    return
+                }
+                self.newImageURL = url.absoluteString // Save to global property
+                
+                //Upload Dict to firebase
+                if let userID = Auth.auth().currentUser?.email, let title = self.titleTextField.text , let text = self.textView.text,  let location = self.newLocation, let type = self.newType, let imageURL = self.newImageURL  {
+                    let documentID = "\(Date().timeIntervalSince1970)"
+                    let date = self.datePicker.date
+
+                    let ref = self.db.collection(userID).document(documentID)
+                    let data = [
+                                "title": title,
+                                "text": text,
+                                "date": date,
+                                "latitude": location.latitude,
+                                "longitude": location.longitude,
+                                "type": type,
+                                "imageURL" : imageURL
+                                ] as [String : Any]
+                    
+                    ref.setData(data) { error in
+                        if let e = error {
+                            print ("Fail to setData: \(e).")
+                        } else {
+                            print("Set Data Successfully.")
+                        }
+                    }
                 }
             }
-            
-            
-            
         }
-//        if let userID = Auth.auth().currentUser?.email, let documentID = self.date {
-//                    let ref = db.collection(userID).document(documentID)
-//                    let data = ["city": city, "name": name, "address": address, "open_time": openTime,
-//                                "mrt": mrt, "url": url, "tasty": tasty, "note": note, "imageURL": photoUrl ?? defaultURL,
-//                                "date": date!, "firebaseStorageName": firebaseStorageName!, "latitude": citiesModel.latitude ?? "", "longitude": citiesModel.longitude ?? ""] as [String: Any]
-//                    ref.setData(data) { error in
-//                        if let error = error {
-//                            print("Fail to setData: (error)")
-//                        } else {
-//                            print("Successful saved data")
-
         
-    
+        
+ 
+        self.navigationController?.popViewController(animated: true)
     }
+    
+    
+    
     //MARK: - UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -113,7 +118,6 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
             self.textView.text = ""
             self.textView.textColor = UIColor.lightGray
         }
-        self.textView.resignFirstResponder()
     }
     
     // create toolbar for resign keyboard

@@ -7,6 +7,8 @@
 
 import Foundation
 import UIKit
+import MapKit
+
 class PostVC: UIViewController {
 
     @IBOutlet weak var dataLabel: UILabel!
@@ -19,7 +21,7 @@ class PostVC: UIViewController {
     
     var currentPost : PostModel?
     
-    var currentAnnotation : MyAnnotation?
+    var currentAnnotation : PostModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,8 +37,8 @@ class PostVC: UIViewController {
 //        }
 //
 //        self.dataLabel.text = currentAnnotation?.date
-//        self.titleLabel.text = currentAnnotation?.title
-//        self.textView.text = currentAnnotation?.text
+        self.titleLabel.text = currentAnnotation?.title
+        self.textView.text = currentAnnotation?.text
 //        self.imageView.image = UIImage(contentsOfFile: imagePath)
 //
 //        

@@ -23,16 +23,18 @@ class TableVC: UIViewController {
         self.tableView.dataSource = self
         self.tableView.delegate = self
         
-        queryFromFireStore()
-    }
-    
-    func queryFromFireStore() {
-        
         let setting = FirestoreSettings()
         Firestore.firestore().settings = setting
         db = Firestore.firestore()
+        queryFromFireStore()// load data from Firebase
         
-        if let userID = Auth.auth().currentUser?.uid{
+    }
+    
+    
+    // Retrieve data from Firebase
+    func queryFromFireStore() {
+        
+        if let userID = Auth.auth().currentUser?.email{
             db.collection(userID).getDocuments { (querySnapshot, error) in
                 if let error = error {
                     print("Query error : \(error)")
@@ -42,17 +44,23 @@ class TableVC: UIViewController {
                     let post = PostModel()
                     post.title = document.data()["title"] as? String
                     post.text = document.data()["text"] as? String
-                    post.date = document.data()["date"] as? Date
-                    post.image = document.data()["image"] as? String
                     post.type = document.data()["type"] as? String
+                    post.date = document.data()["date"] as? Date
+                    post.imageURL = document.data()["imageURL"] as? String
+                    post.latitude = document.data()["latitude"] as? Double
+                    post.longitude = document.data()["longitude"] as? Double
+                                        
                     self.data.append(post)
                 }
-                self.tableView.reloadData()
+                // update UI
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+
             }
         }
-    
     }
-    
+
 
     
     // MARK: - Navigation
