@@ -29,7 +29,8 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                 
         // load data from Firebase
         db = Firestore.firestore()
-        monitorData()
+//        monitorData()
+        queryFromFireStore()
 
         locationManager.requestAlwaysAuthorization()
         if !CLLocationManager.locationServicesEnabled(){
@@ -183,10 +184,12 @@ extension MapVC : MKMapViewDelegate {
         let reuseID = "pin"
         var result = mapView.dequeueReusableAnnotationView(withIdentifier: reuseID)
         if result == nil {
-            result = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: reuseID)
+            result = MKAnnotationView(annotation: annotation, reuseIdentifier: reuseID)
         } else {
             result?.annotation = annotation
         }
+        result?.image = UIImage(named: "mpin_v1")
+        
         return result
     }
     

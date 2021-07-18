@@ -24,39 +24,49 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     var newImageURL : String?
     var db : Firestore!
     
+    // Create boolean to check whether upload a new Image
+    var isNewImage : Bool = false
+    
     // Create property for retrieve data from PostVC
     var editPost : PostModel?
     
     private let storage = Storage.storage().reference()
-        
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.dataSource = self
         self.tableView.delegate = self
         self.titleTextField.delegate = self
-        
+        createToolbar(textField: self.textView)
+
         self.textView.delegate = self
         self.textView.layer.cornerRadius = 5.0
         self.textView.layer.borderColor = UIColor.lightGray.cgColor
         self.textView.layer.borderWidth = 1
         
-        self.photoImageView.image = editPost?.image
-        self.titleTextField.text = editPost?.title
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
-        self.datePicker.date = dateFormatter.date(from: editPost?.date ?? "") as? Date ?? Date.init()
-
+        // check whether editPost receieve model
+        if editPost != nil {
+            self.photoImageView.image = editPost?.image
+            self.titleTextField.text = editPost?.title
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
+            self.datePicker.date = dateFormatter.date(from: editPost?.date ?? "") as? Date ?? Date.init()
+            self.typeSegmentControl.selectedSegmentIndex = typeSegmentIndexCheck(editPost?.type ?? "other")
+            self.textView.text = editPost?.text
+            guard let location = editPost?.coordinate else {
+                assertionFailure("Fail to unwrap edit post coordinate")
+                return
+            }
+            // Present to UI
+            convertToPlaceMark(location) { (address) in
+                if let address = address {
+                    self.locationLabel.text = address
+                }
+            }
+        }
         
-        self.locationLabel.text = reverseGeocodeLocation(location: editPost?.coordinate ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0))
-        
-        
-        self.typeSegmentControl.selectedSegmentIndex = typeSegmentIndexCheck(editPost?.type ?? "other")
-        self.textView.text = editPost?.text
-        
-
-        
-        createToolbar(textField: self.textView)
+        // connect to Firebase
         db = Firestore.firestore()
     }
     
@@ -69,7 +79,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         let uuid = UUID().uuidString
         guard let uploadImage = self.photoImageView.image?.resize(maxEdge: 1024) else {return}
         guard let realUploadImage = uploadImage.jpegData(compressionQuality: 0.7) else {return}
-
+        
         storage.child("images/\(uuid).jpeg").putData(realUploadImage, metadata: nil) { _, error
             in
             if let error = error {
@@ -86,18 +96,18 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
                     
                     let documentID = "\(Date().timeIntervalSince1970)"
                     let date = self.datePicker.date.description
-
+                    
                     let ref = self.db.collection(userID).document(documentID)
                     let data = [
-                                "postID" : uuid,
-                                "title": title,
-                                "text": text,
-                                "date": date,
-                                "latitude": location.latitude,
-                                "longitude": location.longitude,
-                                "type": type,
-                                "imageURL" : imageURL
-                                ] as [String : Any]
+                        "postID" : uuid,
+                        "title": title,
+                        "text": text,
+                        "date": date,
+                        "latitude": location.latitude,
+                        "longitude": location.longitude,
+                        "type": type,
+                        "imageURL" : imageURL
+                    ] as [String : Any]
                     
                     ref.setData(data) { error in
                         if let e = error {
@@ -128,12 +138,12 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
             self.textView.text = nil
             self.textView.textColor = UIColor.black
         }
-
+        
     }
     func textViewDidEndEditing(_ textView: UITextView) {
         if self.textView.text.isEmpty {
             self.textView.text = ""
-//            self.textView.textColor = UIColor.lightGray
+            //            self.textView.textColor = UIColor.lightGray
         }
     }
     
@@ -144,15 +154,15 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         toolbar.sizeToFit()
         let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let hidekeyboard = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(hidekeyboardd))
-
+        
         toolbar.items = [flexSpace,hidekeyboard]
         self.textView.inputAccessoryView = toolbar
     }
-
+    
     @objc func hidekeyboardd() {
         self.textView.resignFirstResponder()
     }
-
+    
     
     //MARK: - Input Type
     @IBAction func typeSegmentControlPressed(_ sender: UISegmentedControl) {
@@ -195,17 +205,17 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     
     
     // MARK: - Table view data source
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return 6
     }
-
+    
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0 {
@@ -245,15 +255,16 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
             present(photoSourceRequestController, animated: true, completion: nil)
             
         }
-                
+        
     }
     
     //MARK: - UIImagePickerControllerDelegate
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            photoImageView.image = selectedImage
-            photoImageView.contentMode = .scaleAspectFill
-            photoImageView.clipsToBounds = true
+            self.photoImageView.image = selectedImage
+            self.isNewImage = true
+            self.photoImageView.contentMode = .scaleAspectFill
+            self.photoImageView.clipsToBounds = true
         }
         
         imageLayout(imageView: photoImageView)
@@ -261,50 +272,58 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     }
     
     func imageLayout(imageView: UIImageView) {
-            let leading = NSLayoutConstraint(item: photoImageView as Any, attribute: .leading, relatedBy: .equal, toItem: photoImageView.superview, attribute: .leading, multiplier: 1, constant: 0)
-            leading.isActive = true
-
-            let trailing = NSLayoutConstraint(item: photoImageView as Any, attribute: .trailing, relatedBy: .equal, toItem: photoImageView.superview, attribute: .trailing, multiplier: 1, constant: 0)
-            trailing.isActive = true
-
-            let top = NSLayoutConstraint(item: photoImageView as Any, attribute: .top, relatedBy: .equal, toItem: photoImageView.superview, attribute: .top, multiplier: 1, constant: 0)
-            top.isActive = true
-
-            let bottom = NSLayoutConstraint(item: photoImageView as Any, attribute: .bottom, relatedBy: .equal, toItem: photoImageView.superview, attribute: .bottom, multiplier: 1, constant: 0)
-            bottom.isActive = true
-
-        }
-
-    //MARK: - PinMapVCDelegate
-    func didFinishUpdate(location: CLLocationCoordinate2D) {
-                
-        // Save to variable
-        self.newLocation = location
-
-        // Present to UI
-        if let locationLabel = reverseGeocodeLocation(location: location) {
-            self.locationLabel.text = locationLabel
-        }
-        self.tableView.reloadData()
+        let leading = NSLayoutConstraint(item: photoImageView as Any, attribute: .leading, relatedBy: .equal, toItem: photoImageView.superview, attribute: .leading, multiplier: 1, constant: 0)
+        leading.isActive = true
+        
+        let trailing = NSLayoutConstraint(item: photoImageView as Any, attribute: .trailing, relatedBy: .equal, toItem: photoImageView.superview, attribute: .trailing, multiplier: 1, constant: 0)
+        trailing.isActive = true
+        
+        let top = NSLayoutConstraint(item: photoImageView as Any, attribute: .top, relatedBy: .equal, toItem: photoImageView.superview, attribute: .top, multiplier: 1, constant: 0)
+        top.isActive = true
+        
+        let bottom = NSLayoutConstraint(item: photoImageView as Any, attribute: .bottom, relatedBy: .equal, toItem: photoImageView.superview, attribute: .bottom, multiplier: 1, constant: 0)
+        bottom.isActive = true
+        
     }
     
-    func reverseGeocodeLocation(location: CLLocationCoordinate2D) -> String? {
+    //MARK: - PinMapVCDelegate
+    func didFinishUpdate(location: CLLocationCoordinate2D) {
         
-        let geocoder = CLGeocoder()
-        var description : String = ""
-        let loc : CLLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
+        // Save to variable
+        self.newLocation = location
         
-        geocoder.reverseGeocodeLocation(loc) { (placemarks, error) in
-            if let places = placemarks{
-                guard let subAdministrativeArea = places[0].subAdministrativeArea else {
-                    description = "Can't locate associated region"
-                    return }
-                description = subAdministrativeArea
+        // Present to UI
+        convertToPlaceMark(location) { (address) in
+            if let address = address {
+                self.locationLabel.text = address
             }
         }
-        return description
+        
     }
-
+    
+    func convertToPlaceMark(_ location: CLLocationCoordinate2D, _ handler: @escaping ((String?) -> Void)) {
+        
+        let loc : CLLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
+        
+        CLGeocoder().reverseGeocodeLocation(loc) {
+            placemarks,err in
+            
+            if err != nil {
+                print("geocoder error")
+                handler(nil)
+                return
+            }
+            if let places = placemarks{
+                guard let subAdministrativeArea = places[0].subAdministrativeArea else {
+                    self.locationLabel.text = "Can't locate associated region"
+                    return
+                }
+                handler(subAdministrativeArea)
+            }
+        }
+    }
+    
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "pinMapSegue"{
             if let PinMapVC = segue.destination as? PinMapVC{

@@ -389,7 +389,7 @@
                                                             <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="8B0-7r-eyZ">
+                                                        <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" translatesAutoresizingMaskIntoConstraints="NO" id="8B0-7r-eyZ">
                                                             <rect key="frame" x="0.0" y="21" width="394" height="58"/>
                                                             <segments>
                                                                 <segment title="" image="山"/>
@@ -458,7 +458,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="New Post" largeTitleDisplayMode="always" id="AbY-qm-aSK">
-                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="ime-dO-dQb">
+                        <barButtonItem key="rightBarButtonItem" image="ok" style="plain" id="ime-dO-dQb">
                             <connections>
                                 <action selector="uploadPost:" destination="UGE-QY-eXX" id="yvB-a8-LAe"/>
                             </connections>
@@ -559,7 +559,7 @@
                         <viewLayoutGuide key="safeArea" id="f32-H9-75j"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Profile" image="person.fill" catalog="system" id="Hml-71-KLo"/>
+                    <tabBarItem key="tabBarItem" title="Profile" image="member" id="Hml-71-KLo"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="D1u-Ca-Nwb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -618,7 +618,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Lam-hU-FAZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4836" y="703"/>
+            <point key="canvasLocation" x="4751" y="721"/>
         </scene>
         <!--PostVC-->
         <scene sceneID="hVj-za-zev">
@@ -715,11 +715,11 @@
             </objects>
             <point key="canvasLocation" x="2052" y="548"/>
         </scene>
-        <!--map-->
+        <!--Map-->
         <scene sceneID="QwA-Ml-nFL">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Chc-q4-xjs" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="map" image="map.fill" catalog="system" id="Abn-Ur-1uG"/>
+                    <tabBarItem key="tabBarItem" title="Map" image="map" id="Abn-Ur-1uG"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="RjL-E5-yQJ">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -734,11 +734,11 @@
             </objects>
             <point key="canvasLocation" x="3338" y="-154"/>
         </scene>
-        <!--Table-->
+        <!--Memo-->
         <scene sceneID="D2N-jF-txS">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="dOl-pm-6Qh" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Table" image="table.fill" catalog="system" id="uha-vB-X6x"/>
+                    <tabBarItem key="tabBarItem" title="Memo" image="memo" id="uha-vB-X6x"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="aDr-gg-CZZ">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -774,16 +774,17 @@
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="0QK-nW-bDO"/>
-        <segue reference="nXa-Bq-ZOv"/>
+        <segue reference="kjz-Rz-pe3"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="checkmark.circle.fill" catalog="system" width="128" height="121"/>
         <image name="circle.fill" catalog="system" width="128" height="121"/>
         <image name="clear.fill" catalog="system" width="128" height="114"/>
-        <image name="map.fill" catalog="system" width="128" height="110"/>
-        <image name="person.fill" catalog="system" width="128" height="120"/>
+        <image name="map" width="30" height="27"/>
+        <image name="member" width="27" height="25"/>
+        <image name="memo" width="30" height="27.5"/>
+        <image name="ok" width="25" height="23.5"/>
         <image name="photo" catalog="system" width="128" height="93"/>
-        <image name="table.fill" catalog="system" width="128" height="93"/>
         <image name="山" width="475" height="464"/>
         <image name="浮潛" width="578" height="553"/>
         <image name="瀑布2" width="1089" height="1065"/>

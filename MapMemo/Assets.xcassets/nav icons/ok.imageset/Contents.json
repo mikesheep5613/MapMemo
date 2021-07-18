@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "map2.png",
+      "filename" : "ok.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "ok@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "ok@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
