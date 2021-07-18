@@ -23,6 +23,10 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     var newType : String?
     var newImageURL : String?
     var db : Firestore!
+    
+    // Create property for retrieve data from PostVC
+    var editPost : PostModel?
+    
     private let storage = Storage.storage().reference()
         
     override func viewDidLoad() {
@@ -35,24 +39,38 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         self.textView.layer.cornerRadius = 5.0
         self.textView.layer.borderColor = UIColor.lightGray.cgColor
         self.textView.layer.borderWidth = 1
-        createToolbar(textField: self.textView)
         
-        let settings = FirestoreSettings()
-        Firestore.firestore().settings = settings
+        self.photoImageView.image = editPost?.image
+        self.titleTextField.text = editPost?.title
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
+        self.datePicker.date = dateFormatter.date(from: editPost?.date ?? "") as? Date ?? Date.init()
+
+        
+        self.locationLabel.text = reverseGeocodeLocation(location: editPost?.coordinate ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0))
+        
+        
+        self.typeSegmentControl.selectedSegmentIndex = typeSegmentIndexCheck(editPost?.type ?? "other")
+        self.textView.text = editPost?.text
+        
+
+        
+        createToolbar(textField: self.textView)
         db = Firestore.firestore()
     }
     
-    
-
-    
     @IBAction func uploadPost(_ sender: UIBarButtonItem) {
-            
-        //Upload image data to firebase storage
-        guard let uploadImage = self.photoImageView.image?.jpegData(compressionQuality: 1) else {return}
         
+        self.navigationItem.rightBarButtonItem?.image = UIImage(systemName: "slowmo")
+        self.navigationItem.rightBarButtonItem?.tintColor = .lightGray
+        
+        //Upload image data to firebase storage
         let uuid = UUID().uuidString
+        guard let uploadImage = self.photoImageView.image?.resize(maxEdge: 1024) else {return}
+        guard let realUploadImage = uploadImage.jpegData(compressionQuality: 0.7) else {return}
 
-        storage.child("images/\(uuid).jpeg").putData(uploadImage, metadata: nil) { _, error
+        storage.child("images/\(uuid).jpeg").putData(realUploadImage, metadata: nil) { _, error
             in
             if let error = error {
                 assertionFailure("Fail to upload image")
@@ -65,11 +83,13 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
                 
                 //Upload Dict to firebase
                 if let userID = Auth.auth().currentUser?.email, let title = self.titleTextField.text , let text = self.textView.text,  let location = self.newLocation, let type = self.newType, let imageURL = self.newImageURL  {
+                    
                     let documentID = "\(Date().timeIntervalSince1970)"
-                    let date = self.datePicker.date
+                    let date = self.datePicker.date.description
 
                     let ref = self.db.collection(userID).document(documentID)
                     let data = [
+                                "postID" : uuid,
                                 "title": title,
                                 "text": text,
                                 "date": date,
@@ -84,15 +104,12 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
                             print ("Fail to setData: \(e).")
                         } else {
                             print("Set Data Successfully.")
+                            self.navigationController?.popViewController(animated: true)
                         }
                     }
                 }
             }
         }
-        
-        
- 
-        self.navigationController?.popViewController(animated: true)
     }
     
     
@@ -116,7 +133,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     func textViewDidEndEditing(_ textView: UITextView) {
         if self.textView.text.isEmpty {
             self.textView.text = ""
-            self.textView.textColor = UIColor.lightGray
+//            self.textView.textColor = UIColor.lightGray
         }
     }
     
@@ -156,6 +173,24 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         default:
             self.newType = "mountain_climbing"
         }
+    }
+    
+    func typeSegmentIndexCheck(_ type: String) -> Int {
+        var int : Int = 0
+        if type == "mountain_climbing" {
+            int = 0
+        } else if type == "river_trekking"{
+            int = 1
+        } else if type == "waterfall"{
+            int = 2
+        } else if type == "camping"{
+            int = 3
+        } else if type == "snorkeling"{
+            int = 4
+        } else{
+            int = 5
+        }
+        return int
     }
     
     
@@ -245,21 +280,29 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
                 
         // Save to variable
         self.newLocation = location
-            
+
         // Present to UI
+        if let locationLabel = reverseGeocodeLocation(location: location) {
+            self.locationLabel.text = locationLabel
+        }
+        self.tableView.reloadData()
+    }
+    
+    func reverseGeocodeLocation(location: CLLocationCoordinate2D) -> String? {
+        
         let geocoder = CLGeocoder()
+        var description : String = ""
         let loc : CLLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
         
-        geocoder.reverseGeocodeLocation(loc, completionHandler: { (placemarks, error) in
-            if let places = placemarks {
+        geocoder.reverseGeocodeLocation(loc) { (placemarks, error) in
+            if let places = placemarks{
                 guard let subAdministrativeArea = places[0].subAdministrativeArea else {
-                    self.locationLabel.text = "Can't locate associated region"
-                    return
-                }
-                self.locationLabel.text = "\(subAdministrativeArea)"
+                    description = "Can't locate associated region"
+                    return }
+                description = subAdministrativeArea
             }
-        })
-        self.tableView.reloadData()
+        }
+        return description
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

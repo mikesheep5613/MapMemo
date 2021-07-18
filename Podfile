@@ -6,8 +6,8 @@ target 'MapMemo' do
   use_frameworks!
 
   # For firebase
-pod 'Firebase/Analytics'
-pod 'Firebase/Core'
+#pod 'Firebase/Analytics'
+#pod 'Firebase/Core'
 pod 'Firebase/Auth'
 pod 'Firebase/Firestore'
 pod 'Firebase/Storage'
@@ -15,6 +15,7 @@ pod 'Firebase/Storage'
 #pod 'GoogleSignIn'
 
 # For facebook login
+#pod 'Bolts'
 #pod 'FBSDKLoginKit'
 #pod 'FBSDKCoreKit'
 

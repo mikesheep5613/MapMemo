@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import Firebase
 import FirebaseFirestore
-import FirebaseAuth
+//import FirebaseAuth
 import FirebaseStorage
 
 class TableVC: UIViewController {
@@ -20,16 +21,68 @@ class TableVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // load data from Firebase
+        db = Firestore.firestore()
+        monitorData()
+
         self.tableView.dataSource = self
         self.tableView.delegate = self
-        
-        let setting = FirestoreSettings()
-        Firestore.firestore().settings = setting
-        db = Firestore.firestore()
-        queryFromFireStore()// load data from Firebase
+    }
+
+    
+    // Retrieve data from Firebase
+    func monitorData() {
+        guard let userID = Auth.auth().currentUser?.email else {
+            assertionFailure("Invalid userID")
+            return
+        }
+        self.db.collection(userID).addSnapshotListener { qSnapshot, error in
+            if let e = error {
+                print("error snapshot listener \(e)")
+                return
+            }
+            guard let documentsChange = qSnapshot?.documentChanges else {return}
+           
+            for change in documentsChange {
+                
+                if change.type == .added{
+                    
+                    let post = PostModel(document: change.document)
+                    
+                    self.data.insert(post, at: 0)
+                    let indexPath = IndexPath(row: 0, section: 0)
+                    self.tableView.insertRows(at: [indexPath], with: .automatic)
+                    
+                    guard let imageURL = post.imageURL else {return}
+                    if let loadImageURL = URL(string: imageURL){
+                        NetworkController.shared.fetchImage(url: loadImageURL) { image in
+                            DispatchQueue.main.async {
+                                post.image = image
+                                self.tableView.reloadData()
+                            }
+
+                        }
+                    }
+
+                }else if change.type == .modified{
+                    
+                    //透過documentId找到self.data相對應的Note
+                    let docID = change.document.data()["postID"] as? String
+                    if let post = self.data.filter({ post in post.postID == docID }).first{
+                        //更新資料
+                        post.title = change.document.data()["text"] as? String
+                        //Reload Table
+                        if let index = self.data.firstIndex(of: post){
+                            let indexPath = IndexPath(row: index, section: 0)
+                            self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                        }
+                    }
+                }
+            }
+        }
         
     }
-    
     
     // Retrieve data from Firebase
     func queryFromFireStore() {
@@ -45,10 +98,20 @@ class TableVC: UIViewController {
                     post.title = document.data()["title"] as? String
                     post.text = document.data()["text"] as? String
                     post.type = document.data()["type"] as? String
-                    post.date = document.data()["date"] as? Date
+                    post.date = document.data()["date"] as? String
                     post.imageURL = document.data()["imageURL"] as? String
                     post.latitude = document.data()["latitude"] as? Double
                     post.longitude = document.data()["longitude"] as? Double
+                    
+                    if let loadImageURL = URL(string: post.imageURL!){
+                        NetworkController.shared.fetchImage(url: loadImageURL) { image in
+                            DispatchQueue.main.async {
+                                post.image = image
+                                self.tableView.reloadData()
+                            }
+
+                        }
+                    }
                                         
                     self.data.append(post)
                 }
@@ -90,7 +153,7 @@ extension TableVC : UITableViewDataSource{
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         cell.detailTextLabel?.text = item.date?.description
         cell.textLabel?.text = item.title
-//        cell.imageView?.image = item.imageDownloadFromStorage()
+        cell.imageView?.image = item.thumbnailImage()
         return cell
     }
     

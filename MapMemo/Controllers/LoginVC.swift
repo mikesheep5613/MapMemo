@@ -6,7 +6,8 @@
 //
 
 import UIKit
-import FirebaseAuth
+import Firebase
+//import FirebaseAuth
 //import GoogleSignIn
 //import FBSDKCoreKit
 //import FBSDKLoginKit

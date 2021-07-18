@@ -26,13 +26,11 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let setting = FirestoreSettings()
-        Firestore.firestore().settings = setting
+                
+        // load data from Firebase
         db = Firestore.firestore()
-        queryFromFireStore()// load data from Firebase
+        monitorData()
 
-        
         locationManager.requestAlwaysAuthorization()
         if !CLLocationManager.locationServicesEnabled(){
             print("Location Request Denied")
@@ -46,14 +44,12 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
         
         mapView.delegate = self
         
-        
-        
         // set Mapview for UI press gesture recognizer
         self.setMapview()
         
-
-
     }
+    
+    
     func setMapview(){
         let lpgr = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(gestureRecognizer:)))
         lpgr.minimumPressDuration = 1.0
@@ -73,7 +69,43 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
         }
     }
     
-    
+    // Retrieve data from Firebase
+    func monitorData() {
+        guard let userID = Auth.auth().currentUser?.email else {
+            assertionFailure("Invalid userID")
+            return
+        }
+        self.db.collection(userID).addSnapshotListener { qSnapshot, error in
+            if let e = error {
+                print("error snapshot listener \(e)")
+                return
+            }
+            guard let documentsChange = qSnapshot?.documentChanges else {return}
+           
+            for change in documentsChange {
+                
+                if change.type == .added{
+                    
+                    let post = PostModel(document: change.document)
+                    
+                    self.data.insert(post, at: 0)
+                    
+                    guard let imageURL = post.imageURL else {return}
+                    if let loadImageURL = URL(string: imageURL){
+                        NetworkController.shared.fetchImage(url: loadImageURL) { image in
+                            DispatchQueue.main.async {
+                                post.image = image
+                            }
+
+                        }
+                    }
+
+                }
+            }
+        }
+        
+    }
+
     
     // Retrieve data from Firebase
     func queryFromFireStore() {
@@ -89,7 +121,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                     post.title = document.data()["title"] as? String
                     post.text = document.data()["text"] as? String
                     post.type = document.data()["type"] as? String
-                    post.date = document.data()["date"] as? Date
+                    post.date = document.data()["date"] as? String
                     post.imageURL = document.data()["imageURL"] as? String
                     post.latitude = document.data()["latitude"] as? Double
                     post.longitude = document.data()["longitude"] as? Double
@@ -129,25 +161,18 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
         mapView.setRegion(region, animated: true)
     }
     
-    
     //MARK: - Place Pins on MapView
     func placePin(){
-        
         for item in self.data {
             mapView.addAnnotation(item)
         }
-        
     }
 }
 
 
 //MARK: - MKMapViewDelegate
-
-
-
 extension MapVC : MKMapViewDelegate {
-
-        
+    
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         // 如果為自己位置，不顯示圖標
         if annotation is MKUserLocation {
@@ -162,10 +187,8 @@ extension MapVC : MKMapViewDelegate {
         } else {
             result?.annotation = annotation
         }
-        
         return result
     }
-    
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if let pin = view.annotation as? PostModel {
@@ -175,11 +198,10 @@ extension MapVC : MKMapViewDelegate {
     }
     
     
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "pinTouched"{
             if let postVC = segue.destination as? PostVC {
-                postVC.currentAnnotation = sender as! PostModel
+                postVC.currentPost = sender as! PostModel
             }
         }
     }

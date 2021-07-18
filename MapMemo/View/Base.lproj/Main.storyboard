@@ -27,13 +27,6 @@
                                     <action selector="facebookLoginBtn:" destination="BYZ-38-t0r" eventType="touchUpInside" id="RLc-2z-6Md"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="---------------- OR ----------------" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Va-1B-p72">
-                                <rect key="frame" x="70" y="629" width="275" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Qd-vf-YtC">
                                 <rect key="frame" x="95" y="671" width="80" height="80"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -105,6 +98,13 @@
                                 <rect key="frame" x="0.0" y="45" width="414" height="183"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" name="MarkerFelt-Thin" family="Marker Felt" pointSize="60"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="────   or connect with   ────" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Va-1B-p72">
+                                <rect key="frame" x="66" y="633" width="281" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -230,7 +230,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SW7-uV-nT6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4249.275362318841" y="-154.01785714285714"/>
+            <point key="canvasLocation" x="4835" y="-154"/>
         </scene>
         <!--New Post-->
         <scene sceneID="snB-3I-43H">
@@ -392,11 +392,11 @@
                                                         <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="8B0-7r-eyZ">
                                                             <rect key="frame" x="0.0" y="21" width="394" height="58"/>
                                                             <segments>
-                                                                <segment title="登山"/>
-                                                                <segment title="溯溪"/>
-                                                                <segment title="瀑布"/>
-                                                                <segment title="露營"/>
-                                                                <segment title="玩水"/>
+                                                                <segment title="" image="山"/>
+                                                                <segment title="" image="瀑布2"/>
+                                                                <segment title="" image="野溪"/>
+                                                                <segment title="" image="露營"/>
+                                                                <segment title="" image="浮潛"/>
                                                                 <segment title="其他"/>
                                                             </segments>
                                                             <connections>
@@ -458,7 +458,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="New Post" largeTitleDisplayMode="always" id="AbY-qm-aSK">
-                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="ime-dO-dQb">
+                        <barButtonItem key="rightBarButtonItem" systemItem="done" id="ime-dO-dQb">
                             <connections>
                                 <action selector="uploadPost:" destination="UGE-QY-eXX" id="yvB-a8-LAe"/>
                             </connections>
@@ -475,7 +475,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QRZ-ZO-pnk" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5221.739130434783" y="-154.01785714285714"/>
+            <point key="canvasLocation" x="7306" y="123"/>
         </scene>
         <!--Pin MapVC-->
         <scene sceneID="7Pf-4K-Jqo">
@@ -534,7 +534,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vS9-Ig-huA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6079.7101449275369" y="-147.32142857142856"/>
+            <point key="canvasLocation" x="8438" y="271"/>
         </scene>
         <!--Profile-->
         <scene sceneID="j05-1i-U4G">
@@ -563,7 +563,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="D1u-Ca-Nwb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3339" y="1343"/>
+            <point key="canvasLocation" x="2051" y="1523"/>
         </scene>
         <!--TableVC-->
         <scene sceneID="ZaM-H5-Fsu">
@@ -618,7 +618,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Lam-hU-FAZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4249.275362318841" y="547.76785714285711"/>
+            <point key="canvasLocation" x="4836" y="703"/>
         </scene>
         <!--PostVC-->
         <scene sceneID="hVj-za-zev">
@@ -628,10 +628,10 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DateLabel" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Agg-tn-AoQ">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DateLabel" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Agg-tn-AoQ">
                                 <rect key="frame" x="20" y="88" width="374" height="24"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                <nil key="textColor"/>
+                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xv6-6V-CVD">
@@ -675,7 +675,14 @@
                             <constraint firstItem="UGh-YK-p5P" firstAttribute="trailing" secondItem="Xv6-6V-CVD" secondAttribute="trailing" constant="20" id="uRc-xy-nju"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="RWv-xI-lg8"/>
+                    <navigationItem key="navigationItem" id="RWv-xI-lg8">
+                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="na9-WO-41Y">
+                            <connections>
+                                <action selector="editBtnPressed:" destination="ejm-qF-CH4" id="W0c-6C-x4f"/>
+                                <segue destination="UGE-QY-eXX" kind="show" identifier="editSegue" id="nXa-Bq-ZOv"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="dataLabel" destination="Agg-tn-AoQ" id="Isk-JU-OOg"/>
                         <outlet property="imageView" destination="wHH-O4-Ccf" id="fBB-rG-965"/>
@@ -685,7 +692,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CAU-s9-7aI" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5281.1594202898559" y="547.76785714285711"/>
+            <point key="canvasLocation" x="6158" y="722"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="sem-r3-qXe">
@@ -699,8 +706,8 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
                     <connections>
-                        <segue destination="dOl-pm-6Qh" kind="relationship" relationship="viewControllers" id="DKb-yx-Zuv"/>
                         <segue destination="Chc-q4-xjs" kind="relationship" relationship="viewControllers" id="1wK-Hb-S33"/>
+                        <segue destination="dOl-pm-6Qh" kind="relationship" relationship="viewControllers" id="DKb-yx-Zuv"/>
                         <segue destination="tWE-t3-ayA" kind="relationship" relationship="viewControllers" id="lhI-3E-j8o"/>
                     </connections>
                 </tabBarController>
@@ -708,11 +715,11 @@
             </objects>
             <point key="canvasLocation" x="2052" y="548"/>
         </scene>
-        <!--Map-->
+        <!--map-->
         <scene sceneID="QwA-Ml-nFL">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Chc-q4-xjs" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Map" image="map.fill" catalog="system" id="Abn-Ur-1uG"/>
+                    <tabBarItem key="tabBarItem" title="map" image="map.fill" catalog="system" id="Abn-Ur-1uG"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="RjL-E5-yQJ">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -725,7 +732,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Vvf-5D-yz9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3339.130434782609" y="-154.01785714285714"/>
+            <point key="canvasLocation" x="3338" y="-154"/>
         </scene>
         <!--Table-->
         <scene sceneID="D2N-jF-txS">
@@ -744,7 +751,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jTd-ib-EXc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3339" y="548"/>
+            <point key="canvasLocation" x="3339" y="722"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="oSm-SD-pcc">
@@ -767,6 +774,7 @@
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="0QK-nW-bDO"/>
+        <segue reference="nXa-Bq-ZOv"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="checkmark.circle.fill" catalog="system" width="128" height="121"/>
@@ -776,6 +784,11 @@
         <image name="person.fill" catalog="system" width="128" height="120"/>
         <image name="photo" catalog="system" width="128" height="93"/>
         <image name="table.fill" catalog="system" width="128" height="93"/>
+        <image name="山" width="475" height="464"/>
+        <image name="浮潛" width="578" height="553"/>
+        <image name="瀑布2" width="1089" height="1065"/>
+        <image name="野溪" width="578" height="553"/>
+        <image name="露營" width="975" height="900"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
