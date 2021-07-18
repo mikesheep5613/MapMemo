@@ -458,11 +458,19 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="New Post" largeTitleDisplayMode="always" id="AbY-qm-aSK">
-                        <barButtonItem key="rightBarButtonItem" image="ok" style="plain" id="ime-dO-dQb">
-                            <connections>
-                                <action selector="uploadPost:" destination="UGE-QY-eXX" id="yvB-a8-LAe"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem image="ok" style="plain" id="ime-dO-dQb">
+                                <connections>
+                                    <action selector="uploadPost:" destination="UGE-QY-eXX" id="yvB-a8-LAe"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="trash" id="rBm-tl-FZI">
+                                <color key="tintColor" systemColor="systemRedColor"/>
+                                <connections>
+                                    <action selector="trashBtnPressed:" destination="UGE-QY-eXX" id="lPb-z6-taG"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="datePicker" destination="7Zl-Lt-baW" id="Le0-TE-Fxx"/>

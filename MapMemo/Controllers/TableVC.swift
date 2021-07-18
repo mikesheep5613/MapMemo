@@ -47,13 +47,13 @@ class TableVC: UIViewController {
             for change in documentsChange {
                 
                 if change.type == .added{
-                    
+                    //建立資料
                     let post = PostModel(document: change.document)
-                    
+                    //Reload Table
                     self.data.insert(post, at: 0)
                     let indexPath = IndexPath(row: 0, section: 0)
                     self.tableView.insertRows(at: [indexPath], with: .automatic)
-                    
+                    //Reload image
                     guard let imageURL = post.imageURL else {return}
                     if let loadImageURL = URL(string: imageURL){
                         NetworkController.shared.fetchImage(url: loadImageURL) { image in
@@ -71,13 +71,45 @@ class TableVC: UIViewController {
                     let docID = change.document.data()["postID"] as? String
                     if let post = self.data.filter({ post in post.postID == docID }).first{
                         //更新資料
-                        post.title = change.document.data()["text"] as? String
+                        post.title = change.document.data()["title"] as? String
+                        post.text = change.document.data()["text"] as? String
+                        post.type = change.document.data()["type"] as? String
+                        post.date = change.document.data()["date"] as? String
+                        post.imageURL = change.document.data()["imageURL"] as? String
+                        post.latitude = change.document.data()["latitude"] as? Double
+                        post.longitude = change.document.data()["longitude"] as? Double
+                        
                         //Reload Table
                         if let index = self.data.firstIndex(of: post){
                             let indexPath = IndexPath(row: index, section: 0)
                             self.tableView.reloadRows(at: [indexPath], with: .automatic)
                         }
+                        //Reload image
+                        guard let imageURL = post.imageURL else {return}
+                        if let loadImageURL = URL(string: imageURL){
+                            NetworkController.shared.fetchImage(url: loadImageURL) { image in
+                                DispatchQueue.main.async {
+                                    post.image = image
+                                    self.tableView.reloadData()
+                                }
+
+                            }
+                        }
+
                     }
+                }else if change.type == .removed {
+                    //透過documentId找到self.data相對應的Note
+                    let docID = change.document.data()["postID"] as? String
+                    if let post = self.data.filter({ post in post.postID == docID }).first{
+                        //Reload Table
+                        if let index = self.data.firstIndex(of: post){
+                            self.data.remove(at: index)
+                            let indexPath = IndexPath(row: index, section: 0)
+                            self.tableView.deleteRows(at: [indexPath], with: .automatic)
+                        }
+
+                    }
+
                 }
             }
         }

@@ -22,6 +22,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     var newLocation : CLLocationCoordinate2D?
     var newType : String?
     var newImageURL : String?
+    var uuid : String?
     var db : Firestore!
     
     // Create boolean to check whether upload a new Image
@@ -29,6 +30,8 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     
     // Create property for retrieve data from PostVC
     var editPost : PostModel?
+    
+    var isEditMode : Bool = false
     
     private let storage = Storage.storage().reference()
     
@@ -47,18 +50,22 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         
         // check whether editPost receieve model
         if editPost != nil {
+            self.isEditMode = true
+            
+            // Present to UI
             self.photoImageView.image = editPost?.image
             self.titleTextField.text = editPost?.title
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
             self.datePicker.date = dateFormatter.date(from: editPost?.date ?? "") as? Date ?? Date.init()
             self.typeSegmentControl.selectedSegmentIndex = typeSegmentIndexCheck(editPost?.type ?? "other")
+            self.newType = editPost?.type
             self.textView.text = editPost?.text
+            self.newLocation = editPost?.coordinate
             guard let location = editPost?.coordinate else {
                 assertionFailure("Fail to unwrap edit post coordinate")
                 return
             }
-            // Present to UI
             convertToPlaceMark(location) { (address) in
                 if let address = address {
                     self.locationLabel.text = address
@@ -76,28 +83,36 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         self.navigationItem.rightBarButtonItem?.tintColor = .lightGray
         
         //Upload image data to firebase storage
-        let uuid = UUID().uuidString
+        
+        // check Post need to be Added or Edited
+        
+        if self.isEditMode == true {
+            self.uuid = editPost?.postID
+        } else {
+            self.uuid = UUID().uuidString
+        }
+        
         guard let uploadImage = self.photoImageView.image?.resize(maxEdge: 1024) else {return}
         guard let realUploadImage = uploadImage.jpegData(compressionQuality: 0.7) else {return}
         
-        storage.child("images/\(uuid).jpeg").putData(realUploadImage, metadata: nil) { _, error
+        storage.child("images/\(self.uuid).jpeg").putData(realUploadImage, metadata: nil) { _, error
             in
             if let error = error {
                 assertionFailure("Fail to upload image")
             }
-            self.storage.child("images/\(uuid).jpeg").downloadURL { url, error in
+            self.storage.child("images/\(self.uuid).jpeg").downloadURL { url, error in
                 guard let url = url , error == nil else{
                     return
                 }
                 self.newImageURL = url.absoluteString // Save to global property
                 
                 //Upload Dict to firebase
-                if let userID = Auth.auth().currentUser?.email, let title = self.titleTextField.text , let text = self.textView.text,  let location = self.newLocation, let type = self.newType, let imageURL = self.newImageURL  {
+                if let userID = Auth.auth().currentUser?.email, let title = self.titleTextField.text , let text = self.textView.text,  let location = self.newLocation, let type = self.newType, let imageURL = self.newImageURL, let uuid = self.uuid {
                     
-                    let documentID = "\(Date().timeIntervalSince1970)"
+//                    let documentID = "\(Date().timeIntervalSince1970)"
                     let date = self.datePicker.date.description
                     
-                    let ref = self.db.collection(userID).document(documentID)
+                    let ref = self.db.collection(userID).document(uuid)
                     let data = [
                         "postID" : uuid,
                         "title": title,
@@ -114,7 +129,18 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
                             print ("Fail to setData: \(e).")
                         } else {
                             print("Set Data Successfully.")
-                            self.navigationController?.popViewController(animated: true)
+                            
+                            
+                            // if is edit mode pop to TableVC
+                            if self.isEditMode == true {
+                                self.navigationController?.popToRootViewController(animated: true)
+
+                            } else {
+                            // if not, pop to MapVC
+                                self.navigationController?.popViewController(animated: true)
+
+                            }
+
                         }
                     }
                 }
@@ -123,6 +149,37 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     }
     
     
+    @IBAction func trashBtnPressed(_ sender: UIBarButtonItem) {
+        
+        if self.isEditMode == true {
+            self.uuid = editPost?.postID
+
+            let alert = UIAlertController(title: "是否刪除本篇心得??", message: "按下確認刪除資料", preferredStyle: .alert)
+            let pop = UIAlertAction(title: "確認", style: .default ){ (action) in
+                // Delete post from Firebase
+                if let userID = Auth.auth().currentUser?.email, let uuid = self.uuid {
+                    self.db.collection(userID).document(uuid).delete()
+                }
+                self.navigationController?.popToRootViewController(animated: true)
+            }
+            let cancel = UIAlertAction(title: "取消", style: .cancel, handler: nil)
+            alert.addAction(pop)
+            alert.addAction(cancel)
+            self.present(alert, animated: true, completion: nil)
+
+        } else {
+            let alert = UIAlertController(title: "是否放棄本次編輯??", message: "按下確認返回前一頁面", preferredStyle: .alert)
+            let pop = UIAlertAction(title: "確認", style: .default ){ (action) in
+                self.navigationController?.popViewController(animated: true)
+            }
+            let cancel = UIAlertAction(title: "取消", style: .cancel, handler: nil)
+            alert.addAction(pop)
+            alert.addAction(cancel)
+            self.present(alert, animated: true, completion: nil)
+
+        }
+
+    }
     
     //MARK: - UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
