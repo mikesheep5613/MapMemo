@@ -3,6 +3,7 @@
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -230,7 +231,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SW7-uV-nT6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4835" y="-154"/>
+            <point key="canvasLocation" x="4684" y="-154"/>
         </scene>
         <!--New Post-->
         <scene sceneID="snB-3I-43H">
@@ -243,7 +244,7 @@
                         <sections>
                             <tableViewSection id="5lQ-cP-ENf">
                                 <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="400" id="WuQ-1z-cd1">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleAspectFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="400" id="WuQ-1z-cd1">
                                         <rect key="frame" x="0.0" y="24.5" width="414" height="400"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="WuQ-1z-cd1" id="LSm-D0-5SF">
@@ -251,7 +252,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="photo" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="0AZ-yd-XLZ">
-                                                    <rect key="frame" x="192.5" y="189" width="29.5" height="22"/>
+                                                    <rect key="frame" x="192.5" y="189" width="29" height="22"/>
                                                     <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="large"/>
                                                 </imageView>
@@ -317,7 +318,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <datePicker contentMode="scaleToFill" contentHorizontalAlignment="fill" contentVerticalAlignment="center" datePickerMode="date" style="compact" translatesAutoresizingMaskIntoConstraints="NO" id="7Zl-Lt-baW">
-                                                            <rect key="frame" x="0.0" y="36" width="394" height="32"/>
+                                                            <rect key="frame" x="0.0" y="36" width="300" height="32"/>
                                                         </datePicker>
                                                     </subviews>
                                                 </stackView>
@@ -483,7 +484,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QRZ-ZO-pnk" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="7306" y="123"/>
+            <point key="canvasLocation" x="6345" y="145"/>
         </scene>
         <!--Pin MapVC-->
         <scene sceneID="7Pf-4K-Jqo">
@@ -521,6 +522,12 @@
                                     <constraint firstAttribute="width" constant="160" id="uRH-Jw-E4j"/>
                                 </constraints>
                             </stackView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Press &amp; Hold To Select Location" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hlf-7g-L7J">
+                                <rect key="frame" x="71.5" y="138" width="271" height="21.5"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+                                <color key="textColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="AXL-lx-7a7"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -528,21 +535,31 @@
                             <constraint firstItem="8G8-0N-fry" firstAttribute="centerX" secondItem="AGO-nF-9V2" secondAttribute="centerX" id="3Cx-6D-XPk"/>
                             <constraint firstItem="WO8-u4-eQf" firstAttribute="trailing" secondItem="AXL-lx-7a7" secondAttribute="trailing" id="DRz-na-3of"/>
                             <constraint firstItem="AXL-lx-7a7" firstAttribute="bottom" secondItem="8G8-0N-fry" secondAttribute="bottom" constant="65" id="Dgq-lu-LGD"/>
+                            <constraint firstItem="Hlf-7g-L7J" firstAttribute="top" secondItem="AXL-lx-7a7" secondAttribute="top" constant="50" id="Mfs-gD-KSb"/>
                             <constraint firstAttribute="bottom" secondItem="WO8-u4-eQf" secondAttribute="bottom" id="W1n-IX-ggh"/>
+                            <constraint firstItem="Hlf-7g-L7J" firstAttribute="centerX" secondItem="AGO-nF-9V2" secondAttribute="centerX" id="ajj-kH-VDc"/>
                             <constraint firstItem="WO8-u4-eQf" firstAttribute="leading" secondItem="AXL-lx-7a7" secondAttribute="leading" id="cIn-Bk-fz1"/>
                             <constraint firstItem="WO8-u4-eQf" firstAttribute="top" secondItem="AGO-nF-9V2" secondAttribute="top" id="mVb-p2-UpT"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="W1M-jt-hcM"/>
+                    <navigationItem key="navigationItem" id="W1M-jt-hcM">
+                        <barButtonItem key="rightBarButtonItem" title="Locate Myself" id="yjQ-9d-Nsb">
+                            <imageReference key="image" image="figure.wave.circle" catalog="system" symbolScale="large"/>
+                            <connections>
+                                <action selector="locateMeBtnressed:" destination="MRf-jl-df7" id="hxL-Fm-D0t"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="checkBtn" destination="4EL-z9-RSK" id="O6Z-J1-1FO"/>
                         <outlet property="clearBtn" destination="Pce-Gu-4JY" id="uLt-bT-XSZ"/>
+                        <outlet property="locateMeBtn" destination="yjQ-9d-Nsb" id="Z7w-aT-lFS"/>
                         <outlet property="pinMapView" destination="WO8-u4-eQf" id="7Ww-zh-z2M"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vS9-Ig-huA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="8438" y="271"/>
+            <point key="canvasLocation" x="7286" y="145"/>
         </scene>
         <!--Profile-->
         <scene sceneID="j05-1i-U4G">
@@ -571,7 +588,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="D1u-Ca-Nwb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2051" y="1523"/>
+            <point key="canvasLocation" x="3338" y="1558"/>
         </scene>
         <!--TableVC-->
         <scene sceneID="ZaM-H5-Fsu">
@@ -626,7 +643,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Lam-hU-FAZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4751" y="721"/>
+            <point key="canvasLocation" x="4262" y="722"/>
         </scene>
         <!--PostVC-->
         <scene sceneID="hVj-za-zev">
@@ -661,24 +678,22 @@
                             </textView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wHH-O4-Ccf">
                                 <rect key="frame" x="0.0" y="353" width="414" height="460"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="460" id="l9x-Cy-E4F"/>
-                                </constraints>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="UGh-YK-p5P"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Xv6-6V-CVD" firstAttribute="leading" secondItem="UGh-YK-p5P" secondAttribute="leading" constant="20" id="3tv-wd-Bze"/>
-                            <constraint firstItem="wHH-O4-Ccf" firstAttribute="bottom" secondItem="UGh-YK-p5P" secondAttribute="bottom" id="7xu-ZG-lUF"/>
                             <constraint firstItem="UGh-YK-p5P" firstAttribute="trailing" secondItem="qtJ-7e-cuz" secondAttribute="trailing" constant="20" id="BWX-SP-XeL"/>
-                            <constraint firstItem="wHH-O4-Ccf" firstAttribute="leading" secondItem="UGh-YK-p5P" secondAttribute="leading" id="H6r-wo-Mr7"/>
+                            <constraint firstItem="wHH-O4-Ccf" firstAttribute="top" secondItem="qtJ-7e-cuz" secondAttribute="bottom" constant="16" id="Kbz-Wl-Kih"/>
                             <constraint firstItem="Agg-tn-AoQ" firstAttribute="top" secondItem="UGh-YK-p5P" secondAttribute="top" id="NTC-tx-lGw"/>
+                            <constraint firstItem="wHH-O4-Ccf" firstAttribute="leading" secondItem="UGh-YK-p5P" secondAttribute="leading" id="VLE-x0-pxV"/>
                             <constraint firstItem="qtJ-7e-cuz" firstAttribute="leading" secondItem="UGh-YK-p5P" secondAttribute="leading" constant="20" id="X6J-BI-chL"/>
                             <constraint firstItem="qtJ-7e-cuz" firstAttribute="top" secondItem="Xv6-6V-CVD" secondAttribute="bottom" id="XJY-BS-1Wo"/>
                             <constraint firstItem="UGh-YK-p5P" firstAttribute="trailing" secondItem="Agg-tn-AoQ" secondAttribute="trailing" constant="20" id="ZVl-4V-Hjp"/>
                             <constraint firstItem="Xv6-6V-CVD" firstAttribute="top" secondItem="Agg-tn-AoQ" secondAttribute="bottom" constant="23" id="g5Z-LJ-JW3"/>
-                            <constraint firstItem="wHH-O4-Ccf" firstAttribute="trailing" secondItem="UGh-YK-p5P" secondAttribute="trailing" id="odJ-eD-S0l"/>
+                            <constraint firstItem="wHH-O4-Ccf" firstAttribute="trailing" secondItem="UGh-YK-p5P" secondAttribute="trailing" id="hRZ-cH-ugF"/>
+                            <constraint firstItem="wHH-O4-Ccf" firstAttribute="bottom" secondItem="UGh-YK-p5P" secondAttribute="bottom" id="nbe-9q-elh"/>
                             <constraint firstItem="Agg-tn-AoQ" firstAttribute="leading" secondItem="UGh-YK-p5P" secondAttribute="leading" constant="20" id="rBu-he-VEQ"/>
                             <constraint firstItem="UGh-YK-p5P" firstAttribute="trailing" secondItem="Xv6-6V-CVD" secondAttribute="trailing" constant="20" id="uRc-xy-nju"/>
                         </constraints>
@@ -700,7 +715,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CAU-s9-7aI" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="6158" y="722"/>
+            <point key="canvasLocation" x="5206" y="722"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="sem-r3-qXe">
@@ -721,7 +736,7 @@
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kgb-KB-rKI" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2052" y="548"/>
+            <point key="canvasLocation" x="2126" y="722"/>
         </scene>
         <!--Map-->
         <scene sceneID="QwA-Ml-nFL">
@@ -788,6 +803,7 @@
         <image name="checkmark.circle.fill" catalog="system" width="128" height="121"/>
         <image name="circle.fill" catalog="system" width="128" height="121"/>
         <image name="clear.fill" catalog="system" width="128" height="114"/>
+        <image name="figure.wave.circle" catalog="system" width="128" height="121"/>
         <image name="map" width="30" height="27"/>
         <image name="member" width="27" height="25"/>
         <image name="memo" width="30" height="27.5"/>

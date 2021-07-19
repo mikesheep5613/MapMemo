@@ -27,11 +27,6 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     override func viewDidLoad() {
         super.viewDidLoad()
                 
-        // load data from Firebase
-        db = Firestore.firestore()
-//        monitorData()
-        queryFromFireStore()
-
         locationManager.requestAlwaysAuthorization()
         if !CLLocationManager.locationServicesEnabled(){
             print("Location Request Denied")
@@ -42,34 +37,14 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
             locationManager.delegate = self
             locationManager.startUpdatingLocation()
         }
-        
         mapView.delegate = self
         
-        // set Mapview for UI press gesture recognizer
-        self.setMapview()
+        // load data from Firebase
+        db = Firestore.firestore()
+        monitorData()
+//        queryFromFireStore()
+    }
         
-    }
-    
-    
-    func setMapview(){
-        let lpgr = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(gestureRecognizer:)))
-        lpgr.minimumPressDuration = 1.0
-        lpgr.delaysTouchesBegan = true
-        lpgr.delegate = self
-        self.mapView.addGestureRecognizer(lpgr)
-    }
-    
-    @objc func handleLongPress(gestureRecognizer : UILongPressGestureRecognizer){
-        if gestureRecognizer.state != UIGestureRecognizer.State.ended {
-            let touchLocation = gestureRecognizer.location(in: mapView)
-            let locationCoordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
-            print("Tapped at lat:\(locationCoordinate.latitude), lon:\(locationCoordinate.longitude)")
-        }
-        if gestureRecognizer.state != UIGestureRecognizer.State.began {
-            return
-        }
-    }
-    
     // Retrieve data from Firebase
     func monitorData() {
         guard let userID = Auth.auth().currentUser?.email else {
@@ -86,11 +61,16 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
             for change in documentsChange {
                 
                 if change.type == .added{
-                    
+                    //建立資料
                     let post = PostModel(document: change.document)
-                    
+                    //Reload Table
                     self.data.insert(post, at: 0)
                     
+                    // Insert pin based on data from Post Array
+                    //Reload map
+                    self.placePin()
+
+                    //Reload image
                     guard let imageURL = post.imageURL else {return}
                     if let loadImageURL = URL(string: imageURL){
                         NetworkController.shared.fetchImage(url: loadImageURL) { image in
@@ -101,44 +81,57 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                         }
                     }
 
+                }else if change.type == .modified{
+                    
+                    //透過documentId找到self.data相對應的Note
+                    let docID = change.document.data()["postID"] as? String
+                    if let post = self.data.filter({ post in post.postID == docID }).first{
+                        //更新資料
+                        post.title = change.document.data()["title"] as? String
+                        post.text = change.document.data()["text"] as? String
+                        post.type = change.document.data()["type"] as? String
+                        post.date = change.document.data()["date"] as? String
+                        post.imageURL = change.document.data()["imageURL"] as? String
+                        post.latitude = change.document.data()["latitude"] as? Double
+                        post.longitude = change.document.data()["longitude"] as? Double
+                                                
+                        //Reload image
+                        guard let imageURL = post.imageURL else {return}
+                        if let loadImageURL = URL(string: imageURL){
+                            NetworkController.shared.fetchImage(url: loadImageURL) { image in
+                                DispatchQueue.main.async {
+                                    post.image = image
+                                    
+                                    //Reload map
+                                    self.mapView.removeAnnotations(self.mapView.annotations)
+                                    self.placePin()
+                                }
+
+                            }
+                        }
+
+                    }
+                }else if change.type == .removed {
+                    //透過documentId找到self.data相對應的Note
+                    let docID = change.document.data()["postID"] as? String
+                    if let post = self.data.filter({ post in post.postID == docID }).first{
+                        //Reload Table
+                        if let index = self.data.firstIndex(of: post){
+                            self.data.remove(at: index)
+                            
+                            //Reload map
+                            self.mapView.removeAnnotations(self.mapView.annotations)
+                            self.placePin()
+                        }
+
+                    }
+
                 }
             }
         }
         
     }
 
-    
-    // Retrieve data from Firebase
-    func queryFromFireStore() {
-        
-        if let userID = Auth.auth().currentUser?.email{
-            db.collection(userID).getDocuments { (querySnapshot, error) in
-                if let error = error {
-                    print("Query error : \(error)")
-                }
-                guard let snapshot = querySnapshot else {return}
-                for document in snapshot.documents{
-                    let post = PostModel()
-                    post.title = document.data()["title"] as? String
-                    post.text = document.data()["text"] as? String
-                    post.type = document.data()["type"] as? String
-                    post.date = document.data()["date"] as? String
-                    post.imageURL = document.data()["imageURL"] as? String
-                    post.latitude = document.data()["latitude"] as? Double
-                    post.longitude = document.data()["longitude"] as? Double
-                    
-                    guard let lat = post.latitude, let lon = post.longitude else {return}
-                    post.coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
-                    
-                    self.data.append(post)
-                }
-                
-                // Insert pin based on data from Post Array
-                self.placePin()
-            }
-        }
-        
-    }
     
     //MARK: - CLLocationManagerDelegate
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -170,7 +163,6 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     }
 }
 
-
 //MARK: - MKMapViewDelegate
 extension MapVC : MKMapViewDelegate {
     
@@ -182,13 +174,16 @@ extension MapVC : MKMapViewDelegate {
         
         //Handle ImageAnnotations..
         let reuseID = "pin"
-        var result = mapView.dequeueReusableAnnotationView(withIdentifier: reuseID)
+        var result = mapView.dequeueReusableAnnotationView(withIdentifier: reuseID) as? MKMarkerAnnotationView
+        
         if result == nil {
-            result = MKAnnotationView(annotation: annotation, reuseIdentifier: reuseID)
+            result = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: reuseID)
         } else {
             result?.annotation = annotation
         }
-        result?.image = UIImage(named: "mpin_v1")
+        
+        result?.glyphImage = #imageLiteral(resourceName: "山")
+        result?.markerTintColor = UIColor.lightGray
         
         return result
     }

@@ -20,10 +20,7 @@ class PostVC: UIViewController {
         
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Change tab bar index to tableVC
-        tabBarController?.selectedIndex = 1
-        
+                
         self.dataLabel.text = currentPost?.date
         self.titleLabel.text = currentPost?.title
         self.textView.text = currentPost?.text

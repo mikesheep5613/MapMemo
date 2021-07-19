@@ -38,10 +38,7 @@ class PostModel : NSObject, MKAnnotation {
         self.imageURL = document.data()["imageURL"] as? String
         self.latitude = document.data()["latitude"] as? Double
         self.longitude = document.data()["longitude"] as? Double
-        
         self.coordinate = CLLocationCoordinate2D(latitude: document.data()["latitude"] as? Double ?? 0.0, longitude: document.data()["longitude"] as? Double ?? 0.0)
-//        self.coordinate = CLLocationCoordinate2D(latitude: self.latitude ?? 0.0, longitude: self.longitude ?? 0.0)
-
     }
     
     

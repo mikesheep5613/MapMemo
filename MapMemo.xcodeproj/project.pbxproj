@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		21B199DDDE48707A74CCFCCE /* Pods_MapMemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC4DE18701567AEF2448483F /* Pods_MapMemo.framework */; };
-		721107A6269AD0F40060D2B0 /* MyAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 721107A5269AD0F40060D2B0 /* MyAnnotation.swift */; };
 		7235B3102697276D00BCB618 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7235B30F2697276D00BCB618 /* GoogleService-Info.plist */; };
 		7235B31226972A5E00BCB618 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7235B31126972A5E00BCB618 /* LoginVC.swift */; };
 		72387F362695A17F00598763 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72387F342695A17F00598763 /* TableViewCell.swift */; };
@@ -33,7 +32,6 @@
 
 /* Begin PBXFileReference section */
 		13499B8F1E49D760511BD21D /* Pods-MapMemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapMemo.release.xcconfig"; path = "Target Support Files/Pods-MapMemo/Pods-MapMemo.release.xcconfig"; sourceTree = "<group>"; };
-		721107A5269AD0F40060D2B0 /* MyAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyAnnotation.swift; sourceTree = "<group>"; };
 		7235B30F2697276D00BCB618 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7235B31126972A5E00BCB618 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		72387F342695A17F00598763 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
@@ -80,6 +78,42 @@
 			path = Cell;
 			sourceTree = "<group>";
 		};
+		72554D8A26A519DB00CFCA67 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				7235B31126972A5E00BCB618 /* LoginVC.swift */,
+				72FDE351269A13EC008BB9BA /* RegisterVC.swift */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
+		72554D8B26A519EA00CFCA67 /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				7278E92726903A6C00875B33 /* MapVC.swift */,
+				72B54EE2269C67B000C5FD2D /* NewPostTableVC.swift */,
+				7256507C269DE21200A84649 /* PinMapVC.swift */,
+			);
+			path = Map;
+			sourceTree = "<group>";
+		};
+		72554D8C26A51A0D00CFCA67 /* Memo */ = {
+			isa = PBXGroup;
+			children = (
+				7278E92926903A9500875B33 /* TableVC.swift */,
+				7278E92B26903AD600875B33 /* PostVC.swift */,
+			);
+			path = Memo;
+			sourceTree = "<group>";
+		};
+		72554D8D26A51A2600CFCA67 /* Member */ = {
+			isa = PBXGroup;
+			children = (
+				72E1045B2699E3CB00641C4C /* ProfileVC.swift */,
+			);
+			path = Member;
+			sourceTree = "<group>";
+		};
 		7278E9022690343D00875B33 = {
 			isa = PBXGroup;
 			children = (
@@ -122,7 +156,6 @@
 				72F64F8E26A1AD1300AD48D0 /* NetworkController.swift */,
 				725AA80126A3220E0084B2BA /* UIImage+resize.swift */,
 				72823D12269A29B5005F109B /* LoginSwitch.swift */,
-				721107A5269AD0F40060D2B0 /* MyAnnotation.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -130,14 +163,10 @@
 		7278E925269039EE00875B33 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				7235B31126972A5E00BCB618 /* LoginVC.swift */,
-				72FDE351269A13EC008BB9BA /* RegisterVC.swift */,
-				7278E92726903A6C00875B33 /* MapVC.swift */,
-				72B54EE2269C67B000C5FD2D /* NewPostTableVC.swift */,
-				7256507C269DE21200A84649 /* PinMapVC.swift */,
-				7278E92926903A9500875B33 /* TableVC.swift */,
-				7278E92B26903AD600875B33 /* PostVC.swift */,
-				72E1045B2699E3CB00641C4C /* ProfileVC.swift */,
+				72554D8D26A51A2600CFCA67 /* Member */,
+				72554D8C26A51A0D00CFCA67 /* Memo */,
+				72554D8B26A519EA00CFCA67 /* Map */,
+				72554D8A26A519DB00CFCA67 /* Login */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -283,7 +312,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				721107A6269AD0F40060D2B0 /* MyAnnotation.swift in Sources */,
 				725AA80226A3220E0084B2BA /* UIImage+resize.swift in Sources */,
 				72387F362695A17F00598763 /* TableViewCell.swift in Sources */,
 				7278E92C26903AD600875B33 /* PostVC.swift in Sources */,

@@ -13,15 +13,19 @@ protocol PinMapVCDelegate : AnyObject {
     func didFinishUpdate(location: CLLocationCoordinate2D)
 }
 
-class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate {
+class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate, CLLocationManagerDelegate {
 
     var selectedLocation : CLLocationCoordinate2D?
     var isSelected : Bool = false
     weak var delegate : PinMapVCDelegate?
+    // class initialized
+    let locationManager = CLLocationManager()
+
     
     @IBOutlet weak var pinMapView: MKMapView!
     @IBOutlet weak var clearBtn: UIButton!
     @IBOutlet weak var checkBtn: UIButton!
+    @IBOutlet weak var locateMeBtn: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,7 +45,6 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
     }
     
     @IBAction func checkBtnPressed(_ sender: UIButton) {
-        
         if let sendLocation = self.selectedLocation{
             self.delegate?.didFinishUpdate(location: sendLocation)
         }
@@ -85,16 +88,56 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
         pinMapView.addAnnotation(annotation)
     }
 
-
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    
+    @IBAction func locateMeBtnressed(_ sender: Any) {
+        
+        locationManager.requestAlwaysAuthorization()
+        if !CLLocationManager.locationServicesEnabled(){
+            print("Location Request Denied")
+        }else {
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.activityType = .automotiveNavigation
+            locationManager.showsBackgroundLocationIndicator = true
+            locationManager.delegate = self
+            locationManager.startUpdatingLocation()
+        }
+        
+        
+        
+        
     }
-    */
+    //MARK: - CLLocationManagerDelegate
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let lastLocation = locations.last else {
+            assertionFailure("Fail to get any location")
+            return
+        }
+        let coordinate = lastLocation.coordinate
+        print ("Location: \(coordinate.latitude),\(coordinate.longitude)")
+        moveAndZoomMap()
+        
+        // Pin on self loaction
+        if self.isSelected == false {
+            addAnnotationOnLocation(location: coordinate)
+            self.isSelected = true
+            clearBtn.isHidden = false
+            checkBtn.isHidden = false
+            self.selectedLocation = coordinate
+        }
 
+    }
+    
+    func moveAndZoomMap(){
+        guard  let coordinate = locationManager.location?.coordinate else {
+            assertionFailure("Invalid coordinate")
+            return
+        }
+        // Prepare span region
+        let span = MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+        let region = MKCoordinateRegion(center: coordinate, span: span)
+        pinMapView.setRegion(region, animated: true)
+        pinMapView.showsUserLocation = true
+    }
+
+    
 }

@@ -24,10 +24,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     var newImageURL : String?
     var uuid : String?
     var db : Firestore!
-    
-    // Create boolean to check whether upload a new Image
-    var isNewImage : Bool = false
-    
+        
     // Create property for retrieve data from PostVC
     var editPost : PostModel?
     
@@ -78,7 +75,6 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     }
     
     @IBAction func uploadPost(_ sender: UIBarButtonItem) {
-        
         self.navigationItem.rightBarButtonItem?.image = UIImage(systemName: "slowmo")
         self.navigationItem.rightBarButtonItem?.tintColor = .lightGray
         
@@ -94,20 +90,20 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         
         guard let uploadImage = self.photoImageView.image?.resize(maxEdge: 1024) else {return}
         guard let realUploadImage = uploadImage.jpegData(compressionQuality: 0.7) else {return}
-        
-        storage.child("images/\(self.uuid).jpeg").putData(realUploadImage, metadata: nil) { _, error
+        guard let uuid = self.uuid else {return}
+        storage.child("images/\(uuid).jpeg").putData(realUploadImage, metadata: nil) { _, error
             in
             if let error = error {
                 assertionFailure("Fail to upload image")
             }
-            self.storage.child("images/\(self.uuid).jpeg").downloadURL { url, error in
+            self.storage.child("images/\(uuid).jpeg").downloadURL { url, error in
                 guard let url = url , error == nil else{
                     return
                 }
                 self.newImageURL = url.absoluteString // Save to global property
                 
                 //Upload Dict to firebase
-                if let userID = Auth.auth().currentUser?.email, let title = self.titleTextField.text , let text = self.textView.text,  let location = self.newLocation, let type = self.newType, let imageURL = self.newImageURL, let uuid = self.uuid {
+                if let userID = Auth.auth().currentUser?.email, let title = self.titleTextField.text , let text = self.textView.text,  let location = self.newLocation, let type = self.newType, let imageURL = self.newImageURL {
                     
 //                    let documentID = "\(Date().timeIntervalSince1970)"
                     let date = self.datePicker.date.description
@@ -200,7 +196,6 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     func textViewDidEndEditing(_ textView: UITextView) {
         if self.textView.text.isEmpty {
             self.textView.text = ""
-            //            self.textView.textColor = UIColor.lightGray
         }
     }
     
@@ -262,7 +257,6 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     
     
     // MARK: - Table view data source
-    
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
@@ -319,7 +313,6 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             self.photoImageView.image = selectedImage
-            self.isNewImage = true
             self.photoImageView.contentMode = .scaleAspectFill
             self.photoImageView.clipsToBounds = true
         }
