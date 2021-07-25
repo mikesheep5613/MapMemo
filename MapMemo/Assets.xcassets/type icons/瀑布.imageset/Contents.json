@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "瀑布2.png",
+      "filename" : "瀑布.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "瀑布@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "瀑布@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

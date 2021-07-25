@@ -13,21 +13,32 @@ import FirebaseStorage
 
 class TableVC: UIViewController {
     
-    var data : [PostModel] = []
+    var data : [PostModel] = [] //全部的資料都在這,searchcontroller.isActive=false時顯示
+    var filteredData : [PostModel] = [] //過濾後的資料,searchcontroller.isActive=true時顯示
+    
+    var searchController = UISearchController(searchResultsController: nil)
 
     var db : Firestore!
+    
+    
     
     @IBOutlet weak var tableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+
         // load data from Firebase
         db = Firestore.firestore()
         monitorData()
 
         self.tableView.dataSource = self
-        self.tableView.delegate = self
+        
+        self.navigationItem.searchController = self.searchController
+        self.searchController.hidesNavigationBarDuringPresentation = true
+        self.searchController.obscuresBackgroundDuringPresentation = false
+        self.searchController.searchResultsUpdater = self
+
     }
 
     
@@ -73,10 +84,14 @@ class TableVC: UIViewController {
                         post.title = change.document.data()["title"] as? String
                         post.text = change.document.data()["text"] as? String
                         post.type = change.document.data()["type"] as? String
-                        post.date = change.document.data()["date"] as? String
                         post.imageURL = change.document.data()["imageURL"] as? String
                         post.latitude = change.document.data()["latitude"] as? Double
                         post.longitude = change.document.data()["longitude"] as? Double
+                        if let tempDate = change.document.data()["date"] as? String {
+                            let dateFormatter = DateFormatter()
+                            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
+                            post.date = dateFormatter.date(from: tempDate)
+                        }
                         
                         //Reload image
                         guard let imageURL = post.imageURL else {return}
@@ -114,45 +129,45 @@ class TableVC: UIViewController {
         
     }
     
-    // Retrieve data from Firebase
-    func queryFromFireStore() {
-        
-        if let userID = Auth.auth().currentUser?.email{
-            db.collection(userID).getDocuments { (querySnapshot, error) in
-                if let error = error {
-                    print("Query error : \(error)")
-                }
-                guard let snapshot = querySnapshot else {return}
-                for document in snapshot.documents{
-                    let post = PostModel()
-                    post.title = document.data()["title"] as? String
-                    post.text = document.data()["text"] as? String
-                    post.type = document.data()["type"] as? String
-                    post.date = document.data()["date"] as? String
-                    post.imageURL = document.data()["imageURL"] as? String
-                    post.latitude = document.data()["latitude"] as? Double
-                    post.longitude = document.data()["longitude"] as? Double
-                    
-                    if let loadImageURL = URL(string: post.imageURL!){
-                        NetworkController.shared.fetchImage(url: loadImageURL) { image in
-                            DispatchQueue.main.async {
-                                post.image = image
-                                self.tableView.reloadData()
-                            }
-
-                        }
-                    }
-                                        
-                    self.data.append(post)
-                }
-                // update UI
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-
-            }
-        }
-    }
+//     Retrieve data from Firebase
+//    func queryFromFireStore() {
+//
+//        if let userID = Auth.auth().currentUser?.email{
+//            db.collection(userID).getDocuments { (querySnapshot, error) in
+//                if let error = error {
+//                    print("Query error : \(error)")
+//                }
+//                guard let snapshot = querySnapshot else {return}
+//                for document in snapshot.documents{
+//                    let post = PostModel()
+//                    post.title = document.data()["title"] as? String
+//                    post.text = document.data()["text"] as? String
+//                    post.type = document.data()["type"] as? String
+//                    post.date = document.data()["date"] as? String
+//                    post.imageURL = document.data()["imageURL"] as? String
+//                    post.latitude = document.data()["latitude"] as? Double
+//                    post.longitude = document.data()["longitude"] as? Double
+//
+//                    if let loadImageURL = URL(string: post.imageURL!){
+//                        NetworkController.shared.fetchImage(url: loadImageURL) { image in
+//                            DispatchQueue.main.async {
+//                                post.image = image
+//                                self.tableView.reloadData()
+//                            }
+//
+//                        }
+//                    }
+//
+//                    self.data.append(post)
+//                }
+//                // update UI
+//                DispatchQueue.main.async {
+//                    self.tableView.reloadData()
+//                }
+//
+//            }
+//        }
+//    }
 
 
     
@@ -168,28 +183,93 @@ class TableVC: UIViewController {
                 postVC.currentPost = post
             }
         }
-    }
-    
+        
+        if segue.identifier == "sortingSegue"{
+            if let popoverVC = segue.destination as? popoverTableVC {
+                popoverVC.preferredContentSize = CGSize(width: 180, height: 90)
+                popoverVC.popoverPresentationController?.delegate = self
+                popoverVC.delegate = self
 
+            }
+        }
+    }
 }
 
+//MARK: - UITableViewDataSource
 extension TableVC : UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.data.count
+        if self.searchController.isActive {//搜尋模式，找filteredData
+            return self.filteredData.count
+        }else{
+            return self.data.count//10
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let item = self.data[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.detailTextLabel?.text = item.date?.description
+        
+        //顯示search bar過濾後內容
+        let item = self.searchController.isActive ? self.filteredData[indexPath.row] : self.data[indexPath.row]
+
         cell.textLabel?.text = item.title
         cell.imageView?.image = item.thumbnailImage()
+        cell.detailTextLabel?.text = DateFormatter.localizedString(from: item.date!, dateStyle: .long, timeStyle: .none)
         return cell
     }
     
     
 }
 
-extension TableVC : UITableViewDelegate{
+//MARK: - UISearchResultsUpdating
+extension TableVC : UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        //key search字會被呼叫的delegate方法
+        //根據使用者輸入的字，過濾資料放到filteredData
+        generateFilterData()
+        //更新tableView
+        self.tableView.reloadData()
+    }
+    
+    func generateFilterData() {
+        
+        if self.searchController.isActive , let text = self.searchController.searchBar.text {
+            // 根據使用者輸入字，過濾資料放到filteredData
+            self.filteredData = self.data.filter { n in
+                if let content = n.title {
+                    let isMatch = content.localizedCaseInsensitiveContains(text)
+                    return isMatch
+                }
+                return false
+            }
+            
+        } else {
+            self.filteredData = []
+        }
+    }
+}
+
+//MARK: - UIPopoverPresentationControllerDelegate
+extension TableVC : UIPopoverPresentationControllerDelegate {
+    
+    func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
+        
+        return .none
+        
+    }
+}
+
+extension TableVC : PopoverViewControllerDelegate {
+    func didSelectData(_ result: String) {
+        
+        if result == "Date: New -> Old" {
+            self.data = self.data.sorted(by: { ($0.date! ) < ($1.date!)})
+        } else {
+            self.data = self.data.sorted(by: { ($0.date! ) > ($1.date!)})
+        }
+        
+        self.tableView.reloadData()
+
+    }
+    
     
 }

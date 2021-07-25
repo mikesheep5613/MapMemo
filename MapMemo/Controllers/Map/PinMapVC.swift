@@ -115,6 +115,7 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
         let coordinate = lastLocation.coordinate
         print ("Location: \(coordinate.latitude),\(coordinate.longitude)")
         moveAndZoomMap()
+        locationManager.stopUpdatingLocation()
         
         // Pin on self loaction
         if self.isSelected == false {

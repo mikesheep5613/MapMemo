@@ -12,15 +12,17 @@ import Firebase
 //import FBSDKCoreKit
 //import FBSDKLoginKit
 
-class LoginVC: UIViewController {
+class LoginVC: UIViewController,UITextFieldDelegate{
 
     @IBOutlet weak var emailTextfield: UITextField!
-    
     @IBOutlet weak var passwordTextfield: UITextField!
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.emailTextfield.delegate = self
+        self.passwordTextfield.delegate = self
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -33,7 +35,14 @@ class LoginVC: UIViewController {
         navigationController?.isNavigationBarHidden = false
     }
 
-    // Email signin method
+    //MARK: - UITextFieldDelegate
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    
+    //MARK: - Email signin method
     @IBAction func signinBtnPressed(_ sender: UIButton) {
     
         if let email = emailTextfield.text, let password = passwordTextfield.text {

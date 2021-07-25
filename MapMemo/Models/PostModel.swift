@@ -13,7 +13,7 @@ import CoreLocation
 
 class PostModel : NSObject, MKAnnotation {
     
-    var date : String?
+    var date : Date?
     var imageURL: String?
     var title : String?
     var text : String?
@@ -34,10 +34,16 @@ class PostModel : NSObject, MKAnnotation {
         self.title = document.data()["title"] as? String
         self.text = document.data()["text"] as? String
         self.type = document.data()["type"] as? String
-        self.date = document.data()["date"] as? String
         self.imageURL = document.data()["imageURL"] as? String
         self.latitude = document.data()["latitude"] as? Double
         self.longitude = document.data()["longitude"] as? Double
+        
+        if let tempDate = document.data()["date"] as? String {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
+            self.date = dateFormatter.date(from: tempDate)
+        }
+        
         self.coordinate = CLLocationCoordinate2D(latitude: document.data()["latitude"] as? Double ?? 0.0, longitude: document.data()["longitude"] as? Double ?? 0.0)
     }
     

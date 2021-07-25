@@ -27,18 +27,19 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     override func viewDidLoad() {
         super.viewDidLoad()
                 
-        locationManager.requestAlwaysAuthorization()
-        if !CLLocationManager.locationServicesEnabled(){
-            print("Location Request Denied")
-        }else {
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            locationManager.activityType = .automotiveNavigation
-            locationManager.showsBackgroundLocationIndicator = true
-            locationManager.delegate = self
-            locationManager.startUpdatingLocation()
-        }
+
+//        locationManager.requestAlwaysAuthorization()
+//        if !CLLocationManager.locationServicesEnabled(){
+//            print("Location Request Denied")
+//        }else {
+//            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+//            locationManager.activityType = .automotiveNavigation
+//            locationManager.showsBackgroundLocationIndicator = true
+//            locationManager.delegate = self
+//            locationManager.startUpdatingLocation()
+//        }
         mapView.delegate = self
-        
+        moveAndZoomMap()
         // load data from Firebase
         db = Firestore.firestore()
         monitorData()
@@ -90,10 +91,15 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                         post.title = change.document.data()["title"] as? String
                         post.text = change.document.data()["text"] as? String
                         post.type = change.document.data()["type"] as? String
-                        post.date = change.document.data()["date"] as? String
                         post.imageURL = change.document.data()["imageURL"] as? String
                         post.latitude = change.document.data()["latitude"] as? Double
                         post.longitude = change.document.data()["longitude"] as? Double
+                        if let tempDate = change.document.data()["date"] as? String {
+                            let dateFormatter = DateFormatter()
+                            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
+                            post.date = dateFormatter.date(from: tempDate)
+                        }
+
                                                 
                         //Reload image
                         guard let imageURL = post.imageURL else {return}
@@ -134,23 +140,25 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
 
     
     //MARK: - CLLocationManagerDelegate
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let lastLocation = locations.last else {
-            assertionFailure("Fail to get any location")
-            return
-        }
-        let coordinate = lastLocation.coordinate
-        print ("Location: \(coordinate.latitude),\(coordinate.longitude)")
-        moveAndZoomMap()
-    }
+//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+//        guard let lastLocation = locations.last else {
+//            assertionFailure("Fail to get any location")
+//            return
+//        }
+//        let coordinate = lastLocation.coordinate
+//        print ("Location: \(coordinate.latitude),\(coordinate.longitude)")
+//        moveAndZoomMap()
+//    }
     
     func moveAndZoomMap(){
-        guard  let coordinate = locationManager.location?.coordinate else {
-            assertionFailure("Invalid coordinate")
-            return
-        }
+//        guard  let coordinate = locationManager.location?.coordinate else {
+//            assertionFailure("Invalid coordinate")
+//            return
+//        }
         // Prepare span region
-        let span = MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+        // 以台灣中心來準備region
+        let coordinate = CLLocationCoordinate2D(latitude: 23.974098094452746 , longitude: 120.9796606886788)
+        let span = MKCoordinateSpan(latitudeDelta: 5, longitudeDelta: 5)
         let region = MKCoordinateRegion(center: coordinate, span: span)
         mapView.setRegion(region, animated: true)
     }
@@ -167,30 +175,48 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
 extension MapVC : MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        // 如果為自己位置，不顯示圖標
-        if annotation is MKUserLocation {
+        
+        guard let annotation = annotation as? PostModel else {
             return nil
         }
         
-        //Handle ImageAnnotations..
-        let reuseID = "pin"
-        var result = mapView.dequeueReusableAnnotationView(withIdentifier: reuseID) as? MKMarkerAnnotationView
+        // 如果為自己位置，不顯示圖標
+//        if annotation is MKUserLocation {
+//            return nil
+//        }
         
-        if result == nil {
-            result = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: reuseID)
+        //Handle ImageAnnotations..
+        let reuseID = "Pin"
+        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseID) //as? MKMarkerAnnotationView
+        if pinView == nil {
+            pinView = MKAnnotationView(annotation: annotation, reuseIdentifier: reuseID)
         } else {
-            result?.annotation = annotation
+            pinView?.annotation = annotation
         }
         
-        result?.glyphImage = #imageLiteral(resourceName: "山")
-        result?.markerTintColor = UIColor.lightGray
+        switch annotation.type {
+        case "mountain":
+            pinView?.image = UIImage(named: "mpin")
+        case "waterfall":
+            pinView?.image = UIImage(named: "wpin")
+        case "hotspring":
+            pinView?.image = UIImage(named: "hpin")
+        case "camping":
+            pinView?.image = UIImage(named: "cpin")
+        case "snorkeling":
+            pinView?.image = UIImage(named: "spin")
+        default:
+            pinView?.image = UIImage(named: "opin")
+        }
         
-        return result
+
+        return pinView
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if let pin = view.annotation as? PostModel {
             print("get pin success")
+            self.mapView.deselectAnnotation(view.annotation, animated: true)
             performSegue(withIdentifier: "pinTouched", sender: pin)
         }
     }
@@ -199,7 +225,7 @@ extension MapVC : MKMapViewDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "pinTouched"{
             if let postVC = segue.destination as? PostVC {
-                postVC.currentPost = sender as! PostModel
+                postVC.currentPost = sender as? PostModel
             }
         }
     }

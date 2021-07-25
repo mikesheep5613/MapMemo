@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "mpin_v1.png",
+      "filename" : "cpin.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "mpin_v1@2x.png",
+      "filename" : "cpin@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "mpin_v1@3x.png",
+      "filename" : "cpin@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

@@ -18,12 +18,19 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     @IBOutlet weak var locationLabel: UILabel!
     @IBOutlet weak var typeSegmentControl: UISegmentedControl!
     @IBOutlet weak var textView: UITextView!
+    @IBOutlet weak var uploadBtn: UIBarButtonItem!
+    @IBOutlet weak var trashBtn: UIBarButtonItem!
     
     var newLocation : CLLocationCoordinate2D?
     var newType : String?
     var newImageURL : String?
     var uuid : String?
     var db : Firestore!
+    
+    var activityIndicator = UIActivityIndicatorView()
+    var uploadBarButton = UIBarButtonItem()
+    var activityBarButton = UIBarButtonItem()
+    
         
     // Create property for retrieve data from PostVC
     var editPost : PostModel?
@@ -45,16 +52,21 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         self.textView.layer.borderWidth = 1
         
         
+//        let image = UIImage(systemName: "photo")
+//        self.photoImageView.image = image
+        
+        
         // check whether editPost receieve model
         if editPost != nil {
             self.isEditMode = true
             
             // Present to UI
             self.photoImageView.image = editPost?.image
+            self.photoImageView.contentMode = .scaleAspectFill
+            imageLayout(imageView: photoImageView)
+
             self.titleTextField.text = editPost?.title
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
-            self.datePicker.date = dateFormatter.date(from: editPost?.date ?? "") as? Date ?? Date.init()
+            self.datePicker.date = editPost?.date ?? Date.init()
             self.typeSegmentControl.selectedSegmentIndex = typeSegmentIndexCheck(editPost?.type ?? "other")
             self.newType = editPost?.type
             self.textView.text = editPost?.text
@@ -72,29 +84,51 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         
         // connect to Firebase
         db = Firestore.firestore()
+        
+        
+        // add right barbutton item
+        activityIndicator.sizeToFit()
+        activityIndicator.color = .gray
+        activityBarButton = UIBarButtonItem(customView: activityIndicator)
+        uploadBarButton = UIBarButtonItem(image: UIImage(named: "ok"), style: .plain, target: self, action: #selector(uploadPost(_:)))
+        showUploadBarButton()
+
+
     }
     
     @IBAction func uploadPost(_ sender: UIBarButtonItem) {
-        self.navigationItem.rightBarButtonItem?.image = UIImage(systemName: "slowmo")
-        self.navigationItem.rightBarButtonItem?.tintColor = .lightGray
         
+        showActivityIndicator()
+        activityIndicator.startAnimating()
+
         //Upload image data to firebase storage
-        
         // check Post need to be Added or Edited
-        
         if self.isEditMode == true {
             self.uuid = editPost?.postID
         } else {
             self.uuid = UUID().uuidString
         }
         
+        if self.photoImageView.image == UIImage(systemName: "photo") || self.titleTextField.text == "" || self.textView.text == "" || self.newLocation == nil || self.newType == "" {
+            
+            self.activityIndicator.stopAnimating()
+            self.showUploadBarButton()
+            let alert = UIAlertController(title: "貼文上傳失敗!", message: "確認所有欄位是否都有正確填入", preferredStyle: .alert)
+            let cancel = UIAlertAction(title: "繼續", style: .cancel, handler: nil)
+            alert.addAction(cancel)
+            self.present(alert, animated: true, completion: nil)
+            return
+        }
+        
         guard let uploadImage = self.photoImageView.image?.resize(maxEdge: 1024) else {return}
         guard let realUploadImage = uploadImage.jpegData(compressionQuality: 0.7) else {return}
         guard let uuid = self.uuid else {return}
+        
         storage.child("images/\(uuid).jpeg").putData(realUploadImage, metadata: nil) { _, error
             in
             if let error = error {
                 assertionFailure("Fail to upload image")
+                return
             }
             self.storage.child("images/\(uuid).jpeg").downloadURL { url, error in
                 guard let url = url , error == nil else{
@@ -177,6 +211,14 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
 
     }
     
+    func showUploadBarButton() {
+        self.navigationItem.setRightBarButton(self.uploadBarButton, animated: true)
+    }
+
+    func showActivityIndicator() {
+        self.navigationItem.setRightBarButton(self.activityBarButton, animated: true)
+    }
+    
     //MARK: - UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -221,11 +263,11 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         
         switch typeSegmentControl.selectedSegmentIndex {
         case 0:
-            self.newType = "mountain_climbing"
+            self.newType = "mountain"
         case 1:
-            self.newType = "river_trekking"
-        case 2:
             self.newType = "waterfall"
+        case 2:
+            self.newType = "hotspring"
         case 3:
             self.newType = "camping"
         case 4:
@@ -233,17 +275,17 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         case 5:
             self.newType = "other"
         default:
-            self.newType = "mountain_climbing"
+            self.newType = "mountain"
         }
     }
     
     func typeSegmentIndexCheck(_ type: String) -> Int {
         var int : Int = 0
-        if type == "mountain_climbing" {
+        if type == "mountain" {
             int = 0
-        } else if type == "river_trekking"{
-            int = 1
         } else if type == "waterfall"{
+            int = 1
+        } else if type == "hotspring"{
             int = 2
         } else if type == "camping"{
             int = 3
