@@ -14,12 +14,15 @@ import MessageUI
 class ProfileVC: UIViewController, UITableViewDelegate,  MFMailComposeViewControllerDelegate {
     
     var sectionTitles = ["Account Setting", "Feedback"]
-    var sectionContent = [[( image: "key.fill", text: "Change Password"),
+    var sectionContent = [[( image: "person.fill", text: "Edit Profile"),
+                           ( image: "lock.fill", text: "Change Password"),
                            ( image: "hand.point.left.fill", text: "Log Out")],
                           [( image: "envelope.fill", text: "Send Email To Developer"),
                            (image: "star.circle" , text: "Rate Us On App Store")]]
     var db : Firestore!
-    
+    var userEmail : String?
+    var userName : String?
+    var userImage : UIImage?
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var imageView: UIImageView!
@@ -31,7 +34,7 @@ class ProfileVC: UIViewController, UITableViewDelegate,  MFMailComposeViewContro
         self.tableView.dataSource = self
         self.tableView.delegate = self
         self.tableView.cellLayoutMarginsFollowReadableWidth = true
-//        navigationController?.navigationBar.prefersLargeTitles = true
+        //        navigationController?.navigationBar.prefersLargeTitles = true
         
         self.imageView.layer.cornerRadius = self.imageView.bounds.height / 2
         self.imageView.clipsToBounds = true
@@ -41,40 +44,70 @@ class ProfileVC: UIViewController, UITableViewDelegate,  MFMailComposeViewContro
         montitorProfileData()
     }
     
-    func montitorProfileData() {
-        if let userUID = Auth.auth().currentUser?.uid{
-            db.collection("users").document(userUID).getDocument { (docSnapshot, error) in
-                
-                if let error = error {
-                    print("Query error : \(error)")
-                }
-                guard let document = docSnapshot else {return}
-                
-                if let data = document.data(){
-                    self.userNameLabel.text = data["username"] as? String
+    override func viewWillAppear(_ animated: Bool) {
+        montitorProfileData()
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "editProfileSegue" {
+            // head to PostVC
+            if let editProfileVC = segue.destination as? EditProfileVC, let indexPath = self.tableView.indexPathForSelectedRow {
+                //                print(indexPath)
+                if indexPath.row == 0 {
+                    // Edit Profile
+                    editProfileVC.userEmail = self.userEmail
+                    editProfileVC.userName = self.userName
+                    editProfileVC.userImage = self.userImage
                     
+                } else if indexPath.row == 1{
+                    // Change Password
+                    // do not send userEmail bcz is a switch for EditPorfile VC
+                    editProfileVC.userName = self.userName
+                    editProfileVC.userImage = self.userImage
+
+                }
+            }
+        }
+    }
+    
+    // Get Profile Data
+    func montitorProfileData() {
+        self.userEmail = Auth.auth().currentUser?.email
+        
+        guard let userID = Auth.auth().currentUser?.uid else {return}
+        
+        self.db.collection("users").addSnapshotListener { qSnapshot, error in
+            if let e = error {
+                print("error snapshot listener \(e)")
+                return
+            }
+            
+            guard let qsanp = qSnapshot else {return}
+            for doc in qsanp.documents {
+                if doc.documentID == userID{
+                    let userName = doc.data()["username"] as? String
+                    self.userName = userName
+                    self.userNameLabel.text = self.userName
+                    
+                    let photoURL = doc.data()["photoURL"] as? String
                     //Reload image
-                    guard let photoURL = data["photoURL"] as? String else {return}
+                    guard let photoURL = photoURL else {return}
                     if let loadImageURL = URL(string: photoURL){
                         NetworkController.shared.fetchImage(url: loadImageURL) { image in
                             DispatchQueue.main.async {
-                                self.imageView.image = image
+                                self.userImage = image
+                                self.imageView.image = self.userImage
                                 self.imageView.layer.cornerRadius = self.imageView.bounds.height / 2
                                 self.imageView.clipsToBounds = true
                             }
-
                         }
                     }
-
-                    
                 }
-                
             }
             
         }
         
     }
-    
 }
 
 
@@ -109,9 +142,12 @@ extension ProfileVC : UITableViewDataSource {
         // Account section
         case 0:
             if indexPath.row == 0 {
-                // Change Password
-                
+                // Edit Profile
+                performSegue(withIdentifier: "editProfileSegue", sender: self)
             } else if indexPath.row == 1{
+                // Change Password
+                performSegue(withIdentifier: "editProfileSegue", sender: self)
+            } else if indexPath.row == 2{
                 // Log Out
                 do {
                     try Auth.auth().signOut()

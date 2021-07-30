@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import MapKit
+import Firebase
 
 class PostVC: UIViewController {
 
@@ -16,16 +17,25 @@ class PostVC: UIViewController {
     @IBOutlet weak var textView: UITextView!
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var typeImageView: UIImageView!
+    
+    @IBOutlet weak var userNameLabel: UILabel!
+    @IBOutlet weak var userProfileImage: UIImageView!
+    
     var currentPost : PostModel?
-        
+    var db : Firestore!
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        // load data from Firebase
+        db = Firestore.firestore()
+        montitorProfileData()
+        
+        
+        // Present UI.
         self.dataLabel.text = DateFormatter.localizedString(from: (currentPost?.date)!, dateStyle: .long, timeStyle: .none)
         self.titleLabel.text = currentPost?.title
         self.textView.text = currentPost?.text
         self.imageView.image = currentPost?.image
-        
         switch currentPost?.type{
         case "mountain":
             self.typeImageView.image = UIImage(named: "山")
@@ -41,6 +51,11 @@ class PostVC: UIViewController {
             self.typeImageView.image = UIImage(named: "其他")
         default:
             self.typeImageView.image = UIImage(named: "山")
+        }
+        
+        // If current user is not the author, disable the edit button
+        if Auth.auth().currentUser?.uid != self.currentPost?.authorID {
+            navigationItem.rightBarButtonItem?.isEnabled = false
         }
     }
     
@@ -68,6 +83,41 @@ class PostVC: UIViewController {
                 newPostTableVC.editPost = self.currentPost
             }
         }
+    }
+    
+    //MARK: - Profile info
+    func montitorProfileData() {
+        if let userUID = self.currentPost?.authorID {
+            db.collection("users").document(userUID).getDocument { (docSnapshot, error) in
+                
+                if let error = error {
+                    print("Query error : \(error)")
+                }
+                guard let document = docSnapshot else {return}
+                
+                if let data = document.data(){
+                    self.userNameLabel.text = data["username"] as? String
+                    
+                    //Reload image
+                    guard let photoURL = data["photoURL"] as? String else {return}
+                    if let loadImageURL = URL(string: photoURL){
+                        NetworkController.shared.fetchImage(url: loadImageURL) { image in
+                            DispatchQueue.main.async {
+                                self.userProfileImage.image = image
+                                self.userProfileImage.layer.cornerRadius = self.userProfileImage.bounds.height / 2
+                                self.userProfileImage.clipsToBounds = true
+                            }
+
+                        }
+                    }
+
+                    
+                }
+                
+            }
+            
+        }
+        
     }
     
 }

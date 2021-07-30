@@ -13,6 +13,9 @@ import CoreLocation
 
 class PostModel : NSObject, MKAnnotation {
     
+    
+    var authorID : String?
+    
     var date : Date?
     var imageURL: String?
     var title : String?
@@ -30,6 +33,8 @@ class PostModel : NSObject, MKAnnotation {
     }
     
     init(document: QueryDocumentSnapshot) {
+        self.authorID = document.data()["authorID"] as? String
+        
         self.postID = document.data()["postID"] as? String
         self.title = document.data()["title"] as? String
         self.text = document.data()["text"] as? String

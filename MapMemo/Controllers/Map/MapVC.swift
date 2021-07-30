@@ -16,43 +16,115 @@ import FirebaseStorage
 class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDelegate {
     
     var data : [PostModel] = []
-    
+    var userData : [PostModel] = []
     var db : Firestore!
     
     @IBOutlet weak var mapView: MKMapView!
-    
-    // class initialized
-    let locationManager = CLLocationManager()
+    @IBOutlet weak var switchDataSourceControl: UISegmentedControl!
+    @IBOutlet var typeFilterBtn: [UIButton]!
     
     override func viewDidLoad() {
         super.viewDidLoad()
                 
-
-//        locationManager.requestAlwaysAuthorization()
-//        if !CLLocationManager.locationServicesEnabled(){
-//            print("Location Request Denied")
-//        }else {
-//            locationManager.desiredAccuracy = kCLLocationAccuracyBest
-//            locationManager.activityType = .automotiveNavigation
-//            locationManager.showsBackgroundLocationIndicator = true
-//            locationManager.delegate = self
-//            locationManager.startUpdatingLocation()
-//        }
         mapView.delegate = self
         moveAndZoomMap()
+        
         // load data from Firebase
         db = Firestore.firestore()
-        monitorData()
-//        queryFromFireStore()
-    }
         
-    // Retrieve data from Firebase
-    func monitorData() {
-        guard let userID = Auth.auth().currentUser?.email else {
+        //Default Setting show data from all of people
+        monitorAllPostsData()
+        
+        //Btn outlet
+//        self.noneBtn.layer.cornerRadius = 0.5 * self.noneBtn.bounds.size.height
+//        self.noneBtn.clipsToBounds = true
+    }
+    
+    
+    //MARK: - Myself & All ouf us Segment
+    @IBAction func switchDataSourceControlPressed(_ sender: UISegmentedControl) {
+        
+        switch switchDataSourceControl.selectedSegmentIndex {
+        
+        case 0:
+            for annotation in self.data {
+                if self.userData.contains(annotation) == false{
+                    self.mapView.removeAnnotation(annotation)
+                }
+            }
+        case 1:
+            // reset all pins
+            self.placePin(self.data)
+        default:
+            self.placePin(self.data)
+        }
+
+    }
+    
+    //MARK: - typeFilter
+    @IBAction func typeFilterBarBtnPressed(_ sender: Any) {
+        for filterBtn in typeFilterBtn{
+            filterBtn.isHidden = !filterBtn.isHidden
+        }
+    }
+    
+    
+    @IBAction func typeFilterBtnPressed(_ sender: UIButton) {
+        
+        for filterBtn in typeFilterBtn{
+            filterBtn.isHidden = !filterBtn.isHidden
+        }
+        switch sender.tag {
+        case 0:
+            mapViewFilter("mountain")
+        case 1:
+            mapViewFilter("waterfall")
+        case 2:
+            mapViewFilter("hotspring")
+        case 3:
+            mapViewFilter("camping")
+        case 4:
+            mapViewFilter("snorkeling")
+        case 5:
+            mapViewFilter("other")
+        case 6:
+            if switchDataSourceControl.selectedSegmentIndex == 0 {
+                self.placePin(self.userData)
+            }else{
+                self.placePin(self.data)
+            }
+
+        default:
+            break
+        }
+    }
+    
+    func mapViewFilter(_ type : String){
+        
+        let index = switchDataSourceControl.selectedSegmentIndex
+        var dataSource : [PostModel]
+        if index == 0 {
+            dataSource = self.userData
+        }else{
+            dataSource = self.data
+        }
+
+        for annotation in dataSource {
+            if annotation.type != type {
+                self.mapView.removeAnnotation(annotation)
+            } else {
+                self.mapView.addAnnotation(annotation)
+            }
+        }
+    }
+    
+    // Retrieve data from Firebase ( all user or single user)
+    func monitorAllPostsData() {
+        guard let userID = Auth.auth().currentUser?.uid else {
             assertionFailure("Invalid userID")
             return
         }
-        self.db.collection(userID).addSnapshotListener { qSnapshot, error in
+        self.db.collection("posts").addSnapshotListener { qSnapshot, error in
             if let e = error {
                 print("error snapshot listener \(e)")
                 return
@@ -69,7 +141,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                     
                     // Insert pin based on data from Post Array
                     //Reload map
-                    self.placePin()
+                    self.placePin(self.data)
 
                     //Reload image
                     guard let imageURL = post.imageURL else {return}
@@ -88,6 +160,8 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                     let docID = change.document.data()["postID"] as? String
                     if let post = self.data.filter({ post in post.postID == docID }).first{
                         //更新資料
+                        post.authorID = change.document.data()["authorID"] as? String
+                        
                         post.title = change.document.data()["title"] as? String
                         post.text = change.document.data()["text"] as? String
                         post.type = change.document.data()["type"] as? String
@@ -110,7 +184,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                                     
                                     //Reload map
                                     self.mapView.removeAnnotations(self.mapView.annotations)
-                                    self.placePin()
+                                    self.placePin(self.data)
                                 }
 
                             }
@@ -127,35 +201,34 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                             
                             //Reload map
                             self.mapView.removeAnnotations(self.mapView.annotations)
-                            self.placePin()
+                            self.placePin(self.data)
                         }
 
                     }
 
                 }
             }
+            
+            // update User own data array
+            self.monitorUserPostsData()
+
         }
         
     }
+    
+    func monitorUserPostsData() {
+        // filter data from other users
+        self.userData = []
+        if let userID = Auth.auth().currentUser?.uid {
+            for data in self.data{
+                if data.authorID == userID {
+                    self.userData.append(data)
+                }
+            }
+        }
+    }
 
-    
-    //MARK: - CLLocationManagerDelegate
-//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//        guard let lastLocation = locations.last else {
-//            assertionFailure("Fail to get any location")
-//            return
-//        }
-//        let coordinate = lastLocation.coordinate
-//        print ("Location: \(coordinate.latitude),\(coordinate.longitude)")
-//        moveAndZoomMap()
-//    }
-    
     func moveAndZoomMap(){
-//        guard  let coordinate = locationManager.location?.coordinate else {
-//            assertionFailure("Invalid coordinate")
-//            return
-//        }
-        // Prepare span region
         // 以台灣中心來準備region
         let coordinate = CLLocationCoordinate2D(latitude: 23.974098094452746 , longitude: 120.9796606886788)
         let span = MKCoordinateSpan(latitudeDelta: 5, longitudeDelta: 5)
@@ -164,10 +237,8 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     }
     
     //MARK: - Place Pins on MapView
-    func placePin(){
-        for item in self.data {
-            mapView.addAnnotation(item)
-        }
+    func placePin(_ data: [PostModel]){
+        self.mapView.addAnnotations(data)
     }
 }
 
@@ -180,19 +251,17 @@ extension MapVC : MKMapViewDelegate {
             return nil
         }
         
-        // 如果為自己位置，不顯示圖標
-//        if annotation is MKUserLocation {
-//            return nil
-//        }
-        
         //Handle ImageAnnotations..
-        let reuseID = "Pin"
+        // reuseID cannot be the same
+        guard let reuseID = annotation.postID else {return nil}
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseID) //as? MKMarkerAnnotationView
         if pinView == nil {
             pinView = MKAnnotationView(annotation: annotation, reuseIdentifier: reuseID)
         } else {
             pinView?.annotation = annotation
         }
+        
+        print(annotation.title)
         
         switch annotation.type {
         case "mountain":
@@ -209,7 +278,6 @@ extension MapVC : MKMapViewDelegate {
             pinView?.image = UIImage(named: "opin")
         }
         
-
         return pinView
     }
     

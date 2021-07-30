@@ -33,6 +33,11 @@ class TableVC: UIViewController {
         monitorData()
 
         self.tableView.dataSource = self
+        self.tableView.delegate = self
+        
+        // register a nib for cellReuseIdentifier
+        self.tableView.register(UINib(nibName: "MemoTableViewCell", bundle: nil), forCellReuseIdentifier: "memoCell")
+
         
         self.navigationItem.searchController = self.searchController
         self.searchController.hidesNavigationBarDuringPresentation = true
@@ -43,12 +48,13 @@ class TableVC: UIViewController {
 
     
     // Retrieve data from Firebase
+    // Retrieve data for user only
     func monitorData() {
-        guard let userID = Auth.auth().currentUser?.email else {
+        guard let userID = Auth.auth().currentUser?.uid else {
             assertionFailure("Invalid userID")
             return
         }
-        self.db.collection(userID).addSnapshotListener { qSnapshot, error in
+        self.db.collection("posts").whereField("authorID", isEqualTo: userID).addSnapshotListener { qSnapshot, error in
             if let e = error {
                 print("error snapshot listener \(e)")
                 return
@@ -206,18 +212,34 @@ extension TableVC : UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
         //顯示search bar過濾後內容
         let item = self.searchController.isActive ? self.filteredData[indexPath.row] : self.data[indexPath.row]
 
-        cell.textLabel?.text = item.title
-        cell.imageView?.image = item.thumbnailImage()
-        cell.detailTextLabel?.text = DateFormatter.localizedString(from: item.date!, dateStyle: .long, timeStyle: .none)
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "memoCell", for: indexPath) as! MemoTableViewCell
+        cell.titleLabel.text = item.title
+        cell.photoImageView.image = item.image
+        cell.dateLabel.text = DateFormatter.localizedString(from: item.date!, dateStyle: .long, timeStyle: .none)
+        if let userUID = item.authorID {
+            cell.montitorProfileData(userUID: userUID)
+        }
         return cell
     }
+}
+
+//MARK: -
+extension TableVC : UITableViewDelegate {
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
+    {
+        return 120 //or whatever you need
+    }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "postSegue", sender: self)
+    }
+
 }
 
 //MARK: - UISearchResultsUpdating
@@ -261,9 +283,9 @@ extension TableVC : UIPopoverPresentationControllerDelegate {
 extension TableVC : PopoverViewControllerDelegate {
     func didSelectData(_ result: String) {
         
-        if result == "Date: New -> Old" {
+        if result == "Date:New->Old" {
             self.data = self.data.sorted(by: { ($0.date! ) < ($1.date!)})
-        } else {
+        } else if result == "Date:Old->New" {
             self.data = self.data.sorted(by: { ($0.date! ) > ($1.date!)})
         }
         

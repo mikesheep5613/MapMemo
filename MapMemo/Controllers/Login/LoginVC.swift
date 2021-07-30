@@ -42,8 +42,14 @@ class LoginVC: UIViewController,UITextFieldDelegate{
     }
     
     
+    
+    
     //MARK: - Email signin method
     @IBAction func signinBtnPressed(_ sender: UIButton) {
+        
+        // check format
+        validationCode()
+        
     
         if let email = emailTextfield.text, let password = passwordTextfield.text {
             Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
@@ -62,13 +68,20 @@ class LoginVC: UIViewController,UITextFieldDelegate{
     
     }
     
+    //MARK: - Password forgot
     
-    @IBAction func googleLoginBtn(_ sender: Any) {
-
-    }
-    
-    
-    @IBAction func facebookLoginBtn(_ sender: Any) {
+ 
+    @IBAction func forgotPasswordBtnPressed(_ sender: Any) {
+        Auth.auth().sendPasswordReset(withEmail: emailTextfield.text!) { error in
+            if error == nil {
+                self.openAlert(title: "Alert!", message: "Please check your Email to reset password", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{_ in}])
+                print("Send reset your password Email.")
+                
+            } else {
+                self.openAlert(title: "Reset Password", message: "Please provide your Email", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{_ in}])
+                print("Failed: \(String(describing: error?.localizedDescription))")
+            }
+        }
     }
     
         /*
@@ -81,4 +94,33 @@ class LoginVC: UIViewController,UITextFieldDelegate{
     }
     */
 
+}
+
+extension LoginVC {
+    fileprivate func validationCode() {
+        if let email = emailTextfield.text, let password = passwordTextfield.text{
+            if !email.validateEmail(){
+                openAlert(title: "Alert", message: "Please check your Email format.", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
+                    print("Okay clicked!")
+                }])
+            }else if !password.validatePassword(){
+                openAlert(title: "Alert", message: "Please enter valid password.", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
+                    print("Okay clicked!")
+                }])
+            }else{
+                
+            }
+
+        }else{
+            openAlert(title: "Alert", message: "Please input your Email & Password", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{_
+                in
+                print("OKay clicked")
+            }])
+        }
+        
+        
+    }
+    
+    
+    
 }

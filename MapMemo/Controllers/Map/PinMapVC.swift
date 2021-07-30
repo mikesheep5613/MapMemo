@@ -13,12 +13,11 @@ protocol PinMapVCDelegate : AnyObject {
     func didFinishUpdate(location: CLLocationCoordinate2D)
 }
 
-class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate, CLLocationManagerDelegate {
+class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate, CLLocationManagerDelegate, UISearchBarDelegate {
 
     var selectedLocation : CLLocationCoordinate2D?
     var isSelected : Bool = false
     weak var delegate : PinMapVCDelegate?
-    // class initialized
     let locationManager = CLLocationManager()
 
     
@@ -26,6 +25,7 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
     @IBOutlet weak var clearBtn: UIButton!
     @IBOutlet weak var checkBtn: UIButton!
     @IBOutlet weak var locateMeBtn: UIBarButtonItem!
+    @IBOutlet weak var searchBar: UISearchBar!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +34,21 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
         checkBtn.isHidden = true
         pinMapView.delegate = self
         self.setMapview()
+        self.searchBar.delegate = self
+
+    }
+    
+    @IBAction func locateMeBtnressed(_ sender: Any) {
+        locationManager.requestAlwaysAuthorization()
+        if !CLLocationManager.locationServicesEnabled(){
+            print("Location Request Denied")
+        }else {
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.activityType = .automotiveNavigation
+            locationManager.showsBackgroundLocationIndicator = true
+            locationManager.delegate = self
+            locationManager.startUpdatingLocation()
+        }
     }
     
     @IBAction func clearBtnPressed(_ sender: UIButton) {
@@ -52,7 +67,7 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
         
     }
     
-    //set Mapview to detect gesture
+    //MARK: - UIGestureRecognizerDelegate
     func setMapview(){
         let lpgr = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(gestureRecognizer:)))
         lpgr.minimumPressDuration = 0.5
@@ -81,31 +96,34 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
         }
     }
     
-    
+    //MARK: - MKMapViewDelegate
     func addAnnotationOnLocation(location: CLLocationCoordinate2D){
         let annotation = MKPointAnnotation()
         annotation.coordinate = location
         pinMapView.addAnnotation(annotation)
     }
-
     
-    @IBAction func locateMeBtnressed(_ sender: Any) {
-        
-        locationManager.requestAlwaysAuthorization()
-        if !CLLocationManager.locationServicesEnabled(){
-            print("Location Request Denied")
-        }else {
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            locationManager.activityType = .automotiveNavigation
-            locationManager.showsBackgroundLocationIndicator = true
-            locationManager.delegate = self
-            locationManager.startUpdatingLocation()
+    // Select to move and zoon to certain location
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+
+        if let coordinate = view.annotation?.coordinate {
+            moveAndZoomMap(coordinate)
+            
+            // Pin on self loaction
+            if self.isSelected == false {
+                self.isSelected = true
+                clearBtn.isHidden = false
+                checkBtn.isHidden = false
+                self.selectedLocation = coordinate
+            }
+
         }
         
-        
-        
-        
+
     }
+
+    
+
     //MARK: - CLLocationManagerDelegate
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let lastLocation = locations.last else {
@@ -114,7 +132,7 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
         }
         let coordinate = lastLocation.coordinate
         print ("Location: \(coordinate.latitude),\(coordinate.longitude)")
-        moveAndZoomMap()
+        moveAndZoomMap(coordinate)
         locationManager.stopUpdatingLocation()
         
         // Pin on self loaction
@@ -128,11 +146,7 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
 
     }
     
-    func moveAndZoomMap(){
-        guard  let coordinate = locationManager.location?.coordinate else {
-            assertionFailure("Invalid coordinate")
-            return
-        }
+    func moveAndZoomMap(_ coordinate: CLLocationCoordinate2D){
         // Prepare span region
         let span = MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
         let region = MKCoordinateRegion(center: coordinate, span: span)
@@ -140,5 +154,47 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
         pinMapView.showsUserLocation = true
     }
 
+    //MARK: - UISearchBarDelegate
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        self.pinMapView.removeAnnotations(self.pinMapView.annotations)
+        generateMKLocalSearch()
+        searchBar.resignFirstResponder()
+
+    }
     
+    func generateMKLocalSearch() {
+        
+//        if self.searchController.isActive, let searchText = self.searchController.searchBar.text {
+        if let searchText = self.searchBar.text {
+            let request = MKLocalSearch.Request()
+            
+            request.naturalLanguageQuery = searchText
+            
+            request.region = self.pinMapView.region
+            
+            let search = MKLocalSearch(request: request)
+
+            search.start { response, error in
+                guard let response = response else {
+                    print("Error: \(error?.localizedDescription ?? "Unknown error").")
+                    return
+                }
+                for item in response.mapItems {
+                    print("\(item.placemark.name) + \(item.placemark.coordinate)")
+                    
+                    
+                    // insert search point
+                    let annotaiton = MKPointAnnotation()
+                    annotaiton.coordinate = item.placemark.coordinate
+                    annotaiton.title = item.placemark.name
+                    self.pinMapView.addAnnotation(annotaiton)
+                }
+            }
+        }
+    }
+    
+
 }
+
+
+

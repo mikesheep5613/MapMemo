@@ -64,7 +64,6 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
             self.photoImageView.image = editPost?.image
             self.photoImageView.contentMode = .scaleAspectFill
             imageLayout(imageView: photoImageView)
-
             self.titleTextField.text = editPost?.title
             self.datePicker.date = editPost?.date ?? Date.init()
             self.typeSegmentControl.selectedSegmentIndex = typeSegmentIndexCheck(editPost?.type ?? "other")
@@ -127,7 +126,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         storage.child("images/\(uuid).jpeg").putData(realUploadImage, metadata: nil) { _, error
             in
             if let error = error {
-                assertionFailure("Fail to upload image")
+                assertionFailure("Fail to upload image: \(error)")
                 return
             }
             self.storage.child("images/\(uuid).jpeg").downloadURL { url, error in
@@ -137,13 +136,19 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
                 self.newImageURL = url.absoluteString // Save to global property
                 
                 //Upload Dict to firebase
-                if let userID = Auth.auth().currentUser?.email, let title = self.titleTextField.text , let text = self.textView.text,  let location = self.newLocation, let type = self.newType, let imageURL = self.newImageURL {
+                if let userID = Auth.auth().currentUser?.uid,
+                   let title = self.titleTextField.text,
+                   let text = self.textView.text,
+                   let location = self.newLocation,
+                   let type = self.newType,
+                   let imageURL = self.newImageURL {
                     
 //                    let documentID = "\(Date().timeIntervalSince1970)"
                     let date = self.datePicker.date.description
                     
-                    let ref = self.db.collection(userID).document(uuid)
+                    let ref = self.db.collection("posts").document(uuid)
                     let data = [
+                        "authorID" : userID,
                         "postID" : uuid,
                         "title": title,
                         "text": text,
@@ -188,7 +193,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
             let pop = UIAlertAction(title: "確認", style: .default ){ (action) in
                 // Delete post from Firebase
                 if let userID = Auth.auth().currentUser?.email, let uuid = self.uuid {
-                    self.db.collection(userID).document(uuid).delete()
+                    self.db.collection("posts").document(uuid).delete()
                 }
                 self.navigationController?.popToRootViewController(animated: true)
             }

@@ -51,6 +51,7 @@ class RegisterVC: UIViewController, UITextFieldDelegate{
         navigationController?.navigationBar.shadowImage = nil
       }
 
+    
     //MARK: - UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -100,12 +101,6 @@ class RegisterVC: UIViewController, UITextFieldDelegate{
                             }
                         })
                     }
-                    
-                    
-                    
-                    
-                    
-       
                     
                     let alert = UIAlertController(title: "SUCCESS", message: "Your account has been successfully created.", preferredStyle: .alert)
                     let cancel = UIAlertAction(title: "Continue", style: .cancel) { action in

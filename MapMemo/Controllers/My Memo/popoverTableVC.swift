@@ -12,7 +12,7 @@ protocol PopoverViewControllerDelegate: AnyObject {
 }
 
 class popoverTableVC: UITableViewController {
-    let sortOption = ["Date: New -> Old ","Date: Old -> New"]
+    let sortOption = ["Date:New->Old","Date:Old->New"]
     
     weak var delegate: PopoverViewControllerDelegate?
 
