@@ -29,6 +29,7 @@
 		72823D13269A29B5005F109B /* LoginSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72823D12269A29B5005F109B /* LoginSwitch.swift */; };
 		72B54EE1269C616A00C5FD2D /* RoundedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B54EE0269C616A00C5FD2D /* RoundedTextField.swift */; };
 		72B54EE3269C67B000C5FD2D /* NewPostTableVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B54EE2269C67B000C5FD2D /* NewPostTableVC.swift */; };
+		72B8982A26B58B9900C03A24 /* UploadToStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B8982926B58B9900C03A24 /* UploadToStorage.swift */; };
 		72E1045C2699E3CB00641C4C /* ProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E1045B2699E3CB00641C4C /* ProfileVC.swift */; };
 		72EFD7B426B1049D0032EA66 /* EditProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EFD7B326B1049D0032EA66 /* EditProfileVC.swift */; };
 		72F3994D26B039E100802AD8 /* UIViewController + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F3994C26B039E100802AD8 /* UIViewController + Extension.swift */; };
@@ -62,6 +63,7 @@
 		72823D12269A29B5005F109B /* LoginSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSwitch.swift; sourceTree = "<group>"; };
 		72B54EE0269C616A00C5FD2D /* RoundedTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedTextField.swift; sourceTree = "<group>"; };
 		72B54EE2269C67B000C5FD2D /* NewPostTableVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostTableVC.swift; sourceTree = "<group>"; };
+		72B8982926B58B9900C03A24 /* UploadToStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadToStorage.swift; sourceTree = "<group>"; };
 		72E1045B2699E3CB00641C4C /* ProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileVC.swift; sourceTree = "<group>"; };
 		72EFD7B326B1049D0032EA66 /* EditProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileVC.swift; sourceTree = "<group>"; };
 		72F3994C26B039E100802AD8 /* UIViewController + Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController + Extension.swift"; sourceTree = "<group>"; };
@@ -172,6 +174,7 @@
 				7278E923269037EB00875B33 /* PostModel.swift */,
 				72F64F8E26A1AD1300AD48D0 /* NetworkController.swift */,
 				72823D12269A29B5005F109B /* LoginSwitch.swift */,
+				72B8982926B58B9900C03A24 /* UploadToStorage.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -360,6 +363,7 @@
 				72E1045C2699E3CB00641C4C /* ProfileVC.swift in Sources */,
 				7278E9112690343D00875B33 /* SceneDelegate.swift in Sources */,
 				72FDE352269A13EC008BB9BA /* RegisterVC.swift in Sources */,
+				72B8982A26B58B9900C03A24 /* UploadToStorage.swift in Sources */,
 				72B54EE1269C616A00C5FD2D /* RoundedTextField.swift in Sources */,
 				7259375E26AA6E3900CD5922 /* popoverTableVC.swift in Sources */,
 				7278E92A26903A9500875B33 /* TableVC.swift in Sources */,

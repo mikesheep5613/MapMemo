@@ -11,6 +11,7 @@ import Firebase
 
 class RegisterVC: UIViewController, UITextFieldDelegate{
 
+    @IBOutlet weak var confirmBtn: UIButton!
     @IBOutlet weak var profileImageView: UIImageView!
     @IBOutlet weak var usernameField: UITextField!
     @IBOutlet weak var emailTextfield: UITextField!
@@ -24,6 +25,8 @@ class RegisterVC: UIViewController, UITextFieldDelegate{
         self.usernameField.delegate = self
         self.emailTextfield.delegate = self
         self.passwordTextfield.delegate = self
+        self.confirmBtn.layer.cornerRadius = self.confirmBtn.bounds.height / 2
+        self.confirmBtn.clipsToBounds = true
 
         
         let imageTap = UITapGestureRecognizer(target: self, action: #selector(switchProfileImageBtn(_:)))

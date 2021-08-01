@@ -17,11 +17,19 @@ class LoginVC: UIViewController,UITextFieldDelegate{
     @IBOutlet weak var emailTextfield: UITextField!
     @IBOutlet weak var passwordTextfield: UITextField!
     
+    @IBOutlet weak var confirmBtn: UIButton!
+    @IBOutlet weak var regiterBtn: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.emailTextfield.delegate = self
         self.passwordTextfield.delegate = self
+        
+        self.confirmBtn.layer.cornerRadius = self.confirmBtn.bounds.height / 2
+        self.confirmBtn.clipsToBounds = true
+        self.regiterBtn.layer.cornerRadius = self.regiterBtn.bounds.height / 2
+        self.regiterBtn.clipsToBounds = true
+
 
     }
     

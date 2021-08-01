@@ -43,9 +43,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     
     //MARK: - Myself & All ouf us Segment
     @IBAction func switchDataSourceControlPressed(_ sender: UISegmentedControl) {
-        
         switch switchDataSourceControl.selectedSegmentIndex {
-        
         case 0:
             for annotation in self.data {
                 if self.userData.contains(annotation) == false{
@@ -260,9 +258,7 @@ extension MapVC : MKMapViewDelegate {
         } else {
             pinView?.annotation = annotation
         }
-        
-        print(annotation.title)
-        
+                
         switch annotation.type {
         case "mountain":
             pinView?.image = UIImage(named: "mpin")

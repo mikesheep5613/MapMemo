@@ -16,6 +16,7 @@ class EditProfileVC: UIViewController {
     @IBOutlet weak var firstTextField: UITextField!
     @IBOutlet weak var secondTextFieldLabel: UILabel!
     @IBOutlet weak var secondTextField: UITextField!
+    @IBOutlet weak var confirmBtn: UIButton!
     
     var isEditMode : Bool = false
     var userEmail : String?
@@ -33,6 +34,9 @@ class EditProfileVC: UIViewController {
         self.firstTextField.delegate = self
         self.secondTextField.delegate = self
         
+        self.confirmBtn.layer.cornerRadius = self.confirmBtn.bounds.height / 2
+        self.confirmBtn.clipsToBounds = true
+
         
         // Do any additional setup after loading the view.
         if userEmail != nil {
