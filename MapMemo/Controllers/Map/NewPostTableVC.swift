@@ -24,12 +24,13 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     @IBOutlet weak var textView: UITextView!
     @IBOutlet weak var uploadBtn: UIBarButtonItem!
     @IBOutlet weak var trashBtn: UIBarButtonItem!
+    @IBOutlet weak var isPublicLabel: UILabel!
+    @IBOutlet weak var isPublicSwitch: UISwitch!
     
     var newLocation : CLLocationCoordinate2D?
     var newType : String?
     var newImageURL : String?
     var uuid : String?
-    var db : Firestore!
     
     var activityIndicator = UIActivityIndicatorView()
     var uploadBarButton = UIBarButtonItem()
@@ -40,7 +41,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     var editPost : PostModel?
     
     var isEditMode : Bool = false
-    
+    var db : Firestore!
     private let storage = Storage.storage().reference()
     
     
@@ -63,6 +64,9 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         self.textView.layer.cornerRadius = 5.0
         self.textView.layer.borderColor = UIColor.lightGray.cgColor
         self.textView.layer.borderWidth = 1
+        // 設置UISwitch功能
+        self.isPublicSwitch.addTarget(self, action: #selector(isPublicSwitchPressed(_:)), for: .valueChanged)
+        
         
         
         //        let image = UIImage(systemName: "photo")
@@ -74,15 +78,22 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
             self.isEditMode = true
             
             // Present to UI
-            self.photoImageView.image = editPost?.image
-            self.photoImageView.contentMode = .scaleAspectFill
-            imageLayout(imageView: photoImageView)
+            self.photoImageCollection.first?.image = editPost?.imageArray?.first
+            self.photoImageCollection[1].image = editPost?.imageArray?[1]
+            self.photoImageCollection[2].image = editPost?.imageArray?[2]
+            
+            
+            //            self.photoImageView.contentMode = .scaleAspectFill
+            //            imageLayout(imageView: photoImageView)
             self.titleTextField.text = editPost?.title
             self.datePicker.date = editPost?.date ?? Date.init()
             self.typeSegmentControl.selectedSegmentIndex = typeSegmentIndexCheck(editPost?.type ?? "other")
             self.newType = editPost?.type
             self.textView.text = editPost?.text
             self.newLocation = editPost?.coordinate
+            self.isPublicSwitch.isOn = editPost?.isPublic ?? false
+            self.isPublicLabel.text = self.isPublicSwitch.isOn ? "Public" : "Only Me"
+            
             guard let location = editPost?.coordinate else {
                 assertionFailure("Fail to unwrap edit post coordinate")
                 return
@@ -132,10 +143,10 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
             self.uuid = UUID().uuidString
         }
         
-//        if self.photoImageView.image == UIImage(systemName: "photo") || self.titleTextField.text == "" || self.textView.text == "" || self.newLocation == nil || self.newType == "" {
+        //        if self.photoImageView.image == UIImage(systemName: "photo") || self.titleTextField.text == "" || self.textView.text == "" || self.newLocation == nil || self.newType == "" {
         if self.titleTextField.text == "" || self.textView.text == "" || self.newLocation == nil || self.newType == "" {
-
             
+
             self.activityIndicator.stopAnimating()
             self.showUploadBarButton()
             let alert = UIAlertController(title: "貼文上傳失敗!", message: "確認所有欄位是否都有正確填入", preferredStyle: .alert)
@@ -145,8 +156,8 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
             return
         }
         
-//        guard let uploadImage = self.photoImageView.image?.resize(maxEdge: 1024) else {return}
-//        guard let realUploadImage = uploadImage.jpegData(compressionQuality: 0.7) else {return}
+        //        guard let uploadImage = self.photoImageView.image?.resize(maxEdge: 1024) else {return}
+        //        guard let realUploadImage = uploadImage.jpegData(compressionQuality: 0.7) else {return}
         guard let uuid = self.uuid else {return}
         
         guard let firstImage = self.photoImageCollection.first?.image?.resize(maxEdge: 1024) else {return}
@@ -164,9 +175,11 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
                let title = self.titleTextField.text,
                let text = self.textView.text,
                let location = self.newLocation,
-               let type = self.newType {
+               let type = self.newType
+            {
                 
                 //                    let documentID = "\(Date().timeIntervalSince1970)"
+                let isPublic = self.isPublicSwitch.isOn
                 let date = self.datePicker.date.description
                 let imageURL = self.imagesURL
                 let ref = self.db.collection("posts").document(uuid)
@@ -179,7 +192,8 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
                     "latitude": location.latitude,
                     "longitude": location.longitude,
                     "type": type,
-                    "imageURL" : imageURL
+                    "imageURL" : imageURL,
+                    "isPublic" : isPublic
                 ] as [String : Any]
                 
                 ref.setData(data) { error in
@@ -383,6 +397,23 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         return int
     }
     
+    //MARK: - isPublic UISwitch
+    @objc
+    func isPublicSwitchPressed(_ sender : AnyObject){
+        let tempSwitch = sender as! UISwitch
+        
+        if tempSwitch.isOn{
+            self.isPublicLabel.text = "Public"
+            print("switch is on")
+        } else {
+            self.isPublicLabel.text = "Only Me"
+            print("switch is off")
+            
+            
+        }
+        
+    }
+    
     
     // MARK: - Table view data source
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -392,7 +423,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 6
+        return 7
     }
     
     
@@ -438,32 +469,32 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     }
     
     //MARK: - UIImagePickerControllerDelegate
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            self.photoImageView.image = selectedImage
-            self.photoImageView.contentMode = .scaleAspectFill
-            self.photoImageView.clipsToBounds = true
-        }
-        
-        imageLayout(imageView: photoImageView)
-        dismiss(animated: true, completion: nil)
-    }
-    
-    func imageLayout(imageView: UIImageView) {
-        let leading = NSLayoutConstraint(item: photoImageView as Any, attribute: .leading, relatedBy: .equal, toItem: photoImageView.superview, attribute: .leading, multiplier: 1, constant: 0)
-        leading.isActive = true
-        
-        let trailing = NSLayoutConstraint(item: photoImageView as Any, attribute: .trailing, relatedBy: .equal, toItem: photoImageView.superview, attribute: .trailing, multiplier: 1, constant: 0)
-        trailing.isActive = true
-        
-        let top = NSLayoutConstraint(item: photoImageView as Any, attribute: .top, relatedBy: .equal, toItem: photoImageView.superview, attribute: .top, multiplier: 1, constant: 0)
-        top.isActive = true
-        
-        let bottom = NSLayoutConstraint(item: photoImageView as Any, attribute: .bottom, relatedBy: .equal, toItem: photoImageView.superview, attribute: .bottom, multiplier: 1, constant: 0)
-        bottom.isActive = true
-        
-    }
-    
+    //    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    //        if let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+    //            self.photoImageView.image = selectedImage
+    //            self.photoImageView.contentMode = .scaleAspectFill
+    //            self.photoImageView.clipsToBounds = true
+    //        }
+    //
+    //        imageLayout(imageView: photoImageView)
+    //        dismiss(animated: true, completion: nil)
+    //    }
+    //
+    //    func imageLayout(imageView: UIImageView) {
+    //        let leading = NSLayoutConstraint(item: photoImageView as Any, attribute: .leading, relatedBy: .equal, toItem: photoImageView.superview, attribute: .leading, multiplier: 1, constant: 0)
+    //        leading.isActive = true
+    //
+    //        let trailing = NSLayoutConstraint(item: photoImageView as Any, attribute: .trailing, relatedBy: .equal, toItem: photoImageView.superview, attribute: .trailing, multiplier: 1, constant: 0)
+    //        trailing.isActive = true
+    //
+    //        let top = NSLayoutConstraint(item: photoImageView as Any, attribute: .top, relatedBy: .equal, toItem: photoImageView.superview, attribute: .top, multiplier: 1, constant: 0)
+    //        top.isActive = true
+    //
+    //        let bottom = NSLayoutConstraint(item: photoImageView as Any, attribute: .bottom, relatedBy: .equal, toItem: photoImageView.superview, attribute: .bottom, multiplier: 1, constant: 0)
+    //        bottom.isActive = true
+    //
+    //    }
+    //
     //MARK: - PinMapVCDelegate
     func didFinishUpdate(location: CLLocationCoordinate2D) {
         

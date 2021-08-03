@@ -17,7 +17,7 @@ class TableVC: UIViewController {
     var filteredData : [PostModel] = [] //過濾後的資料,searchcontroller.isActive=true時顯示
     
     var searchController = UISearchController(searchResultsController: nil)
-
+    
     var db : Firestore!
     
     
@@ -27,25 +27,25 @@ class TableVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-
+        
         // load data from Firebase
         db = Firestore.firestore()
         monitorData()
-
+        
         self.tableView.dataSource = self
         self.tableView.delegate = self
         
         // register a nib for cellReuseIdentifier
         self.tableView.register(UINib(nibName: "MemoTableViewCell", bundle: nil), forCellReuseIdentifier: "memoCell")
-
+        
         
         self.navigationItem.searchController = self.searchController
         self.searchController.hidesNavigationBarDuringPresentation = true
         self.searchController.obscuresBackgroundDuringPresentation = false
         self.searchController.searchResultsUpdater = self
-
+        
     }
-
+    
     
     // Retrieve data from Firebase
     // Retrieve data for user only
@@ -60,27 +60,48 @@ class TableVC: UIViewController {
                 return
             }
             guard let documentsChange = qSnapshot?.documentChanges else {return}
-           
+            
             for change in documentsChange {
                 
                 if change.type == .added{
                     //建立資料
                     let post = PostModel(document: change.document)
                     //Reload image
-                    guard let imageURL = post.imageURL else {return}
-                    if let loadImageURL = URL(string: imageURL){
-                        NetworkController.shared.fetchImage(url: loadImageURL) { image in
-                            DispatchQueue.main.async {
-                                post.image = image
-                                //Reload Table
-                                self.data.insert(post, at: 0)
-                                let indexPath = IndexPath(row: 0, section: 0)
-                                self.tableView.insertRows(at: [indexPath], with: .automatic)
+                    guard let imageURLs = post.imageURL else {return}
+                    
+                    //                    var array : [UIImage] = []
+                    post.imageArray = []
+                    for imageURL in imageURLs {
+                        if let loadImageURL = URL(string: imageURL){
+                            NetworkController.shared.fetchImage(url: loadImageURL) { image in
+                                guard let image = image else {
+                                    assertionFailure("unwrapping image error")
+                                    return
+                                }
+                                
+                                post.imageArray?.append(image)
+                                print("Successfully fetch image.")
                             }
-
                         }
+                        
                     }
-
+                    self.data.insert(post, at: 0)
+                    let indexPath = IndexPath(row: 0, section: 0)
+                    self.tableView.insertRows(at: [indexPath], with: .automatic)
+                    
+                    //                    if let loadImageURL = URL(string: imageURL){
+                    //                        NetworkController.shared.fetchImage(url: loadImageURL) { image in
+                    //                            DispatchQueue.main.async {
+                    //                                post.image = image
+                    //                                //Reload Table
+                    //                                self.data.insert(post, at: 0)
+                    //                                let indexPath = IndexPath(row: 0, section: 0)
+                    //                                self.tableView.insertRows(at: [indexPath], with: .automatic)
+                    //                            }
+                    //
+                    //                        }
+                    //                    }
+                    
                 }else if change.type == .modified{
                     
                     //透過documentId找到self.data相對應的Note
@@ -90,9 +111,10 @@ class TableVC: UIViewController {
                         post.title = change.document.data()["title"] as? String
                         post.text = change.document.data()["text"] as? String
                         post.type = change.document.data()["type"] as? String
-                        post.imageURL = change.document.data()["imageURL"] as? String
+                        post.imageURL = change.document.data()["imageURL"] as? Array<String>
                         post.latitude = change.document.data()["latitude"] as? Double
                         post.longitude = change.document.data()["longitude"] as? Double
+                        post.isPublic = change.document.data()["isPublic"] as? Bool
                         if let tempDate = change.document.data()["date"] as? String {
                             let dateFormatter = DateFormatter()
                             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
@@ -100,21 +122,38 @@ class TableVC: UIViewController {
                         }
                         
                         //Reload image
-                        guard let imageURL = post.imageURL else {return}
-                        if let loadImageURL = URL(string: imageURL){
-                            NetworkController.shared.fetchImage(url: loadImageURL) { image in
-                                DispatchQueue.main.async {
-                                    post.image = image
-                                    if let index = self.data.firstIndex(of: post){
-                                        let indexPath = IndexPath(row: index, section: 0)
-                                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                        guard let imageURLs = post.imageURL else {return}
+                        post.imageArray = []
+                        for imageURL in imageURLs {
+                            if let loadImageURL = URL(string: imageURL){
+                                NetworkController.shared.fetchImage(url: loadImageURL) { image in
+                                    DispatchQueue.main.async {
+                                        guard let image = image else {
+                                            assertionFailure("unwrapping image error")
+                                            return
+                                        }
+                                        // 把全部圖片刪掉重新load
+                                        post.imageArray?.append(image)
                                     }
-
                                 }
-
                             }
+                            
                         }
-
+                        
+                        //                        if let loadImageURL = URL(string: imageURL){
+                        //                            NetworkController.shared.fetchImage(url: loadImageURL) { image in
+                        //                                DispatchQueue.main.async {
+                        //                                    post.image = image
+                        //                                    if let index = self.data.firstIndex(of: post){
+                        //                                        let indexPath = IndexPath(row: index, section: 0)
+                        //                                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                        //                                    }
+                        //
+                        //                                }
+                        //
+                        //                            }
+                        //                        }
+                        
                     }
                 }else if change.type == .removed {
                     //透過documentId找到self.data相對應的Note
@@ -126,59 +165,59 @@ class TableVC: UIViewController {
                             let indexPath = IndexPath(row: index, section: 0)
                             self.tableView.deleteRows(at: [indexPath], with: .automatic)
                         }
-
+                        
                     }
-
+                    
                 }
             }
         }
         
     }
     
-//     Retrieve data from Firebase
-//    func queryFromFireStore() {
-//
-//        if let userID = Auth.auth().currentUser?.email{
-//            db.collection(userID).getDocuments { (querySnapshot, error) in
-//                if let error = error {
-//                    print("Query error : \(error)")
-//                }
-//                guard let snapshot = querySnapshot else {return}
-//                for document in snapshot.documents{
-//                    let post = PostModel()
-//                    post.title = document.data()["title"] as? String
-//                    post.text = document.data()["text"] as? String
-//                    post.type = document.data()["type"] as? String
-//                    post.date = document.data()["date"] as? String
-//                    post.imageURL = document.data()["imageURL"] as? String
-//                    post.latitude = document.data()["latitude"] as? Double
-//                    post.longitude = document.data()["longitude"] as? Double
-//
-//                    if let loadImageURL = URL(string: post.imageURL!){
-//                        NetworkController.shared.fetchImage(url: loadImageURL) { image in
-//                            DispatchQueue.main.async {
-//                                post.image = image
-//                                self.tableView.reloadData()
-//                            }
-//
-//                        }
-//                    }
-//
-//                    self.data.append(post)
-//                }
-//                // update UI
-//                DispatchQueue.main.async {
-//                    self.tableView.reloadData()
-//                }
-//
-//            }
-//        }
-//    }
-
-
+    //     Retrieve data from Firebase
+    //    func queryFromFireStore() {
+    //
+    //        if let userID = Auth.auth().currentUser?.email{
+    //            db.collection(userID).getDocuments { (querySnapshot, error) in
+    //                if let error = error {
+    //                    print("Query error : \(error)")
+    //                }
+    //                guard let snapshot = querySnapshot else {return}
+    //                for document in snapshot.documents{
+    //                    let post = PostModel()
+    //                    post.title = document.data()["title"] as? String
+    //                    post.text = document.data()["text"] as? String
+    //                    post.type = document.data()["type"] as? String
+    //                    post.date = document.data()["date"] as? String
+    //                    post.imageURL = document.data()["imageURL"] as? String
+    //                    post.latitude = document.data()["latitude"] as? Double
+    //                    post.longitude = document.data()["longitude"] as? Double
+    //
+    //                    if let loadImageURL = URL(string: post.imageURL!){
+    //                        NetworkController.shared.fetchImage(url: loadImageURL) { image in
+    //                            DispatchQueue.main.async {
+    //                                post.image = image
+    //                                self.tableView.reloadData()
+    //                            }
+    //
+    //                        }
+    //                    }
+    //
+    //                    self.data.append(post)
+    //                }
+    //                // update UI
+    //                DispatchQueue.main.async {
+    //                    self.tableView.reloadData()
+    //                }
+    //
+    //            }
+    //        }
+    //    }
+    
+    
     
     // MARK: - Navigation
-
+    
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
@@ -195,7 +234,7 @@ class TableVC: UIViewController {
                 popoverVC.preferredContentSize = CGSize(width: 180, height: 90)
                 popoverVC.popoverPresentationController?.delegate = self
                 popoverVC.delegate = self
-
+                
             }
         }
     }
@@ -215,15 +254,17 @@ extension TableVC : UITableViewDataSource{
         
         //顯示search bar過濾後內容
         let item = self.searchController.isActive ? self.filteredData[indexPath.row] : self.data[indexPath.row]
-
+        
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "memoCell", for: indexPath) as! MemoTableViewCell
         cell.titleLabel.text = item.title
-        cell.photoImageView.image = item.image
         cell.dateLabel.text = DateFormatter.localizedString(from: item.date!, dateStyle: .long, timeStyle: .none)
         if let userUID = item.authorID {
             cell.montitorProfileData(userUID: userUID)
         }
+        
+        cell.photoImageView.image = item.thumbnailImage(item.imageArray?.first)
+        
         return cell
     }
 }
@@ -239,7 +280,7 @@ extension TableVC : UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "postSegue", sender: self)
     }
-
+    
 }
 
 //MARK: - UISearchResultsUpdating
@@ -290,7 +331,7 @@ extension TableVC : PopoverViewControllerDelegate {
         }
         
         self.tableView.reloadData()
-
+        
     }
     
     

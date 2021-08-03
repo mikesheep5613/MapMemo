@@ -16,7 +16,8 @@ import FirebaseStorage
 class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDelegate {
     
     var data : [PostModel] = []
-    var userData : [PostModel] = []
+    var publicData : [PostModel] = []
+    var privateData : [PostModel] = []
     var db : Firestore!
     
     @IBOutlet weak var mapView: MKMapView!
@@ -33,27 +34,23 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
         db = Firestore.firestore()
         
         //Default Setting show data from all of people
-        monitorAllPostsData()
+        monitorData()
         
-        //Btn outlet
-//        self.noneBtn.layer.cornerRadius = 0.5 * self.noneBtn.bounds.size.height
-//        self.noneBtn.clipsToBounds = true
+
     }
     
     
-    //MARK: - Myself & All ouf us Segment
+    //MARK: - privateData & publicData Segment
     @IBAction func switchDataSourceControlPressed(_ sender: UISegmentedControl) {
         switch switchDataSourceControl.selectedSegmentIndex {
-        case 0:
-            for annotation in self.data {
-                if self.userData.contains(annotation) == false{
-                    self.mapView.removeAnnotation(annotation)
-                }
-            }
-        case 1:
-            // reset all pins
+        case 0: // privateData
+            self.mapView.removeAnnotations(self.mapView.annotations)
+            self.placePin(self.data)
+        case 1: // publicData
+            self.mapView.removeAnnotations(self.mapView.annotations)
             self.placePin(self.data)
         default:
+            self.mapView.removeAnnotations(self.mapView.annotations)
             self.placePin(self.data)
         }
 
@@ -66,6 +63,23 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
         }
     }
     
+    func mapViewFilter(_ type : String){
+        
+        var dataSource : [PostModel]
+        if switchDataSourceControl.selectedSegmentIndex == 0 {
+            dataSource = self.privateData
+        }else{
+            dataSource = self.publicData
+        }
+
+        for annotation in dataSource {
+            if annotation.type != type {
+                self.mapView.removeAnnotation(annotation)
+            } else {
+                self.mapView.addAnnotation(annotation)
+            }
+        }
+    }
     
     @IBAction func typeFilterBtnPressed(_ sender: UIButton) {
         
@@ -86,42 +100,18 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
         case 5:
             mapViewFilter("other")
         case 6:
-            if switchDataSourceControl.selectedSegmentIndex == 0 {
-                self.placePin(self.userData)
-            }else{
-                self.placePin(self.data)
-            }
+            self.placePin(self.data)
 
         default:
             break
         }
     }
     
-    func mapViewFilter(_ type : String){
-        
-        let index = switchDataSourceControl.selectedSegmentIndex
-        var dataSource : [PostModel]
-        if index == 0 {
-            dataSource = self.userData
-        }else{
-            dataSource = self.data
-        }
 
-        for annotation in dataSource {
-            if annotation.type != type {
-                self.mapView.removeAnnotation(annotation)
-            } else {
-                self.mapView.addAnnotation(annotation)
-            }
-        }
-    }
     
-    // Retrieve data from Firebase ( all user or single user)
-    func monitorAllPostsData() {
-        guard let userID = Auth.auth().currentUser?.uid else {
-            assertionFailure("Invalid userID")
-            return
-        }
+    // Retrieve data from Firebase
+    func monitorData() {
+  
         self.db.collection("posts").addSnapshotListener { qSnapshot, error in
             if let e = error {
                 print("error snapshot listener \(e)")
@@ -134,26 +124,32 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                 if change.type == .added{
                     //建立資料
                     let post = PostModel(document: change.document)
-                    //Reload Table
-                    self.data.insert(post, at: 0)
                     
+                    //Reload image
+                    guard let imageURLs = post.imageURL else {return}
+                    post.imageArray = []
+                    for imageURL in imageURLs {
+                        if let loadImageURL = URL(string: imageURL){
+                            NetworkController.shared.fetchImage(url: loadImageURL) { image in
+                                DispatchQueue.main.async {
+                                    guard let image = image else {
+                                        assertionFailure("unwrapping image error")
+                                        return
+                                    }
+                                    // 把全部圖片刪掉重新load
+                                    post.imageArray?.append(image)
+                                    print("Successfully fetch image.")
+                                }
+                            }
+                        }
+                        
+                    }
                     // Insert pin based on data from Post Array
+                    self.data.insert(post, at: 0)
                     //Reload map
                     self.placePin(self.data)
-
-                    //Reload image
-                    guard let imageURL = post.imageURL else {return}
-                    if let loadImageURL = URL(string: imageURL){
-                        NetworkController.shared.fetchImage(url: loadImageURL) { image in
-                            DispatchQueue.main.async {
-                                post.image = image
-                            }
-
-                        }
-                    }
-
-                }else if change.type == .modified{
                     
+                }else if change.type == .modified{
                     //透過documentId找到self.data相對應的Note
                     let docID = change.document.data()["postID"] as? String
                     if let post = self.data.filter({ post in post.postID == docID }).first{
@@ -163,32 +159,41 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                         post.title = change.document.data()["title"] as? String
                         post.text = change.document.data()["text"] as? String
                         post.type = change.document.data()["type"] as? String
-                        post.imageURL = change.document.data()["imageURL"] as? String
+                        post.imageURL = change.document.data()["imageURL"] as? Array<String>
                         post.latitude = change.document.data()["latitude"] as? Double
                         post.longitude = change.document.data()["longitude"] as? Double
+                        post.isPublic = change.document.data()["isPublic"] as? Bool
                         if let tempDate = change.document.data()["date"] as? String {
                             let dateFormatter = DateFormatter()
                             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
                             post.date = dateFormatter.date(from: tempDate)
                         }
 
-                                                
                         //Reload image
-                        guard let imageURL = post.imageURL else {return}
-                        if let loadImageURL = URL(string: imageURL){
-                            NetworkController.shared.fetchImage(url: loadImageURL) { image in
-                                DispatchQueue.main.async {
-                                    post.image = image
-                                    
-                                    //Reload map
-                                    self.mapView.removeAnnotations(self.mapView.annotations)
-                                    self.placePin(self.data)
+                        post.imageArray = []
+                        guard let imageURLs = post.imageURL else {return}
+                        for imageURL in imageURLs {
+                            if let loadImageURL = URL(string: imageURL){
+                                NetworkController.shared.fetchImage(url: loadImageURL) { image in
+                                    DispatchQueue.main.async {
+                                        guard let image = image else {
+                                            assertionFailure("unwrapping image error")
+                                            return
+                                        }
+                                        // 把全部圖片刪掉重新load
+                                        post.imageArray?.append(image)
+                                        print("Successfully fetch image.")
+                                    }
                                 }
-
                             }
+                            
                         }
-
                     }
+                    
+                    //Reload map
+                    self.mapView.removeAnnotations(self.mapView.annotations)
+                    self.placePin(self.data)
+                    
                 }else if change.type == .removed {
                     //透過documentId找到self.data相對應的Note
                     let docID = change.document.data()["postID"] as? String
@@ -199,33 +204,33 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                             
                             //Reload map
                             self.mapView.removeAnnotations(self.mapView.annotations)
-                            self.placePin(self.data)
-                        }
-
+                            self.placePin(self.data)                        }
                     }
-
                 }
             }
-            
-            // update User own data array
-            self.monitorUserPostsData()
+            // update public & private data array
+            self.seperatePrivateAndPublic()
 
         }
         
     }
     
-    func monitorUserPostsData() {
-        // filter data from other users
-        self.userData = []
-        if let userID = Auth.auth().currentUser?.uid {
-            for data in self.data{
-                if data.authorID == userID {
-                    self.userData.append(data)
-                }
+    func seperatePrivateAndPublic() {
+        var publicArray : [PostModel] = []
+        var privateArray : [PostModel] = []
+        guard let userID = Auth.auth().currentUser?.uid else {return}
+
+        for post in self.data {
+            if post.isPublic == true {
+                publicArray.append(post)
+            }else if post.authorID == userID && post.isPublic == false {
+                privateArray.append(post)
             }
         }
+        self.publicData = publicArray
+        self.privateData = privateArray
     }
-
+    
     func moveAndZoomMap(){
         // 以台灣中心來準備region
         let coordinate = CLLocationCoordinate2D(latitude: 23.974098094452746 , longitude: 120.9796606886788)
@@ -236,7 +241,19 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     
     //MARK: - Place Pins on MapView
     func placePin(_ data: [PostModel]){
-        self.mapView.addAnnotations(data)
+        guard let userID = Auth.auth().currentUser?.uid else {return}
+        for post in data{
+            if post.isPublic == true{
+                if switchDataSourceControl.selectedSegmentIndex == 1 {
+                    self.mapView.addAnnotation(post)
+                }
+            }else if post.authorID == userID && post.isPublic == false {
+                if switchDataSourceControl.selectedSegmentIndex == 0 {
+                    self.mapView.addAnnotation(post)
+                }
+            }
+        }
+        
     }
 }
 

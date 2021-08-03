@@ -15,14 +15,19 @@ class PostVC: UIViewController {
     @IBOutlet weak var dataLabel: UILabel!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var textView: UITextView!
-    @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var typeImageView: UIImageView!
-    
     @IBOutlet weak var userNameLabel: UILabel!
     @IBOutlet weak var userProfileImage: UIImageView!
+    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var imageViewSecond: UIImageView!
+    @IBOutlet weak var imageViewThird: UIImageView!
+    
+    @IBOutlet weak var pageControl: UIPageControl!
     
     var currentPost : PostModel?
     var db : Firestore!
+    
+    var imagesPageViewController : ImagesPageViewController?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,12 +35,11 @@ class PostVC: UIViewController {
         db = Firestore.firestore()
         montitorProfileData()
         
-        
         // Present UI.
         self.dataLabel.text = DateFormatter.localizedString(from: (currentPost?.date)!, dateStyle: .long, timeStyle: .none)
         self.titleLabel.text = currentPost?.title
         self.textView.text = currentPost?.text
-        self.imageView.image = currentPost?.image
+
         switch currentPost?.type{
         case "mountain":
             self.typeImageView.image = UIImage(named: "山")
@@ -83,6 +87,15 @@ class PostVC: UIViewController {
                 newPostTableVC.editPost = self.currentPost
             }
         }
+        if segue.identifier == "imagesEmbedSegue"{
+            if let imagesPageVC = segue.destination as? ImagesPageViewController {
+                imagesPageVC.imagesArray = self.currentPost?.imageArray
+                imagesPageViewController = imagesPageVC
+                imagesPageViewController?.imagesPageViewControllerDelegate = self
+                
+            }
+            
+        }
     }
     
     //MARK: - Profile info
@@ -119,5 +132,16 @@ class PostVC: UIViewController {
         }
         
     }
+    
+}
+//MARK: - ImagesPageViewControllerDelegate
+extension PostVC : ImagesPageViewControllerDelegate {
+    func didUpdatePageIndex(currentIndex: Int) {
+        if let index = self.imagesPageViewController?.currentIndex{
+            self.pageControl.currentPage = index
+        }
+    }
+    
+    
     
 }

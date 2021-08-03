@@ -15,9 +15,7 @@ class PostModel : NSObject, MKAnnotation {
     
     
     var authorID : String?
-    
     var date : Date?
-    var imageURL: String?
     var title : String?
     var text : String?
     var type : String?
@@ -25,7 +23,11 @@ class PostModel : NSObject, MKAnnotation {
     var longitude : Double?
     var coordinate : CLLocationCoordinate2D
     var postID : String?
-    var image : UIImage?
+    var isPublic : Bool?
+    
+    var imageURL: Array<String>?
+    var imageArray : Array<UIImage>?
+
     
     override init() {
         self.postID = UUID().uuidString
@@ -33,15 +35,16 @@ class PostModel : NSObject, MKAnnotation {
     }
     
     init(document: QueryDocumentSnapshot) {
-        self.authorID = document.data()["authorID"] as? String
         
+        self.authorID = document.data()["authorID"] as? String
         self.postID = document.data()["postID"] as? String
         self.title = document.data()["title"] as? String
         self.text = document.data()["text"] as? String
         self.type = document.data()["type"] as? String
-        self.imageURL = document.data()["imageURL"] as? String
+        self.imageURL = document.data()["imageURL"] as? Array<String>
         self.latitude = document.data()["latitude"] as? Double
         self.longitude = document.data()["longitude"] as? Double
+        self.isPublic = document.data()["isPublic"] as? Bool
         
         if let tempDate = document.data()["date"] as? String {
             let dateFormatter = DateFormatter()
@@ -53,9 +56,9 @@ class PostModel : NSObject, MKAnnotation {
     }
     
     
-    func thumbnailImage()->UIImage?{
+    func thumbnailImage( _ image: UIImage? )->UIImage?{
         
-        if let image =  self.image {
+        if let image =  image {
             
             let thumbnailSize = CGSize(width: 50,height: 50); //設定縮圖大小
             let scale = UIScreen.main.scale //找出目前螢幕的scale，視網膜技術為2.0

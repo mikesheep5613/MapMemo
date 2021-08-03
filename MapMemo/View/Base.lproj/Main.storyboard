@@ -389,8 +389,8 @@
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="51H-UE-pBr">
                                 <rect key="frame" x="66" y="742" width="282" height="32"/>
                                 <segments>
-                                    <segment title="Myself"/>
-                                    <segment title="All of us"/>
+                                    <segment title="Private"/>
+                                    <segment title="Public"/>
                                 </segments>
                                 <connections>
                                     <action selector="switchDataSourceControlPressed:" destination="KCu-jE-T3m" eventType="valueChanged" id="3UP-mX-sIE"/>
@@ -424,7 +424,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="mapView" destination="dD6-h6-5B6" id="aEA-Wa-j9w"/>
+                        <outlet property="mapView" destination="dD6-h6-5B6" id="UJz-8A-PFJ"/>
                         <outlet property="switchDataSourceControl" destination="51H-UE-pBr" id="G1S-Dn-6Ye"/>
                         <outletCollection property="typeFilterBtn" destination="gLY-3L-DQ4" collectionClass="NSMutableArray" id="0Gi-5z-ZYM"/>
                         <outletCollection property="typeFilterBtn" destination="51N-Gd-8ou" collectionClass="NSMutableArray" id="Hcn-ne-Bgg"/>
@@ -723,10 +723,10 @@
                                                         <stackView opaque="NO" contentMode="scaleToFill" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="ba2-Zl-Ecm">
                                                             <rect key="frame" x="0.0" y="38" width="394" height="30"/>
                                                             <subviews>
-                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Only Me / Public" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p90-Bj-t7h">
+                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Only Me" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p90-Bj-t7h">
                                                                     <rect key="frame" x="0.0" y="0.0" width="341" height="30"/>
-                                                                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                                                                    <nil key="textColor"/>
+                                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                                    <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                     <nil key="highlightedColor"/>
                                                                 </label>
                                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="aBC-bX-5hM">
@@ -774,6 +774,8 @@
                     </navigationItem>
                     <connections>
                         <outlet property="datePicker" destination="7Zl-Lt-baW" id="Le0-TE-Fxx"/>
+                        <outlet property="isPublicLabel" destination="p90-Bj-t7h" id="j5B-DO-R6t"/>
+                        <outlet property="isPublicSwitch" destination="aBC-bX-5hM" id="nnF-4P-IJB"/>
                         <outlet property="locationLabel" destination="1e2-35-1cJ" id="UGg-ex-eHQ"/>
                         <outlet property="textView" destination="tda-0P-wgs" id="7CD-Aw-2eC"/>
                         <outlet property="titleTextField" destination="vf3-cA-44h" id="6cB-oH-ULJ"/>
@@ -1164,9 +1166,12 @@
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wFr-hI-YQA" userLabel="UpView">
                                         <rect key="frame" x="0.0" y="0.0" width="414" height="406.5"/>
                                         <subviews>
-                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wHH-O4-Ccf">
+                                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="T0r-YH-xPo">
                                                 <rect key="frame" x="0.0" y="0.0" width="414" height="406.5"/>
-                                            </imageView>
+                                                <connections>
+                                                    <segue destination="EE9-bj-Kpg" kind="embed" identifier="imagesEmbedSegue" id="RC7-3F-k2S"/>
+                                                </connections>
+                                            </containerView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumFontSize="12" translatesAutoresizingMaskIntoConstraints="NO" id="Xv6-6V-CVD">
                                                 <rect key="frame" x="8" y="355" width="398" height="44"/>
                                                 <constraints>
@@ -1176,15 +1181,20 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
+                                            <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="xjU-nH-qjf">
+                                                <rect key="frame" x="146.5" y="374" width="121.5" height="27.5"/>
+                                            </pageControl>
                                         </subviews>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
+                                            <constraint firstItem="T0r-YH-xPo" firstAttribute="top" secondItem="wFr-hI-YQA" secondAttribute="top" id="3hG-ml-ibr"/>
                                             <constraint firstItem="Xv6-6V-CVD" firstAttribute="leading" secondItem="wFr-hI-YQA" secondAttribute="leading" constant="8" id="Fl7-MV-5c4"/>
-                                            <constraint firstItem="wHH-O4-Ccf" firstAttribute="top" secondItem="wFr-hI-YQA" secondAttribute="top" id="MH0-8l-83r"/>
-                                            <constraint firstAttribute="bottom" secondItem="wHH-O4-Ccf" secondAttribute="bottom" id="QCG-Q4-MUI"/>
-                                            <constraint firstItem="wHH-O4-Ccf" firstAttribute="leading" secondItem="wFr-hI-YQA" secondAttribute="leading" id="WU6-l4-2Os"/>
+                                            <constraint firstAttribute="bottom" secondItem="T0r-YH-xPo" secondAttribute="bottom" id="P0x-sO-vzI"/>
+                                            <constraint firstAttribute="trailing" secondItem="T0r-YH-xPo" secondAttribute="trailing" id="ThD-ni-Bse"/>
+                                            <constraint firstItem="xjU-nH-qjf" firstAttribute="centerX" secondItem="wFr-hI-YQA" secondAttribute="centerX" id="Vn2-uC-blz"/>
+                                            <constraint firstAttribute="bottom" secondItem="xjU-nH-qjf" secondAttribute="bottom" constant="5" id="ZFX-ld-QlI"/>
                                             <constraint firstAttribute="bottom" secondItem="Xv6-6V-CVD" secondAttribute="bottom" constant="7.5" id="eFa-dr-Ptv"/>
-                                            <constraint firstAttribute="trailing" secondItem="wHH-O4-Ccf" secondAttribute="trailing" id="g2X-Ok-h3B"/>
+                                            <constraint firstItem="T0r-YH-xPo" firstAttribute="leading" secondItem="wFr-hI-YQA" secondAttribute="leading" id="gk0-PJ-1GX"/>
                                             <constraint firstAttribute="trailing" secondItem="Xv6-6V-CVD" secondAttribute="trailing" constant="8" id="vOb-vk-lrE"/>
                                         </constraints>
                                     </view>
@@ -1294,9 +1304,9 @@
                     </navigationItem>
                     <connections>
                         <outlet property="dataLabel" destination="Agg-tn-AoQ" id="Isk-JU-OOg"/>
-                        <outlet property="imageView" destination="wHH-O4-Ccf" id="fBB-rG-965"/>
+                        <outlet property="pageControl" destination="xjU-nH-qjf" id="Tfs-wr-40t"/>
                         <outlet property="textView" destination="qtJ-7e-cuz" id="KGL-Pj-EbO"/>
-                        <outlet property="titleLabel" destination="Xv6-6V-CVD" id="QHt-LB-Ijd"/>
+                        <outlet property="titleLabel" destination="Xv6-6V-CVD" id="wem-Ia-n3n"/>
                         <outlet property="typeImageView" destination="995-ZF-Vu7" id="qas-Nz-sjG"/>
                         <outlet property="userNameLabel" destination="MO3-K9-vO9" id="Kgn-E9-qLx"/>
                         <outlet property="userProfileImage" destination="Y4W-4H-ykp" id="56R-dO-IQL"/>
@@ -1305,6 +1315,44 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CAU-s9-7aI" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="5204.347826086957" y="719.19642857142856"/>
+        </scene>
+        <!--Images Page View Controller-->
+        <scene sceneID="uAf-dV-d9X">
+            <objects>
+                <pageViewController autoresizesArchivedViewToFullSize="NO" transitionStyle="scroll" navigationOrientation="horizontal" spineLocation="none" id="EE9-bj-Kpg" customClass="ImagesPageViewController" customModule="MapMemo" customModuleProvider="target" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lx0-f4-hEH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="6345" y="838"/>
+        </scene>
+        <!--Images View Controller-->
+        <scene sceneID="n09-cR-GYh">
+            <objects>
+                <viewController storyboardIdentifier="showImageVC" id="p5U-mw-qe8" customClass="ImagesViewController" customModule="MapMemo" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="ABB-NV-h2g">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="406"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="kfO-Kt-Yuf">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="406.5"/>
+                            </imageView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="rzK-tZ-P0l"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="rzK-tZ-P0l" firstAttribute="trailing" secondItem="kfO-Kt-Yuf" secondAttribute="trailing" id="Qcq-IT-DuX"/>
+                            <constraint firstItem="kfO-Kt-Yuf" firstAttribute="leading" secondItem="rzK-tZ-P0l" secondAttribute="leading" id="mGy-1e-wa4"/>
+                            <constraint firstItem="rzK-tZ-P0l" firstAttribute="bottom" secondItem="kfO-Kt-Yuf" secondAttribute="bottom" id="psy-lG-cmn"/>
+                            <constraint firstItem="kfO-Kt-Yuf" firstAttribute="top" secondItem="ABB-NV-h2g" secondAttribute="top" id="ytN-ac-B0c"/>
+                        </constraints>
+                    </view>
+                    <size key="freeformSize" width="414" height="406.5"/>
+                    <connections>
+                        <outlet property="imageView" destination="kfO-Kt-Yuf" id="qYs-cv-nDF"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="0H4-ev-0SL" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="7117" y="838"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="sem-r3-qXe">

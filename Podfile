@@ -7,10 +7,13 @@ target 'MapMemo' do
 
   # For firebase
 #pod 'Firebase/Analytics'
-#pod 'Firebase/Core'
+pod 'Firebase/Core'
 pod 'Firebase/Auth'
 pod 'Firebase/Firestore'
 pod 'Firebase/Storage'
+pod 'Firebase/Crashlytics'
+
+
   # For Google login
 #pod 'GoogleSignIn'
 
@@ -18,6 +21,8 @@ pod 'Firebase/Storage'
 #pod 'Bolts'
 #pod 'FBSDKLoginKit'
 #pod 'FBSDKCoreKit'
+#pod "KRProgressHUD"
+
 
   # Pods for MapMemo
 
