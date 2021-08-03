@@ -63,6 +63,10 @@ class LoginVC: UIViewController,UITextFieldDelegate{
             Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
                 if let error = error {
                     print("Sign in error : \(error)")
+                    self.openAlert(title: "Alert", message: error.localizedDescription , alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
+                        print("Okay clicked!")
+                    }])
+
                 } else {
                     UserDefaults.standard.setValue("login", forKey: "username")
                     UserDefaults.standard.synchronize()

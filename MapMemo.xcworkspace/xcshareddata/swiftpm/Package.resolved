@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "KRActivityIndicatorView",
+        "repositoryURL": "https://github.com/krimpedance/KRActivityIndicatorView.git",
+        "state": {
+          "branch": null,
+          "revision": "bcb0e841d6de0cd343a32bd5056580a56d06c0bc",
+          "version": "3.0.7"
+        }
+      },
+      {
+        "package": "KRProgressHUD",
+        "repositoryURL": "https://github.com/krimpedance/KRProgressHUD.git",
+        "state": {
+          "branch": null,
+          "revision": "265142816d8f8ea93840accaf4ac7c49998e77c2",
+          "version": "3.4.7"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

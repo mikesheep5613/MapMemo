@@ -36,6 +36,15 @@ class EditProfileVC: UIViewController {
         
         self.confirmBtn.layer.cornerRadius = self.confirmBtn.bounds.height / 2
         self.confirmBtn.clipsToBounds = true
+        self.imageViewLabel.text = self.userName
+        self.imageView.image = self.userImage
+        self.imageView.layer.cornerRadius = self.imageView.bounds.height / 2
+        self.imageView.clipsToBounds = true
+        let imageTap = UITapGestureRecognizer(target: self, action: #selector(switchProfileImageBtn(_:)))
+        self.imageView.isUserInteractionEnabled = true
+        self.imageView.addGestureRecognizer(imageTap)
+        self.imageView.layer.cornerRadius = self.imageView.bounds.height / 2
+        self.imageView.clipsToBounds = true
 
         
         // Do any additional setup after loading the view.
@@ -51,16 +60,7 @@ class EditProfileVC: UIViewController {
             self.secondTextFieldLabel.text = "USER NAME"
             self.secondTextField.text = self.userName
         }
-        self.imageViewLabel.text = self.userName
-        self.imageView.image = self.userImage
-        self.imageView.layer.cornerRadius = self.imageView.bounds.height / 2
-        self.imageView.clipsToBounds = true
         
-        let imageTap = UITapGestureRecognizer(target: self, action: #selector(switchProfileImageBtn(_:)))
-        self.imageView.isUserInteractionEnabled = true
-        self.imageView.addGestureRecognizer(imageTap)
-        self.imageView.layer.cornerRadius = self.imageView.bounds.height / 2
-        self.imageView.clipsToBounds = true
         
     }
     

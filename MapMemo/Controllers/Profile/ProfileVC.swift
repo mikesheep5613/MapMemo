@@ -13,12 +13,13 @@ import MessageUI
 
 class ProfileVC: UIViewController, UITableViewDelegate,  MFMailComposeViewControllerDelegate {
     
-    var sectionTitles = ["Account Setting", "Feedback"]
+    var sectionTitles = ["Account Setting", "Feedback", "Version"]
     var sectionContent = [[( image: "person.fill", text: "Edit Profile"),
                            ( image: "lock.fill", text: "Change Password"),
                            ( image: "hand.point.left.fill", text: "Log Out")],
                           [( image: "envelope.fill", text: "Send Email To Developer"),
-                           (image: "star.circle" , text: "Rate Us On App Store")]]
+                           (image: "star.circle" , text: "Rate Us On App Store")],
+                          [ (image: "wrench.and.screwdriver" , text: "V1.0.0") ]]
     var db : Firestore!
     var userEmail : String?
     var userName : String?
@@ -36,7 +37,7 @@ class ProfileVC: UIViewController, UITableViewDelegate,  MFMailComposeViewContro
         self.tableView.cellLayoutMarginsFollowReadableWidth = true
         //        navigationController?.navigationBar.prefersLargeTitles = true
         
-        self.imageView.layer.cornerRadius = self.imageView.bounds.height / 2
+        self.imageView.layer.cornerRadius = self.imageView.frame.height / 2
         self.imageView.clipsToBounds = true
         
         // load data from Firebase

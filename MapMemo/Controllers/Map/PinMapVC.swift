@@ -109,17 +109,14 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
         if let coordinate = view.annotation?.coordinate {
             moveAndZoomMap(coordinate)
             
-            // Pin on self loaction
+//             Pin on self loaction
             if self.isSelected == false {
                 self.isSelected = true
                 clearBtn.isHidden = false
                 checkBtn.isHidden = false
                 self.selectedLocation = coordinate
             }
-
         }
-        
-
     }
 
     

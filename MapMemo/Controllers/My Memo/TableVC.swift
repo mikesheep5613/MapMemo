@@ -46,6 +46,9 @@ class TableVC: UIViewController {
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        self.tableView.reloadData()
+    }
     
     // Retrieve data from Firebase
     // Retrieve data for user only
@@ -68,39 +71,34 @@ class TableVC: UIViewController {
                     let post = PostModel(document: change.document)
                     //Reload image
                     guard let imageURLs = post.imageURL else {return}
-                    
-                    //                    var array : [UIImage] = []
                     post.imageArray = []
                     for imageURL in imageURLs {
                         if let loadImageURL = URL(string: imageURL){
                             NetworkController.shared.fetchImage(url: loadImageURL) { image in
-                                guard let image = image else {
-                                    assertionFailure("unwrapping image error")
-                                    return
+                                DispatchQueue.main.async {
+                                    
+                                    guard let image = image else {
+                                        assertionFailure("unwrapping image error")
+                                        return
+                                    }
+                                    
+                                    post.imageArray?.append(image)
+                                    print("Successfully fetch image.")
+                                    
+                                    //如果圖片陣列讀滿到url陣列數量，更新畫面
+                                    if post.imageArray?.count == post.imageURL?.count{
+                                        self.data.insert(post, at: 0)
+                                        let indexPath = IndexPath(row: 0, section: 0)
+                                        self.tableView.insertRows(at: [indexPath], with: .automatic)
+
+                                    }
                                 }
-                                
-                                post.imageArray?.append(image)
-                                print("Successfully fetch image.")
                             }
                         }
                         
                     }
-                    self.data.insert(post, at: 0)
-                    let indexPath = IndexPath(row: 0, section: 0)
-                    self.tableView.insertRows(at: [indexPath], with: .automatic)
+                                        
                     
-                    //                    if let loadImageURL = URL(string: imageURL){
-                    //                        NetworkController.shared.fetchImage(url: loadImageURL) { image in
-                    //                            DispatchQueue.main.async {
-                    //                                post.image = image
-                    //                                //Reload Table
-                    //                                self.data.insert(post, at: 0)
-                    //                                let indexPath = IndexPath(row: 0, section: 0)
-                    //                                self.tableView.insertRows(at: [indexPath], with: .automatic)
-                    //                            }
-                    //
-                    //                        }
-                    //                    }
                     
                 }else if change.type == .modified{
                     
@@ -122,8 +120,8 @@ class TableVC: UIViewController {
                         }
                         
                         //Reload image
-                        guard let imageURLs = post.imageURL else {return}
                         post.imageArray = []
+                        guard let imageURLs = post.imageURL else {return}
                         for imageURL in imageURLs {
                             if let loadImageURL = URL(string: imageURL){
                                 NetworkController.shared.fetchImage(url: loadImageURL) { image in
@@ -134,26 +132,21 @@ class TableVC: UIViewController {
                                         }
                                         // 把全部圖片刪掉重新load
                                         post.imageArray?.append(image)
+                                        print("Successfully fetch image.")
+                                        
+                                        //如果圖片陣列讀滿到url陣列數量，更新畫面
+                                        if post.imageArray?.count == post.imageURL?.count{
+                                            if let index = self.data.firstIndex(of: post){
+                                                let indexPath = IndexPath(row: index, section: 0)
+                                                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                                            }
+                                        }
                                     }
                                 }
                             }
                             
                         }
-                        
-                        //                        if let loadImageURL = URL(string: imageURL){
-                        //                            NetworkController.shared.fetchImage(url: loadImageURL) { image in
-                        //                                DispatchQueue.main.async {
-                        //                                    post.image = image
-                        //                                    if let index = self.data.firstIndex(of: post){
-                        //                                        let indexPath = IndexPath(row: index, section: 0)
-                        //                                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
-                        //                                    }
-                        //
-                        //                                }
-                        //
-                        //                            }
-                        //                        }
-                        
+
                     }
                 }else if change.type == .removed {
                     //透過documentId找到self.data相對應的Note
@@ -171,49 +164,7 @@ class TableVC: UIViewController {
                 }
             }
         }
-        
     }
-    
-    //     Retrieve data from Firebase
-    //    func queryFromFireStore() {
-    //
-    //        if let userID = Auth.auth().currentUser?.email{
-    //            db.collection(userID).getDocuments { (querySnapshot, error) in
-    //                if let error = error {
-    //                    print("Query error : \(error)")
-    //                }
-    //                guard let snapshot = querySnapshot else {return}
-    //                for document in snapshot.documents{
-    //                    let post = PostModel()
-    //                    post.title = document.data()["title"] as? String
-    //                    post.text = document.data()["text"] as? String
-    //                    post.type = document.data()["type"] as? String
-    //                    post.date = document.data()["date"] as? String
-    //                    post.imageURL = document.data()["imageURL"] as? String
-    //                    post.latitude = document.data()["latitude"] as? Double
-    //                    post.longitude = document.data()["longitude"] as? Double
-    //
-    //                    if let loadImageURL = URL(string: post.imageURL!){
-    //                        NetworkController.shared.fetchImage(url: loadImageURL) { image in
-    //                            DispatchQueue.main.async {
-    //                                post.image = image
-    //                                self.tableView.reloadData()
-    //                            }
-    //
-    //                        }
-    //                    }
-    //
-    //                    self.data.append(post)
-    //                }
-    //                // update UI
-    //                DispatchQueue.main.async {
-    //                    self.tableView.reloadData()
-    //                }
-    //
-    //            }
-    //        }
-    //    }
-    
     
     
     // MARK: - Navigation
@@ -263,7 +214,7 @@ extension TableVC : UITableViewDataSource{
             cell.montitorProfileData(userUID: userUID)
         }
         
-        cell.photoImageView.image = item.thumbnailImage(item.imageArray?.first)
+        cell.photoImageView.image = item.imageArray?.first
         
         return cell
     }

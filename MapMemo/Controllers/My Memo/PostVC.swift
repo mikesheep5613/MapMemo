@@ -39,12 +39,13 @@ class PostVC: UIViewController {
         self.dataLabel.text = DateFormatter.localizedString(from: (currentPost?.date)!, dateStyle: .long, timeStyle: .none)
         self.titleLabel.text = currentPost?.title
         self.textView.text = currentPost?.text
+        self.pageControl.numberOfPages = currentPost?.imageArray?.count ?? 3
 
         switch currentPost?.type{
         case "mountain":
             self.typeImageView.image = UIImage(named: "山")
         case "snorkeling":
-            self.typeImageView.image = UIImage(named: "浮潛")
+            self.typeImageView.image = UIImage(named: "浮潜")
         case "waterfall":
             self.typeImageView.image = UIImage(named: "瀑布")
         case "camping":

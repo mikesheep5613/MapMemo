@@ -9,8 +9,9 @@ import UIKit
 import MapKit
 import Firebase
 import PhotosUI
+import KRProgressHUD
 
-class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, PinMapVCDelegate, PHPickerViewControllerDelegate {
+class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDelegate, PinMapVCDelegate, PHPickerViewControllerDelegate {
     
     
     @IBOutlet var photoImageCollection: [UIImageView]!
@@ -31,12 +32,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     var newType : String?
     var newImageURL : String?
     var uuid : String?
-    
-    var activityIndicator = UIActivityIndicatorView()
-    var uploadBarButton = UIBarButtonItem()
-    var activityBarButton = UIBarButtonItem()
-    
-    
+        
     // Create property for retrieve data from PostVC
     var editPost : PostModel?
     
@@ -66,25 +62,19 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         self.textView.layer.borderWidth = 1
         // 設置UISwitch功能
         self.isPublicSwitch.addTarget(self, action: #selector(isPublicSwitchPressed(_:)), for: .valueChanged)
-        
-        
-        
-        //        let image = UIImage(systemName: "photo")
-        //        self.photoImageView.image = image
-        
-        
+                
         // check whether editPost receieve model
         if editPost != nil {
             self.isEditMode = true
             
             // Present to UI
-            self.photoImageCollection.first?.image = editPost?.imageArray?.first
-            self.photoImageCollection[1].image = editPost?.imageArray?[1]
-            self.photoImageCollection[2].image = editPost?.imageArray?[2]
-            
-            
-            //            self.photoImageView.contentMode = .scaleAspectFill
-            //            imageLayout(imageView: photoImageView)
+            guard let editImageArray = editPost?.imageArray else {return}
+            let imageCount = editImageArray.count
+            for i in 0 ..< imageCount {
+                self.photoImageCollection[i].image = editImageArray[i]
+                imageLayout(imageView: self.photoImageCollection[i])
+            }
+
             self.titleTextField.text = editPost?.title
             self.datePicker.date = editPost?.date ?? Date.init()
             self.typeSegmentControl.selectedSegmentIndex = typeSegmentIndexCheck(editPost?.type ?? "other")
@@ -107,16 +97,6 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         
         // connect to Firebase
         db = Firestore.firestore()
-        
-        
-        // add right barbutton item
-        activityIndicator.sizeToFit()
-        activityIndicator.color = .gray
-        activityBarButton = UIBarButtonItem(customView: activityIndicator)
-        uploadBarButton = UIBarButtonItem(image: UIImage(named: "ok"), style: .plain, target: self, action: #selector(uploadPost(_:)))
-        showUploadBarButton()
-        
-        
     }
     
     @IBAction func addPhotoBtn(_ sender: Any) {
@@ -130,11 +110,18 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         
         
     }
-    @IBAction func uploadPost(_ sender: UIBarButtonItem) {
-        
-        showActivityIndicator()
-        activityIndicator.startAnimating()
-        
+    
+    @IBAction func removePhotoBtn(_ sender: Any) {
+        // 照片處理
+        for imageView in self.photoImageCollection {
+            let image = UIImage(systemName: "photo")
+            image?.withTintColor(.opaqueSeparator)
+            imageView.image = image
+        }
+    }
+    
+    @IBAction func uploadBtnPressed(_ sender: Any) {
+        KRProgressHUD.show()
         //Upload image data to firebase storage
         // check Post need to be Added or Edited
         if self.isEditMode == true {
@@ -142,13 +129,13 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         } else {
             self.uuid = UUID().uuidString
         }
-        
+        guard let uuid = self.uuid else {return}
+
+        // 如果沒輸入以下欄位會跳alert
         //        if self.photoImageView.image == UIImage(systemName: "photo") || self.titleTextField.text == "" || self.textView.text == "" || self.newLocation == nil || self.newType == "" {
         if self.titleTextField.text == "" || self.textView.text == "" || self.newLocation == nil || self.newType == "" {
-            
+            KRProgressHUD.dismiss()
 
-            self.activityIndicator.stopAnimating()
-            self.showUploadBarButton()
             let alert = UIAlertController(title: "貼文上傳失敗!", message: "確認所有欄位是否都有正確填入", preferredStyle: .alert)
             let cancel = UIAlertAction(title: "繼續", style: .cancel, handler: nil)
             alert.addAction(cancel)
@@ -156,19 +143,17 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
             return
         }
         
-        //        guard let uploadImage = self.photoImageView.image?.resize(maxEdge: 1024) else {return}
-        //        guard let realUploadImage = uploadImage.jpegData(compressionQuality: 0.7) else {return}
-        guard let uuid = self.uuid else {return}
-        
-        guard let firstImage = self.photoImageCollection.first?.image?.resize(maxEdge: 1024) else {return}
-        guard let firstUploadImage = firstImage.jpegData(compressionQuality: 0.7) else {return}
-        guard let secondImage = self.photoImageCollection[1].image?.resize(maxEdge: 1024) else {return}
-        guard let secondUploadImage = secondImage.jpegData(compressionQuality: 0.7) else {return}
-        guard let thirdImage = self.photoImageCollection[2].image?.resize(maxEdge: 1024) else {return}
-        guard let thirdUploadImage = thirdImage.jpegData(compressionQuality: 0.7) else {return}
-        
-        self.images = [firstUploadImage, secondUploadImage, thirdUploadImage]
-        
+        // 照片處理
+        for imageView in self.photoImageCollection {
+            //如果照片有更新過才上傳
+            if imageView.image != UIImage(systemName: "photo"){
+                guard let image = imageView.image?.resize(maxEdge: 1024) else {return}
+                guard let uploadImage = image.jpegData(compressionQuality: 0.7) else {return}
+                self.images.append(uploadImage)
+            }
+        }
+                
+        // 同時上傳照片以及資料
         startUploading {
             // All images have been uploaded
             if let userID = Auth.auth().currentUser?.uid,
@@ -177,8 +162,6 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
                let location = self.newLocation,
                let type = self.newType
             {
-                
-                //                    let documentID = "\(Date().timeIntervalSince1970)"
                 let isPublic = self.isPublicSwitch.isOn
                 let date = self.datePicker.date.description
                 let imageURL = self.imagesURL
@@ -205,79 +188,21 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
                         
                         // if is edit mode pop to TableVC
                         if self.isEditMode == true {
+                            KRProgressHUD.dismiss()
                             self.navigationController?.popToRootViewController(animated: true)
                             
                         } else {
                             // if not, pop to MapVC
+                            KRProgressHUD.dismiss()
                             self.navigationController?.popViewController(animated: true)
                             
                         }
-                        
                     }
                 }
             }
         }
-        
-        /*storage.child("images/\(uuid).jpeg").putData(realUploadImage, metadata: nil) { _, error
-         in
-         if let error = error {
-         assertionFailure("Fail to upload image: \(error)")
-         return
-         }
-         self.storage.child("images/\(uuid).jpeg").downloadURL { url, error in
-         guard let url = url , error == nil else{
-         return
-         }
-         self.newImageURL = url.absoluteString // Save to global property
-         
-         //Upload Dict to firebase
-         if let userID = Auth.auth().currentUser?.uid,
-         let title = self.titleTextField.text,
-         let text = self.textView.text,
-         let location = self.newLocation,
-         let type = self.newType,
-         let imageURL = self.newImageURL {
-         
-         //                    let documentID = "\(Date().timeIntervalSince1970)"
-         let date = self.datePicker.date.description
-         
-         let ref = self.db.collection("posts").document(uuid)
-         let data = [
-         "authorID" : userID,
-         "postID" : uuid,
-         "title": title,
-         "text": text,
-         "date": date,
-         "latitude": location.latitude,
-         "longitude": location.longitude,
-         "type": type,
-         "imageURL" : imageURL
-         ] as [String : Any]
-         
-         ref.setData(data) { error in
-         if let e = error {
-         print ("Fail to setData: \(e).")
-         } else {
-         print("Set Data Successfully.")
-         
-         
-         // if is edit mode pop to TableVC
-         if self.isEditMode == true {
-         self.navigationController?.popToRootViewController(animated: true)
-         
-         } else {
-         // if not, pop to MapVC
-         self.navigationController?.popViewController(animated: true)
-         
-         }
-         
-         }
-         }
-         }
-         }
-         }*/
+
     }
-    
     
     @IBAction func trashBtnPressed(_ sender: UIBarButtonItem) {
         
@@ -311,13 +236,6 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         
     }
     
-    func showUploadBarButton() {
-        self.navigationItem.setRightBarButton(self.uploadBarButton, animated: true)
-    }
-    
-    func showActivityIndicator() {
-        self.navigationItem.setRightBarButton(self.activityBarButton, animated: true)
-    }
     
     //MARK: - UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -408,8 +326,6 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         } else {
             self.isPublicLabel.text = "Only Me"
             print("switch is off")
-            
-            
         }
         
     }
@@ -427,74 +343,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     }
     
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.row == 0 {
-            
-            let photoSourceRequestController = UIAlertController(title: "", message: "Choose your photo source", preferredStyle: .actionSheet)
-            
-            
-            let cameraAction = UIAlertAction(title: "Camera", style: .default) { (action) in
-                if UIImagePickerController.isSourceTypeAvailable(.camera){
-                    let imagePicker = UIImagePickerController()
-                    imagePicker.allowsEditing = false
-                    imagePicker.sourceType = .camera
-                    imagePicker.delegate = self
-                    self.present(imagePicker, animated: true, completion: nil)
-                }
-            }
-            
-            let photoLibraryAction = UIAlertAction(title: "Photo Library", style: .default) { (action) in
-                if UIImagePickerController.isSourceTypeAvailable(.photoLibrary){
-                    let imagePicker = UIImagePickerController()
-                    imagePicker.allowsEditing = false
-                    imagePicker.sourceType = .photoLibrary
-                    imagePicker.delegate = self
-                    self.present(imagePicker, animated: true, completion: nil)
-                }
-            }
-            photoSourceRequestController.addAction(cameraAction)
-            photoSourceRequestController.addAction(photoLibraryAction)
-            
-            //for iPad
-            if let popoverController = photoSourceRequestController.popoverPresentationController {
-                if let cell = tableView.cellForRow(at: indexPath){
-                    popoverController.sourceView = cell
-                    popoverController.sourceRect = cell.bounds
-                }
-            }
-            present(photoSourceRequestController, animated: true, completion: nil)
-            
-        }
-        
-    }
     
-    //MARK: - UIImagePickerControllerDelegate
-    //    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-    //        if let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-    //            self.photoImageView.image = selectedImage
-    //            self.photoImageView.contentMode = .scaleAspectFill
-    //            self.photoImageView.clipsToBounds = true
-    //        }
-    //
-    //        imageLayout(imageView: photoImageView)
-    //        dismiss(animated: true, completion: nil)
-    //    }
-    //
-    //    func imageLayout(imageView: UIImageView) {
-    //        let leading = NSLayoutConstraint(item: photoImageView as Any, attribute: .leading, relatedBy: .equal, toItem: photoImageView.superview, attribute: .leading, multiplier: 1, constant: 0)
-    //        leading.isActive = true
-    //
-    //        let trailing = NSLayoutConstraint(item: photoImageView as Any, attribute: .trailing, relatedBy: .equal, toItem: photoImageView.superview, attribute: .trailing, multiplier: 1, constant: 0)
-    //        trailing.isActive = true
-    //
-    //        let top = NSLayoutConstraint(item: photoImageView as Any, attribute: .top, relatedBy: .equal, toItem: photoImageView.superview, attribute: .top, multiplier: 1, constant: 0)
-    //        top.isActive = true
-    //
-    //        let bottom = NSLayoutConstraint(item: photoImageView as Any, attribute: .bottom, relatedBy: .equal, toItem: photoImageView.superview, attribute: .bottom, multiplier: 1, constant: 0)
-    //        bottom.isActive = true
-    //
-    //    }
-    //
     //MARK: - PinMapVCDelegate
     func didFinishUpdate(location: CLLocationCoordinate2D) {
         
@@ -532,7 +381,6 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         }
     }
     
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "pinMapSegue"{
             if let PinMapVC = segue.destination as? PinMapVC{
@@ -553,6 +401,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
                 DispatchQueue.main.async {
                     guard let self = self, let image = image as? UIImage, self.photoImageCollection[i].image == previousImage else { return }
                     self.photoImageCollection[i].image = image
+                    self.imageLayout(imageView: self.photoImageCollection[i])
                 }
             }
             
@@ -596,5 +445,20 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     }
     
     
+    func imageLayout(imageView: UIImageView) {
+        let leading = NSLayoutConstraint(item: imageView as Any, attribute: .leading, relatedBy: .equal, toItem: imageView.superview, attribute: .leading, multiplier: 1, constant: 0)
+        leading.isActive = true
+
+        let trailing = NSLayoutConstraint(item: imageView as Any, attribute: .trailing, relatedBy: .equal, toItem: imageView.superview, attribute: .trailing, multiplier: 1, constant: 0)
+        trailing.isActive = true
+
+        let top = NSLayoutConstraint(item: imageView as Any, attribute: .top, relatedBy: .equal, toItem: imageView.superview, attribute: .top, multiplier: 1, constant: 0)
+        top.isActive = true
+
+        let bottom = NSLayoutConstraint(item: imageView as Any, attribute: .bottom, relatedBy: .equal, toItem: imageView.superview, attribute: .bottom, multiplier: 1, constant: 0)
+        bottom.isActive = true
+
+    }
+
     
 }

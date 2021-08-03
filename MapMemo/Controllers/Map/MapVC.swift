@@ -11,6 +11,7 @@ import CoreLocation
 import FirebaseFirestore
 import FirebaseAuth
 import FirebaseStorage
+import KRProgressHUD
 
 
 class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDelegate {
@@ -111,7 +112,10 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     
     // Retrieve data from Firebase
     func monitorData() {
-  
+        
+        // Start Loading
+        KRProgressHUD.show()
+        
         self.db.collection("posts").addSnapshotListener { qSnapshot, error in
             if let e = error {
                 print("error snapshot listener \(e)")
@@ -139,15 +143,19 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                                     // 把全部圖片刪掉重新load
                                     post.imageArray?.append(image)
                                     print("Successfully fetch image.")
+                                    //如果圖片陣列讀滿到url陣列數量，更新畫面
+                                    if post.imageArray?.count == post.imageURL?.count{
+                                        // Insert pin based on data from Post Array
+                                        self.data.insert(post, at: 0)
+                                        //Reload map
+                                        self.placePin(self.data)
+                                    }
+
                                 }
                             }
                         }
                         
                     }
-                    // Insert pin based on data from Post Array
-                    self.data.insert(post, at: 0)
-                    //Reload map
-                    self.placePin(self.data)
                     
                 }else if change.type == .modified{
                     //透過documentId找到self.data相對應的Note
@@ -183,16 +191,20 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                                         // 把全部圖片刪掉重新load
                                         post.imageArray?.append(image)
                                         print("Successfully fetch image.")
+                                        //如果圖片陣列讀滿到url陣列數量，更新畫面
+                                        if post.imageArray?.count == post.imageURL?.count{
+                                            //Reload map
+                                            self.mapView.removeAnnotations(self.mapView.annotations)
+                                            self.placePin(self.data)
+                                        }
+
+                                        
                                     }
                                 }
                             }
                             
                         }
                     }
-                    
-                    //Reload map
-                    self.mapView.removeAnnotations(self.mapView.annotations)
-                    self.placePin(self.data)
                     
                 }else if change.type == .removed {
                     //透過documentId找到self.data相對應的Note
@@ -213,6 +225,9 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
 
         }
         
+        // Loading Finished
+        KRProgressHUD.dismiss()
+
     }
     
     func seperatePrivateAndPublic() {

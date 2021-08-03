@@ -3,13 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		7235B3102697276D00BCB618 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7235B30F2697276D00BCB618 /* GoogleService-Info.plist */; };
 		7235B31226972A5E00BCB618 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7235B31126972A5E00BCB618 /* LoginVC.swift */; };
 		72387F362695A17F00598763 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72387F342695A17F00598763 /* TableViewCell.swift */; };
+		72493BD226B8FB5B00BC83DA /* KRProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 72493BD126B8FB5B00BC83DA /* KRProgressHUD */; };
 		7256507D269DE21200A84649 /* PinMapVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7256507C269DE21200A84649 /* PinMapVC.swift */; };
 		7259375E26AA6E3900CD5922 /* popoverTableVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7259375D26AA6E3900CD5922 /* popoverTableVC.swift */; };
 		725AA80226A3220E0084B2BA /* UIImage+resize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725AA80126A3220E0084B2BA /* UIImage+resize.swift */; };
@@ -83,6 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72493BD226B8FB5B00BC83DA /* KRProgressHUD in Frameworks */,
 				B1106819025952B74C92E7B0 /* Pods_MapMemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -261,6 +263,9 @@
 			dependencies = (
 			);
 			name = MapMemo;
+			packageProductDependencies = (
+				72493BD126B8FB5B00BC83DA /* KRProgressHUD */,
+			);
 			productName = MapMemo;
 			productReference = 7278E90B2690343D00875B33 /* MapMemo.app */;
 			productType = "com.apple.product-type.application";
@@ -288,6 +293,9 @@
 				Base,
 			);
 			mainGroup = 7278E9022690343D00875B33;
+			packageReferences = (
+				72493BD026B8FB5B00BC83DA /* XCRemoteSwiftPackageReference "KRProgressHUD" */,
+			);
 			productRefGroup = 7278E90C2690343D00875B33 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -594,6 +602,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		72493BD026B8FB5B00BC83DA /* XCRemoteSwiftPackageReference "KRProgressHUD" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krimpedance/KRProgressHUD.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.4.7;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		72493BD126B8FB5B00BC83DA /* KRProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 72493BD026B8FB5B00BC83DA /* XCRemoteSwiftPackageReference "KRProgressHUD" */;
+			productName = KRProgressHUD;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7278E9032690343D00875B33 /* Project object */;
 }
