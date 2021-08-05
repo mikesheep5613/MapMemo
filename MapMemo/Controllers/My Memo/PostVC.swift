@@ -37,7 +37,7 @@ class PostVC: UIViewController {
         
         // Present UI.
         self.dataLabel.text = DateFormatter.localizedString(from: (currentPost?.date)!, dateStyle: .long, timeStyle: .none)
-        self.titleLabel.text = currentPost?.title
+//        self.titleLabel.text = currentPost?.title
         self.textView.text = currentPost?.text
         self.pageControl.numberOfPages = currentPost?.imageArray?.count ?? 3
 

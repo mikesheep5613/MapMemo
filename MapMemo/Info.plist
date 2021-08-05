@@ -15,7 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -34,7 +34,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FacebookAppID</key>
 	<string>2072362432939199</string>
 	<key>FacebookDisplayName</key>
@@ -62,11 +62,13 @@
 	<key>NSCameraUsageDescription</key>
 	<string>You need to grant the app access to upload your photo.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>取得用戶位置以便於記錄位置資訊</string>
+	<string>You need to grant the app access to detect your location.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>取得用戶位置以便於記錄位置資訊</string>
+	<string>You need to grant the app access to detect your location.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>You need to grant the app access to upload your photo.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>You need to grant the app access to help developer for tracking crash issues.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -88,10 +90,6 @@
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>location</string>
-	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

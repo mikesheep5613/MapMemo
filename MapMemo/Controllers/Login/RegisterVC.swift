@@ -71,11 +71,19 @@ class RegisterVC: UIViewController, UITextFieldDelegate{
     
     @IBAction func snedBtnPressed(_ sender: Any) {
         
+        // check format
+        validationCode()
+
+        
         if let email = self.emailTextfield.text, let password = self.passwordTextfield.text, let username = self.usernameField.text, let image = self.profileImageView.image {
             
             Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
                 if let error = error {
                     print("Resgister error : \(error)")
+                    self.openAlert(title: "Alert", message: error.localizedDescription , alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
+                        print("Okay clicked!")
+                    }])
+
                 } else {
                    
                     //1. upload profile image to storage
@@ -181,5 +189,34 @@ extension RegisterVC : UIImagePickerControllerDelegate, UINavigationControllerDe
         dismiss(animated: true, completion: nil)
     }
 
+    
+}
+
+extension RegisterVC {
+    fileprivate func validationCode() {
+        if let email = emailTextfield.text, let password = passwordTextfield.text{
+            if !email.validateEmail(){
+                openAlert(title: "Alert", message: "Please check your Email format.", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
+                    print("Okay clicked!")
+                }])
+            }else if !password.validatePassword(){
+                openAlert(title: "Alert", message: "Please enter valid password.", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
+                    print("Okay clicked!")
+                }])
+            }else{
+                
+            }
+
+        }else{
+            openAlert(title: "Alert", message: "Please input your Email & Password", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{_
+                in
+                print("OKay clicked")
+            }])
+        }
+        
+        
+    }
+    
+    
     
 }

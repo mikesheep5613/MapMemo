@@ -29,6 +29,7 @@
 		72823D13269A29B5005F109B /* LoginSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72823D12269A29B5005F109B /* LoginSwitch.swift */; };
 		7296424C26B7E638008D518F /* ImagesPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7296424B26B7E638008D518F /* ImagesPageViewController.swift */; };
 		7296424E26B7EA76008D518F /* ImagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7296424D26B7EA76008D518F /* ImagesViewController.swift */; };
+		72AEB4FB26BBC4250001DA5D /* DesignableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72AEB4FA26BBC4250001DA5D /* DesignableView.swift */; };
 		72B54EE1269C616A00C5FD2D /* RoundedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B54EE0269C616A00C5FD2D /* RoundedTextField.swift */; };
 		72B54EE3269C67B000C5FD2D /* NewPostTableVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B54EE2269C67B000C5FD2D /* NewPostTableVC.swift */; };
 		72B8982A26B58B9900C03A24 /* UploadToStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B8982926B58B9900C03A24 /* UploadToStorage.swift */; };
@@ -68,6 +69,7 @@
 		72823D12269A29B5005F109B /* LoginSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSwitch.swift; sourceTree = "<group>"; };
 		7296424B26B7E638008D518F /* ImagesPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesPageViewController.swift; sourceTree = "<group>"; };
 		7296424D26B7EA76008D518F /* ImagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesViewController.swift; sourceTree = "<group>"; };
+		72AEB4FA26BBC4250001DA5D /* DesignableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignableView.swift; sourceTree = "<group>"; };
 		72B54EE0269C616A00C5FD2D /* RoundedTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedTextField.swift; sourceTree = "<group>"; };
 		72B54EE2269C67B000C5FD2D /* NewPostTableVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostTableVC.swift; sourceTree = "<group>"; };
 		72B8982926B58B9900C03A24 /* UploadToStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadToStorage.swift; sourceTree = "<group>"; };
@@ -220,6 +222,7 @@
 			isa = PBXGroup;
 			children = (
 				72F3994C26B039E100802AD8 /* UIViewController + Extension.swift */,
+				72AEB4FA26BBC4250001DA5D /* DesignableView.swift */,
 				725AA80126A3220E0084B2BA /* UIImage+resize.swift */,
 				72F3994E26B03E7700802AD8 /* String+Extension.swift */,
 				72B54EE0269C616A00C5FD2D /* RoundedTextField.swift */,
@@ -257,6 +260,7 @@
 				7278E9082690343D00875B33 /* Frameworks */,
 				7278E9092690343D00875B33 /* Resources */,
 				2FA1EA9F25F417F2E2D51482 /* [CP] Embed Pods Frameworks */,
+				727834FF26BA2261006157A9 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -360,6 +364,25 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MapMemo/Pods-MapMemo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		727834FF26BA2261006157A9 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/FirebaseCrashlytics/run\"\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -383,6 +406,7 @@
 				7278E92826903A6C00875B33 /* MapVC.swift in Sources */,
 				72EFD7B426B1049D0032EA66 /* EditProfileVC.swift in Sources */,
 				7235B31226972A5E00BCB618 /* LoginVC.swift in Sources */,
+				72AEB4FB26BBC4250001DA5D /* DesignableView.swift in Sources */,
 				72F3994D26B039E100802AD8 /* UIViewController + Extension.swift in Sources */,
 				72E1045C2699E3CB00641C4C /* ProfileVC.swift in Sources */,
 				7278E9112690343D00875B33 /* SceneDelegate.swift in Sources */,
@@ -451,7 +475,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				EXCLUDED_ARCHS = "";
@@ -469,7 +493,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -525,7 +549,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -543,16 +567,19 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = LAQ936FAM8;
+				CURRENT_PROJECT_VERSION = 1.0.3;
+				DEVELOPMENT_TEAM = 7LVJW6YG74;
 				EXCLUDED_ARCHS = "";
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				INFOPLIST_FILE = MapMemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.miketsai.MapMemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.upload.MapMemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -566,14 +593,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = LAQ936FAM8;
+				CURRENT_PROJECT_VERSION = 1.0.3;
+				DEVELOPMENT_TEAM = 7LVJW6YG74;
 				INFOPLIST_FILE = MapMemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.miketsai.MapMemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.upload.MapMemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

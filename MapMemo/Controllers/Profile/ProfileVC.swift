@@ -18,8 +18,9 @@ class ProfileVC: UIViewController, UITableViewDelegate,  MFMailComposeViewContro
                            ( image: "lock.fill", text: "Change Password"),
                            ( image: "hand.point.left.fill", text: "Log Out")],
                           [( image: "envelope.fill", text: "Send Email To Developer"),
-                           (image: "star.circle" , text: "Rate Us On App Store")],
-                          [ (image: "wrench.and.screwdriver" , text: "V1.0.0") ]]
+                           (image: "star.circle.fill" , text: "Rate Us On App Store")],
+                          [ (image: "wrench.and.screwdriver.fill" , text:"1.0.0"),(image: "doc.fill" , text: "Privacy Policy") ]]
+
     var db : Firestore!
     var userEmail : String?
     var userName : String?
@@ -31,6 +32,10 @@ class ProfileVC: UIViewController, UITableViewDelegate,  MFMailComposeViewContro
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Update App Version
+        guard let version = Bundle.main.versionNumber else {return}
+        sectionContent[2][0].text = version
         
         self.tableView.dataSource = self
         self.tableView.delegate = self
@@ -178,13 +183,17 @@ extension ProfileVC : UITableViewDataSource {
                                                     let product = Bundle.main.object(forInfoDictionaryKey:"CFBundleName")
                                                     let messageBody = "<br/><br/><br/>Product:\(product!)(\(version!))"
                                                     mailController.setMessageBody(messageBody, isHTML: true)
-                                                    mailController.setToRecipients(["support@yoursupportemail.com"])
+                                                    mailController.setToRecipients(["mikesheep5613@gmail.com"])
                                                     self.present(mailController, animated: true, completion: nil)
                                                 })
                     alert.addAction(email)
                     self.present(alert, animated: true, completion: nil)
                 }else{
                     //alert user can't send email
+                    self.openAlert(title: "Alert", message: "Unable to send email, please check your device configuration." , alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
+                        print("Okay clicked!")
+                    }])
+
                 }
                 
                 
@@ -192,8 +201,8 @@ extension ProfileVC : UITableViewDataSource {
                 //Rate us
                 let askController = UIAlertController(title: "Hello App User", message: "If you like this app,please rate in App Store. Thanks.", preferredStyle: .alert)
                 
-                let okAction = UIAlertAction(title: "我要評分", style: .default) { (action) -> Void in
-                    let appID = "12345"
+                let okAction = UIAlertAction(title: "Rate it", style: .default) { (action) -> Void in
+                    let appID = "1579619070" // My App ID
                     let appURL =
                         URL(string: "https://itunes.apple.com/us/app/itunes-u/id\(appID)?action=write-review")!
                     UIApplication.shared.open(appURL, options: [:],
@@ -202,12 +211,22 @@ extension ProfileVC : UITableViewDataSource {
                 }
                 askController.addAction(okAction)
                 
-                let laterAction = UIAlertAction(title: "稍候再評", style: .default, handler: nil)
+                let laterAction = UIAlertAction(title: "Later", style: .default, handler: nil)
                 askController.addAction(laterAction)
                 
                 self.present(askController, animated: true, completion: nil)
                 
             }
+        // Version section
+        case 2:
+            if indexPath.row == 1 {
+                if let blogURL = URL(string: "https://mapmemoapp.blogspot.com/"){
+                    UIApplication.shared.open(blogURL, options: [:]) { (success) in
+                        
+                    }
+                }
+            }
+
         default:
             break
         }
@@ -215,4 +234,18 @@ extension ProfileVC : UITableViewDataSource {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
+}
+
+extension Bundle {
+    var versionNumber: String? {
+        return infoDictionary?["CFBundleShortVersionString"] as? String
+    }
+
+    var buildNumber: String? {
+        return infoDictionary?["CFBundleVersion"] as? String
+    }
+
+    var bundleName: String? {
+        return infoDictionary?["CFBundleName"] as? String
+    }
 }

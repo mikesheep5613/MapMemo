@@ -136,8 +136,8 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         if self.titleTextField.text == "" || self.textView.text == "" || self.newLocation == nil || self.newType == "" {
             KRProgressHUD.dismiss()
 
-            let alert = UIAlertController(title: "貼文上傳失敗!", message: "確認所有欄位是否都有正確填入", preferredStyle: .alert)
-            let cancel = UIAlertAction(title: "繼續", style: .cancel, handler: nil)
+            let alert = UIAlertController(title: "Unable to upload!!", message: "Please confirm the fields and submit it again.", preferredStyle: .alert)
+            let cancel = UIAlertAction(title: "Continue", style: .cancel, handler: nil)
             alert.addAction(cancel)
             self.present(alert, animated: true, completion: nil)
             return
@@ -209,25 +209,25 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         if self.isEditMode == true {
             self.uuid = editPost?.postID
             
-            let alert = UIAlertController(title: "是否刪除本篇心得??", message: "按下確認刪除資料", preferredStyle: .alert)
-            let pop = UIAlertAction(title: "確認", style: .default ){ (action) in
+            let alert = UIAlertController(title: "Confirm to delete this post?", message: "Press \"Confirm\" to delete the post.", preferredStyle: .alert)
+            let pop = UIAlertAction(title: "Confirm", style: .default ){ (action) in
                 // Delete post from Firebase
-                if let userID = Auth.auth().currentUser?.email, let uuid = self.uuid {
+                if let uuid = self.uuid {
                     self.db.collection("posts").document(uuid).delete()
                 }
                 self.navigationController?.popToRootViewController(animated: true)
             }
-            let cancel = UIAlertAction(title: "取消", style: .cancel, handler: nil)
+            let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
             alert.addAction(pop)
             alert.addAction(cancel)
             self.present(alert, animated: true, completion: nil)
             
         } else {
-            let alert = UIAlertController(title: "是否放棄本次編輯??", message: "按下確認返回前一頁面", preferredStyle: .alert)
-            let pop = UIAlertAction(title: "確認", style: .default ){ (action) in
+            let alert = UIAlertController(title: "Leave this post ?", message: "Press \"Confirm\" to go back.", preferredStyle: .alert)
+            let pop = UIAlertAction(title: "Confirm", style: .default ){ (action) in
                 self.navigationController?.popViewController(animated: true)
             }
-            let cancel = UIAlertAction(title: "取消", style: .cancel, handler: nil)
+            let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
             alert.addAction(pop)
             alert.addAction(cancel)
             self.present(alert, animated: true, completion: nil)
@@ -249,13 +249,22 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         
         if self.textView.text == "Write Something You Want To Record..." {
             self.textView.text = nil
-            self.textView.textColor = UIColor.black
+            self.textView.textColor =  UIColor { tc in
+                switch tc.userInterfaceStyle {
+                case .dark:
+                    return UIColor.white
+                default:
+                    return UIColor.black
+                }
+            }
+
         }
         
     }
     func textViewDidEndEditing(_ textView: UITextView) {
         if self.textView.text.isEmpty {
-            self.textView.text = ""
+            self.textView.text = "Write Something You Want To Record..."
+            self.textView.textColor = .opaqueSeparator
         }
     }
     

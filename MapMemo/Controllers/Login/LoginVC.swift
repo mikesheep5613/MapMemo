@@ -7,10 +7,10 @@
 
 import UIKit
 import Firebase
-//import FirebaseAuth
-//import GoogleSignIn
-//import FBSDKCoreKit
-//import FBSDKLoginKit
+import AppTrackingTransparency
+
+
+
 
 class LoginVC: UIViewController,UITextFieldDelegate{
 
@@ -19,9 +19,27 @@ class LoginVC: UIViewController,UITextFieldDelegate{
     
     @IBOutlet weak var confirmBtn: UIButton!
     @IBOutlet weak var regiterBtn: UIButton!
+    @IBOutlet weak var backgroundImageView: UIImageView!
+    @IBOutlet weak var animateSwitch: UISwitch!
+    
+    var loading_1: UIImage!
+    var loading_2: UIImage!
+    var loading_3: UIImage!
+    var images: [UIImage]!
+    var animatedImage: UIImage!
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let _ = AppTrackingPermission().requestAppTrackingPermission{ success, error in
+          if success == true {
+            print("User permit to track the user")
+          } else {
+            print("AppTrackingPermission:: ", error.debugDescription)
+          }
+        }
+
         self.emailTextfield.delegate = self
         self.passwordTextfield.delegate = self
         
@@ -29,6 +47,12 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         self.confirmBtn.clipsToBounds = true
         self.regiterBtn.layer.cornerRadius = self.regiterBtn.bounds.height / 2
         self.regiterBtn.clipsToBounds = true
+
+        loading_1 = UIImage(named: "S1")
+        loading_2 = UIImage(named: "S2")
+        loading_3 = UIImage(named: "S3")
+        images = [loading_1, loading_2, loading_3]
+        animatedImage = UIImage.animatedImage(with: images, duration: 0.8)
 
 
     }
@@ -42,13 +66,29 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = false
     }
-
+    
+    
+//    @IBAction func registerBtnPressed(_ sender: Any) {
+//        guard let registerVC = self.storyboard?.instantiateViewController(identifier: "registerVC") else {
+//            return
+//        }
+//        self.present(registerVC, animated: true, completion: nil)
+//    }
+    
     //MARK: - UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }
     
+    //MARK: - Login Animation
+    @IBAction func animateSwitch(_ sender: Any) {
+        if self.animateSwitch.isOn {
+            self.backgroundImageView.image = self.animatedImage
+        }else {
+            self.backgroundImageView.image = self.loading_3
+        }
+    }
     
     
     
@@ -96,16 +136,6 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         }
     }
     
-        /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
 
 extension LoginVC {
@@ -135,4 +165,34 @@ extension LoginVC {
     
     
     
+}
+
+enum AppTrackingPermissionError: Error {
+  case denied
+  case notDetermined
+  case restricted
+}
+
+class AppTrackingPermission {
+  
+  func requestAppTrackingPermission(completion: @escaping (Bool, AppTrackingPermissionError?) -> ()) {
+    ATTrackingManager.requestTrackingAuthorization { trackingAuthorizationStatus in
+      switch trackingAuthorizationStatus {
+        case .authorized:
+          print(trackingAuthorizationStatus)
+          completion(true, nil)
+        case .denied:
+          print(trackingAuthorizationStatus)
+          completion(false, .denied)
+        case .notDetermined:
+          print(trackingAuthorizationStatus)
+          completion(false, .notDetermined)
+        case .restricted:
+          print(trackingAuthorizationStatus)
+          completion(false, .restricted)
+        @unknown default:
+          break
+      }
+    }
+  }
 }

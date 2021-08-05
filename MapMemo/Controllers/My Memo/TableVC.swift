@@ -24,6 +24,8 @@ class TableVC: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -58,6 +60,11 @@ class TableVC: UIViewController {
             return
         }
         self.db.collection("posts").whereField("authorID", isEqualTo: userID).addSnapshotListener { qSnapshot, error in
+            
+            // Start Loading
+            self.activityIndicator.isHidden = false
+            self.activityIndicator.startAnimating()
+
             if let e = error {
                 print("error snapshot listener \(e)")
                 return
@@ -90,8 +97,11 @@ class TableVC: UIViewController {
                                         self.data.insert(post, at: 0)
                                         let indexPath = IndexPath(row: 0, section: 0)
                                         self.tableView.insertRows(at: [indexPath], with: .automatic)
-
                                     }
+                                    // Loading Finished
+                                    self.activityIndicator.stopAnimating()
+                                    self.activityIndicator.isHidden = true
+
                                 }
                             }
                         }
@@ -141,6 +151,10 @@ class TableVC: UIViewController {
                                                 self.tableView.reloadRows(at: [indexPath], with: .automatic)
                                             }
                                         }
+                                        // Loading Finished
+                                        self.activityIndicator.stopAnimating()
+                                        self.activityIndicator.isHidden = true
+
                                     }
                                 }
                             }
@@ -160,6 +174,9 @@ class TableVC: UIViewController {
                         }
                         
                     }
+                    // Loading Finished
+                    self.activityIndicator.stopAnimating()
+                    self.activityIndicator.isHidden = true
                     
                 }
             }
