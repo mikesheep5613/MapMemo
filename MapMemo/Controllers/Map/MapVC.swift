@@ -348,11 +348,7 @@ extension MapVC : MKMapViewDelegate {
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        
-        if view.annotation is MKUserLocation {
-            
-        }
-        
+                
         self.mapView.deselectAnnotation(view.annotation, animated: true)
 
         if let pin = view.annotation as? PostModel {

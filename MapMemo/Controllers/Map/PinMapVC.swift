@@ -44,6 +44,17 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
         locationManager.requestAlwaysAuthorization()
         if !CLLocationManager.locationServicesEnabled(){
             print("Location Request Denied")
+            self.openAlert(title: "Alert", message: "Location Request Denied" , alertStyle: .alert, actionTitles: ["Redirect to Privacy Setting!"], actionStyles: [.default], actions: [{ _ in
+                if let url = URL(string: "App-Prefs:Privacy&path=LOCATION"){
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                }
+            }])
+        }else if locationManager.authorizationStatus == .denied{
+            self.openAlert(title: "Alert", message: "Location Request Denied" , alertStyle: .alert, actionTitles: ["Redirect to Privacy Setting!"], actionStyles: [.default], actions: [{ _ in
+                guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {return}
+                UIApplication.shared.open(settingsUrl, options: [:], completionHandler: nil)
+                
+            }])
         }else {
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
             locationManager.activityType = .automotiveNavigation
@@ -52,6 +63,12 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
             locationManager.startUpdatingLocation()
         }
     }
+    
+    //    if #available(iOS 10.0, *) { if let url = URL(string: "App-Prefs:Privacy&path=LOCATION") { UIApplication.shared.open(url, options: [:], completionHandler: nil) } } else { if let url = URL(string: "prefs:root=LOCATION_SERVICE") { // If general location settings are disabled then open general location settings UIApplication.shared.openURL(url) } }
+    //    guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+    //                        return
+    //                    }
+    
     
     @IBAction func clearBtnPressed(_ sender: UIButton) {
         self.pinMapView.removeAnnotations(self.pinMapView.annotations)
@@ -159,7 +176,7 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         self.pinMapView.removeAnnotations(self.pinMapView.annotations)
         self.view.sendSubviewToBack(btnStackView)
-
+        
         generateMKLocalSearch()
         searchBar.resignFirstResponder()
         
