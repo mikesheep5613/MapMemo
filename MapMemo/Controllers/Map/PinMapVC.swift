@@ -42,19 +42,33 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
     
     @IBAction func locateMeBtnressed(_ sender: Any) {
         locationManager.requestAlwaysAuthorization()
-        if !CLLocationManager.locationServicesEnabled(){
-            print("Location Request Denied")
-            self.openAlert(title: "Alert", message: "Location Request Denied" , alertStyle: .alert, actionTitles: ["Redirect to Privacy Setting!"], actionStyles: [.default], actions: [{ _ in
+        if !CLLocationManager.locationServicesEnabled(){ // Location Services is ON
+        
+            //Redirect to Privacy Setting
+            let askController = UIAlertController(title: "Location Request Denied", message: "Redirect to Privacy Setting?", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "Yes", style: .default) { (action) -> Void in
                 if let url = URL(string: "App-Prefs:Privacy&path=LOCATION"){
                     UIApplication.shared.open(url, options: [:], completionHandler: nil)
                 }
-            }])
-        }else if locationManager.authorizationStatus == .denied{
-            self.openAlert(title: "Alert", message: "Location Request Denied" , alertStyle: .alert, actionTitles: ["Redirect to Privacy Setting!"], actionStyles: [.default], actions: [{ _ in
+            }
+            askController.addAction(okAction)
+            let laterAction = UIAlertAction(title: "Later", style: .default, handler: nil)
+            askController.addAction(laterAction)
+            self.present(askController, animated: true, completion: nil)
+
+            
+        }else if locationManager.authorizationStatus == .denied{ // Location Services of App is Never
+            //Redirect to Privacy Setting
+            let askController = UIAlertController(title: "Location Request Denied", message: "Redirect to Privacy Setting?", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "Yes", style: .default) { (action) -> Void in
                 guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {return}
                 UIApplication.shared.open(settingsUrl, options: [:], completionHandler: nil)
-                
-            }])
+            }
+            askController.addAction(okAction)
+            let laterAction = UIAlertAction(title: "Later", style: .default, handler: nil)
+            askController.addAction(laterAction)
+            self.present(askController, animated: true, completion: nil)
+
         }else {
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
             locationManager.activityType = .automotiveNavigation

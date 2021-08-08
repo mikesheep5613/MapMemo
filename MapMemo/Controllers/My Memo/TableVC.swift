@@ -55,12 +55,14 @@ class TableVC: UIViewController {
     // Retrieve data from Firebase
     // Retrieve data for user only
     func monitorData() {
+
         guard let userID = Auth.auth().currentUser?.uid else {
             assertionFailure("Invalid userID")
             return
         }
         self.db.collection("posts").whereField("authorID", isEqualTo: userID).addSnapshotListener { qSnapshot, error in
-            
+            var index = 0
+
             // Start Loading
             self.activityIndicator.isHidden = false
             self.activityIndicator.startAnimating()
@@ -70,7 +72,13 @@ class TableVC: UIViewController {
                 return
             }
             guard let documentsChange = qSnapshot?.documentChanges else {return}
+            print("documentsChange.count:\(documentsChange.count)")
             
+            if documentsChange.count == 0 {
+                self.activityIndicator.stopAnimating()
+                self.activityIndicator.isHidden = true
+            }
+
             for change in documentsChange {
                 
                 if change.type == .added{
@@ -97,10 +105,14 @@ class TableVC: UIViewController {
                                         self.data.insert(post, at: 0)
                                         let indexPath = IndexPath(row: 0, section: 0)
                                         self.tableView.insertRows(at: [indexPath], with: .automatic)
+                                        index += 1
+                                        print("index:\(index)")
                                     }
-                                    // Loading Finished
-                                    self.activityIndicator.stopAnimating()
-                                    self.activityIndicator.isHidden = true
+                                    // Loading Finished, fetch all documentschange
+                                    if index == documentsChange.count{
+                                        self.activityIndicator.stopAnimating()
+                                        self.activityIndicator.isHidden = true
+                                    }
 
                                 }
                             }
@@ -111,6 +123,7 @@ class TableVC: UIViewController {
                     
                     
                 }else if change.type == .modified{
+                    
                     
                     //透過documentId找到self.data相對應的Note
                     let docID = change.document.data()["postID"] as? String
@@ -146,14 +159,19 @@ class TableVC: UIViewController {
                                         
                                         //如果圖片陣列讀滿到url陣列數量，更新畫面
                                         if post.imageArray?.count == post.imageURL?.count{
-                                            if let index = self.data.firstIndex(of: post){
-                                                let indexPath = IndexPath(row: index, section: 0)
+                                            if let firstIndex = self.data.firstIndex(of: post){
+                                                let indexPath = IndexPath(row: firstIndex, section: 0)
                                                 self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                                                index += 1
+                                                print("index:\(index)")
+
                                             }
                                         }
-                                        // Loading Finished
-                                        self.activityIndicator.stopAnimating()
-                                        self.activityIndicator.isHidden = true
+                                        // Loading Finished, fetch all documentschange
+                                        if index == documentsChange.count{
+                                            self.activityIndicator.stopAnimating()
+                                            self.activityIndicator.isHidden = true
+                                        }
 
                                     }
                                 }
@@ -205,6 +223,7 @@ class TableVC: UIViewController {
                 
             }
         }
+        
     }
 }
 

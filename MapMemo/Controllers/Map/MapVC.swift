@@ -127,9 +127,9 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     
     // Retrieve data from Firebase
     func monitorData() {
-                
         self.db.collection("posts").addSnapshotListener { qSnapshot, error in
-            
+            var index = 0
+
             // Start Loading
             self.activityIndicator.isHidden = false
             self.activityIndicator.startAnimating()
@@ -141,7 +141,10 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
             guard let documentsChange = qSnapshot?.documentChanges else {return}
             print("documentsChange.count:\(documentsChange.count)")
             
-            var index = 0
+            if documentsChange.count == 0 {
+                self.activityIndicator.stopAnimating()
+                self.activityIndicator.isHidden = true
+            }
             
             for change in documentsChange {
                 

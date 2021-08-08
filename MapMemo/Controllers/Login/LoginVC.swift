@@ -55,6 +55,16 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         animatedImage = UIImage.animatedImage(with: images, duration: 0.8)
 
 
+        //Autofill registered email
+        NotificationCenter.default.addObserver(self, selector: #selector(finishRegister(notification:)), name: .passUserEmail, object: nil)
+
+
+    }
+    
+    @objc func finishRegister(notification: Notification) {
+        if let email = notification.userInfo?["email"] as? String {
+            self.emailTextfield.text = email
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -67,13 +77,6 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         navigationController?.isNavigationBarHidden = false
     }
     
-    
-//    @IBAction func registerBtnPressed(_ sender: Any) {
-//        guard let registerVC = self.storyboard?.instantiateViewController(identifier: "registerVC") else {
-//            return
-//        }
-//        self.present(registerVC, animated: true, completion: nil)
-//    }
     
     //MARK: - UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -95,9 +98,7 @@ class LoginVC: UIViewController,UITextFieldDelegate{
     //MARK: - Email signin method
     @IBAction func signinBtnPressed(_ sender: UIButton) {
         
-        // check format
-        validationCode()
-        
+        // check format        
     
         if let email = emailTextfield.text, let password = passwordTextfield.text {
             Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
@@ -138,34 +139,35 @@ class LoginVC: UIViewController,UITextFieldDelegate{
     
 }
 
-extension LoginVC {
-    fileprivate func validationCode() {
-        if let email = emailTextfield.text, let password = passwordTextfield.text{
-            if !email.validateEmail(){
-                openAlert(title: "Alert", message: "Please check your Email format.", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
-                    print("Okay clicked!")
-                }])
-            }else if !password.validatePassword(){
-                openAlert(title: "Alert", message: "Please enter valid password.", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
-                    print("Okay clicked!")
-                }])
-            }else{
-                
-            }
 
-        }else{
-            openAlert(title: "Alert", message: "Please input your Email & Password", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{_
-                in
-                print("OKay clicked")
-            }])
-        }
-        
-        
-    }
-    
-    
-    
-}
+//extension LoginVC {
+//    fileprivate func validationCode() {
+//        if let email = emailTextfield.text, let password = passwordTextfield.text{
+//            if !email.validateEmail(){
+//                openAlert(title: "Alert", message: "Please check your Email format.", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
+//                    print("Okay clicked!")
+//                }])
+//            }else if !password.validatePassword(){
+//                openAlert(title: "Alert", message: "Please enter valid password.", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
+//                    print("Okay clicked!")
+//                }])
+//            }else{
+//
+//            }
+//
+//        }else{
+//            openAlert(title: "Alert", message: "Please input your Email & Password", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{_
+//                in
+//                print("OKay clicked")
+//            }])
+//        }
+//
+//
+//    }
+//
+//
+//
+//}
 
 enum AppTrackingPermissionError: Error {
   case denied

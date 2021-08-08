@@ -69,10 +69,21 @@ class RegisterVC: UIViewController, UITextFieldDelegate{
         self.present(controller, animated: true, completion: nil)
     }
     
+ 
+    
+    
     @IBAction func snedBtnPressed(_ sender: Any) {
         
         // check format
-        validationCode()
+        
+        // 如果沒輸入以下欄位會跳alert
+        if self.usernameField.text == "" {
+            let alert = UIAlertController(title: "Alert", message: "Please enter your Username.", preferredStyle: .alert)
+            let cancel = UIAlertAction(title: "Continue", style: .cancel, handler: nil)
+            alert.addAction(cancel)
+            self.present(alert, animated: true, completion: nil)
+            return
+        }
 
         
         if let email = self.emailTextfield.text, let password = self.passwordTextfield.text, let username = self.usernameField.text, let image = self.profileImageView.image {
@@ -101,7 +112,7 @@ class RegisterVC: UIViewController, UITextFieldDelegate{
                                 print("error \(e)")
                                 return
                             } else {
-                                print("user name change")
+                                print("user created")
                                 //2. save profile data to firebase database
                                 self.saveProfile(username: username, profileImageURL: url) { success in
                                     if success {
@@ -115,6 +126,7 @@ class RegisterVC: UIViewController, UITextFieldDelegate{
                     
                     let alert = UIAlertController(title: "SUCCESS", message: "Your account has been successfully created.", preferredStyle: .alert)
                     let cancel = UIAlertAction(title: "Continue", style: .cancel) { action in
+                        NotificationCenter.default.post(name: .passUserEmail , object: nil, userInfo: ["email": self.emailTextfield.text!])
                         self.navigationController?.popViewController(animated: true)
                     }
                     alert.addAction(cancel)
@@ -192,31 +204,8 @@ extension RegisterVC : UIImagePickerControllerDelegate, UINavigationControllerDe
     
 }
 
-extension RegisterVC {
-    fileprivate func validationCode() {
-        if let email = emailTextfield.text, let password = passwordTextfield.text{
-            if !email.validateEmail(){
-                openAlert(title: "Alert", message: "Please check your Email format.", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
-                    print("Okay clicked!")
-                }])
-            }else if !password.validatePassword(){
-                openAlert(title: "Alert", message: "Please enter valid password.", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
-                    print("Okay clicked!")
-                }])
-            }else{
-                
-            }
 
-        }else{
-            openAlert(title: "Alert", message: "Please input your Email & Password", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{_
-                in
-                print("OKay clicked")
-            }])
-        }
-        
-        
-    }
-    
-    
-    
+//定義通知名稱
+extension Notification.Name{
+    static let passUserEmail = Notification.Name("passUserEmail")
 }

@@ -21,9 +21,8 @@ class PostVC: UIViewController {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var imageViewSecond: UIImageView!
     @IBOutlet weak var imageViewThird: UIImageView!
-    
     @IBOutlet weak var pageControl: UIPageControl!
-    
+    @IBOutlet weak var likeBtnOutlet: UIButton!
     var currentPost : PostModel?
     var db : Firestore!
     
@@ -82,12 +81,20 @@ class PostVC: UIViewController {
         performSegue(withIdentifier: "editSegue", sender: self)
     }
     
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "editSegue" {
             if let newPostTableVC = segue.destination as? NewPostTableVC {
                 newPostTableVC.editPost = self.currentPost
             }
         }
+        
+        if segue.identifier == "messageSegue" {
+            if let messageVC = segue.destination as? messageVC {
+                messageVC.postID = self.currentPost?.postID
+            }
+        }
+        
         if segue.identifier == "imagesEmbedSegue"{
             if let imagesPageVC = segue.destination as? ImagesPageViewController {
                 imagesPageVC.imagesArray = self.currentPost?.imageArray
@@ -132,6 +139,26 @@ class PostVC: UIViewController {
             
         }
         
+    }
+    
+//    MARK: - Like Button Function
+    @IBAction func likeBtnPressed(_ sender: Any) {
+        
+        print("btn selected")
+        if self.likeBtnOutlet.imageView?.image == UIImage(named: "heart"){
+            self.likeBtnOutlet.imageView?.image = UIImage(named: "heart.fill")
+        }        
+//        self.db.collection("posts").document(self.currentPost!.postID).observeSingleEvent(of:.value, with: { [self] (snapshot) in
+//
+//            if snapshot.children.allObjects is [DataSnapshot] {
+//
+//                count =  count + 1
+//                LikeCount.text = "\(count)"
+//                LikeCount.textColor = UIColor.red
+//                postRef.updateChildValues(["likes":count])
+//        }
+//        })
+
     }
     
 }
