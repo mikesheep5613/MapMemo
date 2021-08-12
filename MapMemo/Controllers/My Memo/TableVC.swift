@@ -49,6 +49,9 @@ class TableVC: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        // remove navigation title
+        self.navigationItem.title = ""
+        
         self.tableView.reloadData()
     }
     
@@ -245,6 +248,10 @@ extension TableVC : UITableViewDataSource{
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "memoCell", for: indexPath) as! MemoTableViewCell
         cell.titleLabel.text = item.title
+        if let postID = item.postID{
+            cell.monitirLikeCount(postID: postID)
+        }
+        
         cell.dateLabel.text = DateFormatter.localizedString(from: item.date!, dateStyle: .long, timeStyle: .none)
         if let userUID = item.authorID {
             cell.montitorProfileData(userUID: userUID)

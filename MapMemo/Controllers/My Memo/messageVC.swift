@@ -27,6 +27,7 @@ class messageVC: UIViewController {
         super.viewDidLoad()
 
         self.tableView.dataSource = self
+        self.tableView.delegate = self
         self.messageTextField.delegate = self
         
         self.tableView.separatorStyle = .none
@@ -38,20 +39,31 @@ class messageVC: UIViewController {
     }
     
     
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        
+        self.tableView.setEditing(editing, animated: true)
+    }
+    
+    
     //MARK: - Send message
     @IBAction func sendBtnPressed(_ sender: Any) {
         if let username = self.username, let profileImageURL = self.profilePhotoURL, let messageBody = messageTextField.text, let messageSender = Auth.auth().currentUser?.uid, let postID = self.postID {
+           
             let nowDate = Date()
             let df = DateFormatter()
-            df.dateFormat = "yyyy-MM-dd hh:mm:ss"
+            df.dateFormat = "yyyy-MM-dd HH:mm:ss"
             let dateString = df.string(from: nowDate)
-            self.db.collection("posts").document(postID).collection("messages").document("\(Date().timeIntervalSince1970)").setData([
+            
+            let timeInterval = Date().timeIntervalSince1970
+            
+            self.db.collection("posts").document(postID).collection("messages").document("\(timeInterval)").setData([
                 "userID": messageSender,
                 "body": messageBody,
                 "date": dateString,
                 "username": username,
                 "photoURL" : profileImageURL,
-                "timeInterval" : Date().timeIntervalSince1970
+                "timeInterval" : timeInterval
             ]) { error in
                 if let e = error {
                     print("There was an issue saving data to firestore, \(e)")
@@ -185,4 +197,36 @@ extension messageVC: UITableViewDataSource {
         return cell
 
     }
+}
+
+//MARK: - UITableViewDelegate
+extension messageVC: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        
+        if editingStyle == .delete {//紅色刪除，另一種是綠色加號
+            //1.刪除data中的資料
+            let message = self.messages.remove(at: indexPath.row)
+            guard let postID = self.postID else {return}
+            
+            if Auth.auth().currentUser?.uid == message.sender {
+                self.db.collection("posts").document(postID).collection("messages").document("\(message.timeInterval)").delete()
+                //2.通知畫面更新
+                self.tableView.deleteRows(at: [indexPath], with: .automatic)
+            }else {
+                let alertController = UIAlertController(title: "Unable to delete this message!", message: "Please check you select your message.", preferredStyle: .alert)
+                
+                let okAction = UIAlertAction(title: "Okay", style: .cancel, handler: nil)
+                alertController.addAction(okAction)
+                
+                self.present(alertController, animated: true, completion: nil)
+
+            }
+
+            
+        }
+        
+    }
+    
+    
 }

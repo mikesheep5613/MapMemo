@@ -41,6 +41,10 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
         
 
     }
+    override func viewWillAppear(_ animated: Bool) {
+        // remove navigation title
+        self.navigationItem.title = ""
+    }
     
     
     //MARK: - privateData & publicData Segment
@@ -174,6 +178,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                                         self.data.insert(post, at: 0)
                                         //Reload map
                                         self.testplacePin(post)
+                                        
                                         index += 1
                                         print("index:\(index)")
 
@@ -194,9 +199,11 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                     //透過documentId找到self.data相對應的Note
                     let docID = change.document.data()["postID"] as? String
                     if let updatePost = self.data.filter({ post in post.postID == docID }).first{
+                        
+                        self.mapView.removeAnnotation(updatePost)
+
                         //更新資料
                         updatePost.authorID = change.document.data()["authorID"] as? String
-                        
                         updatePost.title = change.document.data()["title"] as? String
                         updatePost.text = change.document.data()["text"] as? String
                         updatePost.type = change.document.data()["type"] as? String
@@ -204,6 +211,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                         updatePost.latitude = change.document.data()["latitude"] as? Double
                         updatePost.longitude = change.document.data()["longitude"] as? Double
                         updatePost.isPublic = change.document.data()["isPublic"] as? Bool
+                        updatePost.coordinate = CLLocationCoordinate2D(latitude: updatePost.latitude ?? 0.0, longitude: updatePost.longitude ?? 0.0)
                         if let tempDate = change.document.data()["date"] as? String {
                             let dateFormatter = DateFormatter()
                             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
@@ -226,9 +234,8 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                                         print("Successfully fetch image.")
                                         //如果圖片陣列讀滿到url陣列數量，更新畫面
                                         if updatePost.imageArray?.count == updatePost.imageURL?.count{
-                                            self.mapView.removeAnnotation(updatePost)
-                                            self.testplacePin(updatePost)
                                             //Reload map
+                                              self.testplacePin(updatePost)
                                             index += 1
                                             print("index:\(index)")
 

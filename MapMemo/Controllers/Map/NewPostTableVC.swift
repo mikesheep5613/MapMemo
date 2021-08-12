@@ -15,7 +15,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     
     
     @IBOutlet var photoImageCollection: [UIImageView]!
-    @IBOutlet weak var photoImageView: UIImageView!
+//    @IBOutlet weak var photoImageView: UIImageView!
     
     
     @IBOutlet weak var titleTextField: RoundedTextField!
@@ -60,6 +60,9 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         self.textView.layer.cornerRadius = 5.0
         self.textView.layer.borderColor = UIColor.lightGray.cgColor
         self.textView.layer.borderWidth = 1
+        // type預設為mountain type
+        self.newType = "mountain"
+        
         // 設置UISwitch功能
         self.isPublicSwitch.addTarget(self, action: #selector(isPublicSwitchPressed(_:)), for: .valueChanged)
                 
@@ -130,18 +133,17 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
             self.uuid = UUID().uuidString
         }
         guard let uuid = self.uuid else {return}
-
-        // 如果沒輸入以下欄位會跳alert
-        //        if self.photoImageView.image == UIImage(systemName: "photo") || self.titleTextField.text == "" || self.textView.text == "" || self.newLocation == nil || self.newType == "" {
-        if self.titleTextField.text == "" || self.textView.text == "" || self.newLocation == nil || self.newType == "" {
-            KRProgressHUD.dismiss()
-
-            let alert = UIAlertController(title: "Unable to upload!!", message: "Please confirm the fields and submit it again.", preferredStyle: .alert)
-            let cancel = UIAlertAction(title: "Continue", style: .cancel, handler: nil)
-            alert.addAction(cancel)
-            self.present(alert, animated: true, completion: nil)
-            return
-        }
+        
+//        if self.typeSegmentControl.isSelected != true {
+//            KRProgressHUD.dismiss()
+//
+//            let alert = UIAlertController(title: "Unable to upload!!", message: "Please confirm the fields are filled and submit it again.", preferredStyle: .alert)
+//            let cancel = UIAlertAction(title: "Continue", style: .cancel, handler: nil)
+//            alert.addAction(cancel)
+//            self.present(alert, animated: true, completion: nil)
+//            return
+//        }
+        
         
         // 照片處理
         for imageView in self.photoImageCollection {
@@ -152,6 +154,18 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
                 self.images.append(uploadImage)
             }
         }
+        
+        // 如果沒輸入以下欄位會跳alert
+        if  self.titleTextField.text == "" || self.textView.text == "" || self.newLocation == nil || self.newType == nil || self.images.isEmpty  {
+            KRProgressHUD.dismiss()
+
+            let alert = UIAlertController(title: "Unable to upload!!", message: "Please confirm the fields are filled and submit it again.", preferredStyle: .alert)
+            let cancel = UIAlertAction(title: "Continue", style: .cancel, handler: nil)
+            alert.addAction(cancel)
+            self.present(alert, animated: true, completion: nil)
+            return
+        }
+
                 
         // 同時上傳照片以及資料
         startUploading {
@@ -258,6 +272,17 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
                 }
             }
 
+        }
+        
+        if self.isEditMode == true{
+            self.textView.textColor =  UIColor { tc in
+                switch tc.userInterfaceStyle {
+                case .dark:
+                    return UIColor.white
+                default:
+                    return UIColor.black
+                }
+            }
         }
         
     }

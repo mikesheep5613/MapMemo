@@ -11,7 +11,7 @@ import MapKit
 import Firebase
 
 class PostVC: UIViewController {
-
+    
     @IBOutlet weak var dataLabel: UILabel!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var textView: UITextView!
@@ -23,11 +23,13 @@ class PostVC: UIViewController {
     @IBOutlet weak var imageViewThird: UIImageView!
     @IBOutlet weak var pageControl: UIPageControl!
     @IBOutlet weak var likeBtnOutlet: UIButton!
+    @IBOutlet weak var dislikeBtnOutlet: UIButton!
+    @IBOutlet weak var commentLabel: UIButton!
     var currentPost : PostModel?
     var db : Firestore!
     
     var imagesPageViewController : ImagesPageViewController?
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // load data from Firebase
@@ -36,10 +38,10 @@ class PostVC: UIViewController {
         
         // Present UI.
         self.dataLabel.text = DateFormatter.localizedString(from: (currentPost?.date)!, dateStyle: .long, timeStyle: .none)
-//        self.titleLabel.text = currentPost?.title
+                self.titleLabel.text = currentPost?.title
         self.textView.text = currentPost?.text
         self.pageControl.numberOfPages = currentPost?.imageArray?.count ?? 3
-
+        
         switch currentPost?.type{
         case "mountain":
             self.typeImageView.image = UIImage(named: "山")
@@ -61,6 +63,12 @@ class PostVC: UIViewController {
         if Auth.auth().currentUser?.uid != self.currentPost?.authorID {
             navigationItem.rightBarButtonItem?.isEnabled = false
         }
+        
+        // check Like Btn status
+        monitorLikeBtn()
+        // check Comment Count
+
+        monitirCommentCount()
     }
     
     // nav invisible
@@ -69,19 +77,21 @@ class PostVC: UIViewController {
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.isTranslucent = true
-      }
-      override func viewWillDisappear(_ animated: Bool) {
+        monitirCommentCount()
+
+    }
+    override func viewWillDisappear(_ animated: Bool) {
         // Restore the navigation bar to default
         navigationController?.navigationBar.setBackgroundImage(nil, for: .default)
         navigationController?.navigationBar.shadowImage = nil
-      }
-
+    }
+    
     
     @IBAction func editBtnPressed(_ sender: UIBarButtonItem) {
         performSegue(withIdentifier: "editSegue", sender: self)
     }
     
-
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "editSegue" {
             if let newPostTableVC = segue.destination as? NewPostTableVC {
@@ -128,10 +138,10 @@ class PostVC: UIViewController {
                                 self.userProfileImage.layer.cornerRadius = self.userProfileImage.bounds.height / 2
                                 self.userProfileImage.clipsToBounds = true
                             }
-
+                            
                         }
                     }
-
+                    
                     
                 }
                 
@@ -141,24 +151,64 @@ class PostVC: UIViewController {
         
     }
     
-//    MARK: - Like Button Function
+    
+    
+    //MARK: - Like Button Function
     @IBAction func likeBtnPressed(_ sender: Any) {
         
-        print("btn selected")
-        if self.likeBtnOutlet.imageView?.image == UIImage(named: "heart"){
-            self.likeBtnOutlet.imageView?.image = UIImage(named: "heart.fill")
-        }        
-//        self.db.collection("posts").document(self.currentPost!.postID).observeSingleEvent(of:.value, with: { [self] (snapshot) in
-//
-//            if snapshot.children.allObjects is [DataSnapshot] {
-//
-//                count =  count + 1
-//                LikeCount.text = "\(count)"
-//                LikeCount.textColor = UIColor.red
-//                postRef.updateChildValues(["likes":count])
-//        }
-//        })
-
+        //如果是空心
+        if let postID = self.currentPost?.postID, let userID = Auth.auth().currentUser?.uid {
+            self.db.collection("posts").document(postID).collection("LikeBy").document("\(postID)_\(userID)").setData(["isLikeed" : true]){ error in
+                if let e = error {
+                    print("Like Button error :\(e)")
+                    return
+                }
+                self.likeBtnOutlet.isHidden = true
+                self.dislikeBtnOutlet.isHidden = false
+            }
+            
+        }
+    }
+    
+    //MARK: - Dislike Button Function
+    @IBAction func dislikeBtnPressed(_ sender: Any) {
+        if let postID = self.currentPost?.postID, let userID = Auth.auth().currentUser?.uid {
+            self.db.collection("posts").document(postID).collection("LikeBy").document("\(postID)_\(userID)").delete()
+            self.likeBtnOutlet.isHidden = false
+            self.dislikeBtnOutlet.isHidden = true
+        }
+    }
+    
+    func monitorLikeBtn() {
+        if let postID = self.currentPost?.postID, let userID = Auth.auth().currentUser?.uid {
+            let ref = self.db.collection("posts").document(postID).collection("LikeBy").document("\(postID)_\(userID)")
+            ref.getDocument { (qSnapchat, error) in
+                if let doc = qSnapchat, doc.exists{
+                    self.likeBtnOutlet.isHidden = true
+                    self.dislikeBtnOutlet.isHidden = false
+                }else{
+                    self.likeBtnOutlet.isHidden = false
+                    self.dislikeBtnOutlet.isHidden = true
+                }
+            }
+        }
+    }
+    
+    func monitirCommentCount(){
+        if let postID = self.currentPost?.postID {
+            self.db.collection("posts").document(postID).collection("messages").getDocuments{ qSanpshot, error in
+                
+                if let e = error {
+                    print("monitirCommentCount error \(e)")
+                    return
+                }
+                
+                guard let documents = qSanpshot else {return}
+                print(documents.count)
+                self.commentLabel.setTitle("\(documents.count) Comments", for: .normal)
+                
+            }
+        }
     }
     
 }

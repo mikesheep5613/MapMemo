@@ -110,6 +110,8 @@ class PinMapVC: UIViewController, UIGestureRecognizerDelegate, MKMapViewDelegate
     
     @objc func handleLongPress(gestureRecognizer : UILongPressGestureRecognizer){
         if gestureRecognizer.state != UIGestureRecognizer.State.ended {
+            self.pinMapView.removeAnnotations(self.pinMapView.annotations)
+            
             let touchLocation = gestureRecognizer.location(in: pinMapView)
             let locationCoordinate = pinMapView.convert(touchLocation, toCoordinateFrom: pinMapView)
             print("Tapped at lat:\(locationCoordinate.latitude), lon:\(locationCoordinate.longitude)")
