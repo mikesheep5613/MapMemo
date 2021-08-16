@@ -129,27 +129,27 @@
                                                 <rect key="frame" x="0.0" y="0.0" width="374" height="50"/>
                                                 <subviews>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="70Q-AG-MFH">
-                                                        <rect key="frame" x="108" y="10" width="158" height="30"/>
-                                                        <state key="normal" title="Forgot Your Password?">
+                                                        <rect key="frame" x="234" y="10" width="132" height="30"/>
+                                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                                        <state key="normal" title="Forgot Password?">
                                                             <color key="titleColor" name="AccentColor"/>
                                                         </state>
                                                         <connections>
                                                             <action selector="forgotPasswordBtnPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="hwh-SI-DuL"/>
                                                         </connections>
                                                     </button>
-                                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="VgP-qQ-9LU">
-                                                        <rect key="frame" x="8" y="9.5" width="51" height="31"/>
-                                                        <connections>
-                                                            <action selector="animateSwitch:" destination="BYZ-38-t0r" eventType="valueChanged" id="947-q6-UnY"/>
-                                                        </connections>
-                                                    </switch>
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hb6-tI-kRI">
+                                                        <rect key="frame" x="8" y="10" width="88" height="30"/>
+                                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                                        <state key="normal" title="Guest Login"/>
+                                                    </button>
                                                 </subviews>
                                                 <constraints>
-                                                    <constraint firstItem="70Q-AG-MFH" firstAttribute="centerY" secondItem="naE-m8-LRg" secondAttribute="centerY" id="4b5-pl-Js5"/>
                                                     <constraint firstAttribute="height" constant="50" id="6dZ-18-MZf"/>
-                                                    <constraint firstItem="VgP-qQ-9LU" firstAttribute="leading" secondItem="naE-m8-LRg" secondAttribute="leading" constant="8" id="Qdu-9j-nu1"/>
-                                                    <constraint firstItem="70Q-AG-MFH" firstAttribute="centerX" secondItem="naE-m8-LRg" secondAttribute="centerX" id="kZd-yj-KrE"/>
-                                                    <constraint firstItem="VgP-qQ-9LU" firstAttribute="centerY" secondItem="naE-m8-LRg" secondAttribute="centerY" id="tUT-yp-VhT"/>
+                                                    <constraint firstAttribute="trailing" secondItem="70Q-AG-MFH" secondAttribute="trailing" constant="8" id="D4J-AZ-wFE"/>
+                                                    <constraint firstItem="hb6-tI-kRI" firstAttribute="leading" secondItem="naE-m8-LRg" secondAttribute="leading" constant="8" id="bXg-wJ-Mvb"/>
+                                                    <constraint firstItem="hb6-tI-kRI" firstAttribute="centerY" secondItem="naE-m8-LRg" secondAttribute="centerY" id="dso-F8-tyL"/>
+                                                    <constraint firstItem="70Q-AG-MFH" firstAttribute="centerY" secondItem="naE-m8-LRg" secondAttribute="centerY" id="hCS-9e-Zkf"/>
                                                 </constraints>
                                             </view>
                                         </subviews>
@@ -162,6 +162,12 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="VgP-qQ-9LU">
+                                <rect key="frame" x="335" y="98" width="51" height="31"/>
+                                <connections>
+                                    <action selector="animateSwitch:" destination="BYZ-38-t0r" eventType="valueChanged" id="947-q6-UnY"/>
+                                </connections>
+                            </switch>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" red="0.46274509803921571" green="0.76862745098039209" blue="0.85882352941176465" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -171,9 +177,11 @@
                             <constraint firstItem="XKe-Mt-JLk" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="OPA-Z2-Ra4"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="XKe-Mt-JLk" secondAttribute="trailing" constant="20" id="S6P-76-x8m"/>
                             <constraint firstAttribute="bottom" secondItem="XKe-Mt-JLk" secondAttribute="bottom" constant="20" id="cXR-vb-byS"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="VgP-qQ-9LU" secondAttribute="trailing" constant="10" id="eDQ-EJ-8zb"/>
                             <constraint firstItem="4K3-1G-dms" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="kci-cy-RrB"/>
                             <constraint firstItem="4K3-1G-dms" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="kod-31-2fl"/>
                             <constraint firstAttribute="bottom" secondItem="4K3-1G-dms" secondAttribute="bottom" id="tWk-wq-gbO"/>
+                            <constraint firstItem="VgP-qQ-9LU" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" constant="10" id="yqD-7t-veC"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="byK-Y8-Avb"/>
