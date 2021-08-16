@@ -15,16 +15,16 @@ class TableVC: UIViewController {
     
     var data : [PostModel] = [] //全部的資料都在這,searchcontroller.isActive=false時顯示
     var filteredData : [PostModel] = [] //過濾後的資料,searchcontroller.isActive=true時顯示
-    
     var searchController = UISearchController(searchResultsController: nil)
-    
     var db : Firestore!
+    var heightForHeader : CGFloat = 0.0
     
     
     
     @IBOutlet weak var tableView: UITableView!
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,33 +34,46 @@ class TableVC: UIViewController {
         db = Firestore.firestore()
         monitorData()
         
+
+
+        
+        
         self.tableView.dataSource = self
         self.tableView.delegate = self
         
         // register a nib for cellReuseIdentifier
         self.tableView.register(UINib(nibName: "MemoTableViewCell", bundle: nil), forCellReuseIdentifier: "memoCell")
         
+        self.tableView.register(UINib(nibName: "MemoEmptyTableViewCell", bundle: nil), forCellReuseIdentifier: "memoEmptyCell")
+
         
         self.navigationItem.searchController = self.searchController
         self.searchController.hidesNavigationBarDuringPresentation = true
         self.searchController.obscuresBackgroundDuringPresentation = false
         self.searchController.searchResultsUpdater = self
         
+        // Guest Login
+        if UserDefaults.standard.value(forKey: "username") as! String == "guest" {
+            self.activityIndicator.stopAnimating()
+            self.activityIndicator.isHidden = true
+            return
+        }
+
+        
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         // remove navigation title
         self.navigationItem.title = ""
         
         self.tableView.reloadData()
     }
-    
+        
     // Retrieve data from Firebase
     // Retrieve data for user only
     func monitorData() {
 
         guard let userID = Auth.auth().currentUser?.uid else {
-            assertionFailure("Invalid userID")
+            print("Invalid userID")
             return
         }
         self.db.collection("posts").whereField("authorID", isEqualTo: userID).addSnapshotListener { qSnapshot, error in
@@ -232,6 +245,8 @@ class TableVC: UIViewController {
 
 //MARK: - UITableViewDataSource
 extension TableVC : UITableViewDataSource{
+    
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if self.searchController.isActive {//搜尋模式，找filteredData
             return self.filteredData.count
@@ -261,6 +276,25 @@ extension TableVC : UITableViewDataSource{
         
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if self.data.count == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "memoEmptyCell") as! MemoEmptyTableViewCell
+            return cell.contentView
+        }else{
+            return nil
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if self.data.count == 0 {
+            heightForHeader = self.tableView.frame.height
+        }else{
+            heightForHeader = 0.0
+        }
+        return heightForHeader
+    }
+
 }
 
 //MARK: -
@@ -274,7 +308,7 @@ extension TableVC : UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "postSegue", sender: self)
     }
-    
+        
 }
 
 //MARK: - UISearchResultsUpdating

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7235B3102697276D00BCB618 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7235B30F2697276D00BCB618 /* GoogleService-Info.plist */; };
 		7235B31226972A5E00BCB618 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7235B31126972A5E00BCB618 /* LoginVC.swift */; };
 		72387F362695A17F00598763 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72387F342695A17F00598763 /* TableViewCell.swift */; };
 		72493BD226B8FB5B00BC83DA /* KRProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 72493BD126B8FB5B00BC83DA /* KRProgressHUD */; };
@@ -17,6 +16,9 @@
 		725D967926B3A80500143A91 /* UIKit+Shadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725D967826B3A80500143A91 /* UIKit+Shadow.swift */; };
 		725D967C26B3B30E00143A91 /* MemoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725D967A26B3B30E00143A91 /* MemoTableViewCell.swift */; };
 		725D967D26B3B30E00143A91 /* MemoTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 725D967B26B3B30E00143A91 /* MemoTableViewCell.xib */; };
+		7262EE4426CA3A180070EB38 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7262EE4326CA3A180070EB38 /* GoogleService-Info.plist */; };
+		7262EE4726CA667C0070EB38 /* MemoEmptyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7262EE4526CA667C0070EB38 /* MemoEmptyTableViewCell.swift */; };
+		7262EE4826CA667C0070EB38 /* MemoEmptyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7262EE4626CA667C0070EB38 /* MemoEmptyTableViewCell.xib */; };
 		7278E90F2690343D00875B33 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7278E90E2690343D00875B33 /* AppDelegate.swift */; };
 		7278E9112690343D00875B33 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7278E9102690343D00875B33 /* SceneDelegate.swift */; };
 		7278E9162690343D00875B33 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7278E9142690343D00875B33 /* Main.storyboard */; };
@@ -50,7 +52,6 @@
 		19C9BCB353BD9775C0FD4B25 /* Pods-MapMemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapMemo.debug.xcconfig"; path = "Target Support Files/Pods-MapMemo/Pods-MapMemo.debug.xcconfig"; sourceTree = "<group>"; };
 		20C82ACEC65E9713284F1F62 /* Pods-MapMemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MapMemo.release.xcconfig"; path = "Target Support Files/Pods-MapMemo/Pods-MapMemo.release.xcconfig"; sourceTree = "<group>"; };
 		55D4254B261DA96BC6B59CCC /* Pods_MapMemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MapMemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		7235B30F2697276D00BCB618 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7235B31126972A5E00BCB618 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		72387F342695A17F00598763 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		7256507C269DE21200A84649 /* PinMapVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinMapVC.swift; sourceTree = "<group>"; };
@@ -59,6 +60,9 @@
 		725D967826B3A80500143A91 /* UIKit+Shadow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIKit+Shadow.swift"; sourceTree = "<group>"; };
 		725D967A26B3B30E00143A91 /* MemoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoTableViewCell.swift; sourceTree = "<group>"; };
 		725D967B26B3B30E00143A91 /* MemoTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MemoTableViewCell.xib; sourceTree = "<group>"; };
+		7262EE4326CA3A180070EB38 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		7262EE4526CA667C0070EB38 /* MemoEmptyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoEmptyTableViewCell.swift; sourceTree = "<group>"; };
+		7262EE4626CA667C0070EB38 /* MemoEmptyTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MemoEmptyTableViewCell.xib; sourceTree = "<group>"; };
 		7278E90B2690343D00875B33 /* MapMemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MapMemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7278E90E2690343D00875B33 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7278E9102690343D00875B33 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -181,7 +185,7 @@
 				7278E9172690343E00875B33 /* Assets.xcassets */,
 				7278E9192690343E00875B33 /* LaunchScreen.storyboard */,
 				7278E91C2690343E00875B33 /* Info.plist */,
-				7235B30F2697276D00BCB618 /* GoogleService-Info.plist */,
+				7262EE4326CA3A180070EB38 /* GoogleService-Info.plist */,
 			);
 			path = MapMemo;
 			sourceTree = "<group>";
@@ -214,6 +218,8 @@
 			children = (
 				7278E9142690343D00875B33 /* Main.storyboard */,
 				725D967A26B3B30E00143A91 /* MemoTableViewCell.swift */,
+				7262EE4526CA667C0070EB38 /* MemoEmptyTableViewCell.swift */,
+				7262EE4626CA667C0070EB38 /* MemoEmptyTableViewCell.xib */,
 				725D967B26B3B30E00143A91 /* MemoTableViewCell.xib */,
 				72E0BC7626C00F7A0096DE32 /* MyMessageCell.swift */,
 				72E0BC7726C00F7A0096DE32 /* MyMessageCell.xib */,
@@ -327,11 +333,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				7278E91B2690343E00875B33 /* LaunchScreen.storyboard in Resources */,
+				7262EE4826CA667C0070EB38 /* MemoEmptyTableViewCell.xib in Resources */,
 				7278E9182690343E00875B33 /* Assets.xcassets in Resources */,
 				72E0BC7926C00F7A0096DE32 /* MyMessageCell.xib in Resources */,
 				7278E9162690343D00875B33 /* Main.storyboard in Resources */,
 				725D967D26B3B30E00143A91 /* MemoTableViewCell.xib in Resources */,
-				7235B3102697276D00BCB618 /* GoogleService-Info.plist in Resources */,
+				7262EE4426CA3A180070EB38 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -404,6 +411,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				725AA80226A3220E0084B2BA /* UIImage+resize.swift in Sources */,
+				7262EE4726CA667C0070EB38 /* MemoEmptyTableViewCell.swift in Sources */,
 				72387F362695A17F00598763 /* TableViewCell.swift in Sources */,
 				7278E92C26903AD600875B33 /* PostVC.swift in Sources */,
 				72E0BC7826C00F7A0096DE32 /* MyMessageCell.swift in Sources */,

@@ -142,6 +142,9 @@
                                                         <rect key="frame" x="8" y="10" width="88" height="30"/>
                                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                                         <state key="normal" title="Guest Login"/>
+                                                        <connections>
+                                                            <action selector="guestLoginBtnPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dWM-wV-YOG"/>
+                                                        </connections>
                                                     </button>
                                                 </subviews>
                                                 <constraints>
@@ -1213,7 +1216,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Lam-hU-FAZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4262" y="722"/>
+            <point key="canvasLocation" x="4260.8695652173919" y="721.875"/>
         </scene>
         <!--Popover TableVC-->
         <scene sceneID="ayR-dp-Ksx">
@@ -1580,7 +1583,7 @@
             <objects>
                 <viewController storyboardIdentifier="showImageVC" id="p5U-mw-qe8" customClass="ImagesViewController" customModule="MapMemo" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="ABB-NV-h2g">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="406.5"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="406"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="kfO-Kt-Yuf">
@@ -1705,7 +1708,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="0QK-nW-bDO"/>
+        <segue reference="1IW-0v-W9a"/>
         <segue reference="kjz-Rz-pe3"/>
     </inferredMetricsTieBreakers>
     <resources>

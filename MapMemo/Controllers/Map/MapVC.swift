@@ -28,18 +28,19 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     
     override func viewDidLoad() {
         super.viewDidLoad()
-                
+        
         mapView.delegate = self
         moveAndZoomMap()
         
         // load data from Firebase
         db = Firestore.firestore()
         
-
+        
         //Default Setting show data from all of people
         monitorData()
         
-
+        
+        
     }
     override func viewWillAppear(_ animated: Bool) {
         // remove navigation title
@@ -60,41 +61,52 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
             self.mapView.removeAnnotations(self.mapView.annotations)
             self.placePin(self.data)
         }
-
+        
     }
     
     //MARK: - typeFilter
     @IBAction func typeFilterBarBtnPressed(_ sender: Any) {
         self.typeFilterStackView.isHidden = !self.typeFilterStackView.isHidden
-                if self.typeFilterStackView.isHidden {
-                    self.view.sendSubviewToBack(self.typeFilterStackView)
-                }else{
-
-                    self.view.bringSubviewToFront(self.typeFilterStackView)
-                }
+        if self.typeFilterStackView.isHidden {
+            self.view.sendSubviewToBack(self.typeFilterStackView)
+        }else{
+            
+            self.view.bringSubviewToFront(self.typeFilterStackView)
+        }
     }
     
     func mapViewFilter(_ type : String){
         var publicArray : [PostModel] = []
         var privateArray : [PostModel] = []
         
-        guard let userID = Auth.auth().currentUser?.uid else {return}
+        
+        // Check Guest Login or User Login
+        if UserDefaults.standard.value(forKey: "username") as! String == "guest" {
+            for post in self.data {
+                if post.isPublic == true {
+                    publicArray.append(post)
+                }
+            }
 
-        for post in self.data {
-            if post.isPublic == true {
-                publicArray.append(post)
-            }else if post.authorID == userID && post.isPublic == false {
-                privateArray.append(post)
+        } else {
+            guard let userID = Auth.auth().currentUser?.uid else {return}
+            for post in self.data {
+                if post.isPublic == true {
+                    publicArray.append(post)
+                }else if post.authorID == userID && post.isPublic == false {
+                    privateArray.append(post)
+                }
             }
         }
-
+        
+        
         var dataSource : [PostModel]
         if switchDataSourceControl.selectedSegmentIndex == 0 {
             dataSource = privateArray
         }else{
             dataSource = publicArray
         }
-
+        
         for annotation in dataSource {
             if annotation.type != type {
                 self.mapView.removeAnnotation(annotation)
@@ -105,7 +117,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     }
     
     @IBAction func typeFilterBtnPressed(_ sender: UIButton) {
-                
+        
         switch sender.tag {
         case 0:
             mapViewFilter("mountain")
@@ -121,23 +133,23 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
             mapViewFilter("other")
         case 6:
             self.placePin(self.data)
-
+            
         default:
             break
         }
     }
     
-
+    
     
     // Retrieve data from Firebase
     func monitorData() {
         self.db.collection("posts").addSnapshotListener { qSnapshot, error in
             var index = 0
-
+            
             // Start Loading
             self.activityIndicator.isHidden = false
             self.activityIndicator.startAnimating()
-
+            
             if let e = error {
                 print("error snapshot listener \(e)")
                 return
@@ -171,7 +183,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                                     // 把全部圖片刪掉重新load
                                     post.imageArray?.append(image)
                                     print("Successfully fetch image.")
-                         
+                                    
                                     //如果圖片陣列讀滿到url陣列數量，更新畫面
                                     if post.imageArray?.count == post.imageURL?.count{
                                         // Insert pin based on data from Post Array
@@ -181,14 +193,14 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                                         
                                         index += 1
                                         print("index:\(index)")
-
+                                        
                                         // Loading Finished, fetch all documentschange
                                         if index == documentsChange.count{
                                             self.activityIndicator.stopAnimating()
                                             self.activityIndicator.isHidden = true
                                         }
                                     }
-
+                                    
                                 }
                             }
                         }
@@ -201,7 +213,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                     if let updatePost = self.data.filter({ post in post.postID == docID }).first{
                         
                         self.mapView.removeAnnotation(updatePost)
-
+                        
                         //更新資料
                         updatePost.authorID = change.document.data()["authorID"] as? String
                         updatePost.title = change.document.data()["title"] as? String
@@ -217,7 +229,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ssZ"
                             updatePost.date = dateFormatter.date(from: tempDate)
                         }
-
+                        
                         //Reload image
                         updatePost.imageArray = []
                         guard let imageURLs = updatePost.imageURL else {return}
@@ -235,18 +247,18 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                                         //如果圖片陣列讀滿到url陣列數量，更新畫面
                                         if updatePost.imageArray?.count == updatePost.imageURL?.count{
                                             //Reload map
-                                              self.testplacePin(updatePost)
+                                            self.testplacePin(updatePost)
                                             index += 1
                                             print("index:\(index)")
-
+                                            
                                             // Loading Finished, fetch all documentschange
                                             if index == documentsChange.count{
                                                 self.activityIndicator.stopAnimating()
                                                 self.activityIndicator.isHidden = true
                                             }
-
+                                            
                                         }
-
+                                        
                                         
                                     }
                                 }
@@ -268,7 +280,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                             // Loading Finished
                             self.activityIndicator.stopAnimating()
                             self.activityIndicator.isHidden = true
-
+                            
                         }
                     }
                 }
@@ -277,7 +289,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
         
         
     }
-        
+    
     func moveAndZoomMap(){
         // 以台灣中心來準備region
         let coordinate = CLLocationCoordinate2D(latitude: 23.974098094452746 , longitude: 120.9796606886788)
@@ -288,7 +300,22 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     
     //MARK: - Place Pins on MapView
     func placePin(_ data: [PostModel]){
-        guard let userID = Auth.auth().currentUser?.uid else {return}
+
+        if UserDefaults.standard.value(forKey: "username") as! String == "guest" {
+            for post in data{
+                if switchDataSourceControl.selectedSegmentIndex == 1 {
+                    self.mapView.addAnnotation(post)
+                }
+            }
+            return
+        }
+        
+        
+        guard let userID = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        
         for post in data{
             if post.isPublic == true{
                 if switchDataSourceControl.selectedSegmentIndex == 1 {
@@ -304,18 +331,29 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     }
     
     func testplacePin(_ post: PostModel){
-        guard let userID = Auth.auth().currentUser?.uid else {return}
-            if post.isPublic == true{
+        
+        // Guest Login In
+        if UserDefaults.standard.value(forKey: "username") as! String == "guest" {
+            for post in data{
                 if switchDataSourceControl.selectedSegmentIndex == 1 {
                     self.mapView.addAnnotation(post)
                 }
-            }else if post.authorID == userID && post.isPublic == false {
-                if switchDataSourceControl.selectedSegmentIndex == 0 {
-                    self.mapView.addAnnotation(post)
-                }
             }
-    }
+            return
+        }
 
+        guard let userID = Auth.auth().currentUser?.uid else {return}
+        if post.isPublic == true{
+            if switchDataSourceControl.selectedSegmentIndex == 1 {
+                self.mapView.addAnnotation(post)
+            }
+        }else if post.authorID == userID && post.isPublic == false {
+            if switchDataSourceControl.selectedSegmentIndex == 0 {
+                self.mapView.addAnnotation(post)
+            }
+        }
+    }
+    
 }
 
 //MARK: - MKMapViewDelegate
@@ -338,7 +376,7 @@ extension MapVC : MKMapViewDelegate {
         } else {
             pinView?.annotation = annotation
         }
-                
+        
         switch annotation.type {
         case "mountain":
             pinView?.image = UIImage(named: "mpin")
@@ -358,24 +396,35 @@ extension MapVC : MKMapViewDelegate {
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-                
+        
         self.mapView.deselectAnnotation(view.annotation, animated: true)
-
+        
         if let pin = view.annotation as? PostModel {
             print("get pin success")
             performSegue(withIdentifier: "pinTouched", sender: pin)
         }
     }
     
-//    func mapViewDidFinishLoadingMap(_ mapView: MKMapView) {
-//        if self.mapView.annotations.count == self.data.count{
-//            self.activityIndicator.stopAnimating()
-//            self.activityIndicator.isHidden = true
-//        }
-//
-//    }
-//
+    //    func mapViewDidFinishLoadingMap(_ mapView: MKMapView) {
+    //        if self.mapView.annotations.count == self.data.count{
+    //            self.activityIndicator.stopAnimating()
+    //            self.activityIndicator.isHidden = true
+    //        }
+    //
+    //    }
+    //
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+
+        if segue.identifier == "newPostSegue"{
+            // Guest Login In, not allow to upload
+            if UserDefaults.standard.value(forKey: "username") as! String == "guest" {
+                self.openAlert(title: "Alert", message: "Guest User is not allowed to upload post, please register an official account." , alertStyle: .alert, actionTitles: ["Continue"], actionStyles: [.default], actions: [{ _ in
+                    print("Okay clicked!")
+                }])
+                return
+            }
+        }
+
         if segue.identifier == "pinTouched"{
             if let postVC = segue.destination as? PostVC {
                 postVC.currentPost = sender as? PostModel

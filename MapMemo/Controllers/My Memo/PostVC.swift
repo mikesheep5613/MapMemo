@@ -69,6 +69,17 @@ class PostVC: UIViewController {
         // check Comment Count
 
         monitirCommentCount()
+        
+        
+        // Guest Login In, not allow to edit
+        if UserDefaults.standard.value(forKey: "username") as! String == "guest" {
+            self.dislikeBtnOutlet.isEnabled = false
+            self.likeBtnOutlet.isEnabled = false
+            self.commentLabel.isEnabled = false
+            self.userNameLabel.text = "User Name"
+            self.userProfileImage.image = UIImage(systemName: "nosign")
+        }
+
     }
     
     // nav invisible
@@ -172,6 +183,7 @@ class PostVC: UIViewController {
     
     //MARK: - Dislike Button Function
     @IBAction func dislikeBtnPressed(_ sender: Any) {
+        
         if let postID = self.currentPost?.postID, let userID = Auth.auth().currentUser?.uid {
             self.db.collection("posts").document(postID).collection("LikeBy").document("\(postID)_\(userID)").delete()
             self.likeBtnOutlet.isHidden = false

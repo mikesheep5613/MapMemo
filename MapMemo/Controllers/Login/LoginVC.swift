@@ -137,6 +137,27 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         }
     }
     
+    
+    @IBAction func guestLoginBtnPressed(_ sender: Any) {
+        
+        let askController = UIAlertController(title: "Sign In As Guest?", message: "Guest should not be able to use entire function and access profile information of other users." , preferredStyle: .alert)
+        
+        let okAction = UIAlertAction(title: "Sign In", style: .default) { (action) -> Void in
+            UserDefaults.standard.setValue("guest", forKey: "username")
+            UserDefaults.standard.synchronize()
+            if let tabVC = self.storyboard?.instantiateViewController(identifier: "tabbarVC"){
+                self.view.window?.rootViewController = tabVC
+            }
+        }
+        askController.addAction(okAction)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        askController.addAction(cancelAction)
+        
+        self.present(askController, animated: true, completion: nil)
+
+    }
+    
 }
 
 

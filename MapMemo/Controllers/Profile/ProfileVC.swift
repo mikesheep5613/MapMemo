@@ -149,9 +149,23 @@ extension ProfileVC : UITableViewDataSource {
         case 0:
             if indexPath.row == 0 {
                 // Edit Profile
+                
+                // Guest Login
+                if UserDefaults.standard.value(forKey: "username") as! String == "guest" {
+                    self.tableView.deselectRow(at: indexPath, animated: true)
+                    return
+                }
+
                 performSegue(withIdentifier: "editProfileSegue", sender: self)
             } else if indexPath.row == 1{
                 // Change Password
+                
+                // Guest Login
+                if UserDefaults.standard.value(forKey: "username") as! String == "guest" {
+                    self.tableView.deselectRow(at: indexPath, animated: true)
+                    return
+                }
+
                 performSegue(withIdentifier: "editProfileSegue", sender: self)
             } else if indexPath.row == 2{
                 // Log Out
