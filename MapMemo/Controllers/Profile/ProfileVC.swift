@@ -20,7 +20,7 @@ class ProfileVC: UIViewController, UITableViewDelegate,  MFMailComposeViewContro
                           [( image: "envelope.fill", text: "Send Email To Developer"),
                            (image: "star.circle.fill" , text: "Rate Us On App Store")],
                           [ (image: "wrench.and.screwdriver.fill" , text:"1.0.0"),(image: "doc.fill" , text: "Privacy Policy") ]]
-
+    
     var db : Firestore!
     var userEmail : String?
     var userName : String?
@@ -70,7 +70,7 @@ class ProfileVC: UIViewController, UITableViewDelegate,  MFMailComposeViewContro
                     // do not send userEmail bcz is a switch for EditPorfile VC
                     editProfileVC.userName = self.userName
                     editProfileVC.userImage = self.userImage
-
+                    
                 }
             }
         }
@@ -155,7 +155,7 @@ extension ProfileVC : UITableViewDataSource {
                     self.tableView.deselectRow(at: indexPath, animated: true)
                     return
                 }
-
+                
                 performSegue(withIdentifier: "editProfileSegue", sender: self)
             } else if indexPath.row == 1{
                 // Change Password
@@ -165,20 +165,46 @@ extension ProfileVC : UITableViewDataSource {
                     self.tableView.deselectRow(at: indexPath, animated: true)
                     return
                 }
-
+                
                 performSegue(withIdentifier: "editProfileSegue", sender: self)
             } else if indexPath.row == 2{
-                // Log Out
-                do {
-                    try Auth.auth().signOut()
+                
+                if UserDefaults.standard.value(forKey: "username") as! String == "guest" {
                     UserDefaults.standard.removeObject(forKey: "username")
                     UserDefaults.standard.synchronize()
                     if let window = self.view.window {
                         checkLogin(window : window)
                     }
-                } catch let signOutError as NSError {
-                    print("Signing out error : \(signOutError)")
+                    return
                 }
+
+                // set fcmToken Id as 0 (null)
+                if let userID = Auth.auth().currentUser?.uid {
+                    let usersRef = Firestore.firestore().collection("users_table").document(userID)
+//                    usersRef.setData(["fcmToken": "0"], merge: true)
+                    usersRef.setData(["fcmToken": "0"], merge: true) { error in
+                        if let e = error {
+                            print("set fcmToken Id as 0 (null) error: \(e)")
+                        }
+                        
+                        // Log Out
+                        do {
+                            try Auth.auth().signOut()
+                            UserDefaults.standard.removeObject(forKey: "username")
+                            UserDefaults.standard.synchronize()
+                            if let window = self.view.window {
+                                checkLogin(window : window)
+                            }
+                        } catch let signOutError as NSError {
+                            print("Signing out error : \(signOutError)")
+                        }
+
+                    }
+                    
+                    
+                    
+                }
+                
                 
             }
         // Feedback section
@@ -207,7 +233,7 @@ extension ProfileVC : UITableViewDataSource {
                     self.openAlert(title: "Alert", message: "Unable to send email, please check your device configuration." , alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
                         print("Okay clicked!")
                     }])
-
+                    
                 }
                 
                 
@@ -240,7 +266,7 @@ extension ProfileVC : UITableViewDataSource {
                     }
                 }
             }
-
+            
         default:
             break
         }
@@ -254,11 +280,11 @@ extension Bundle {
     var versionNumber: String? {
         return infoDictionary?["CFBundleShortVersionString"] as? String
     }
-
+    
     var buildNumber: String? {
         return infoDictionary?["CFBundleVersion"] as? String
     }
-
+    
     var bundleName: String? {
         return infoDictionary?["CFBundleName"] as? String
     }

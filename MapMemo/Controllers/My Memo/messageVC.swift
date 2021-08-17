@@ -18,7 +18,8 @@ class messageVC: UIViewController {
     var messages: [Message] = []
 
     var postID : String?
-    
+    var authorID : String?
+
     var username : String?
     var profilePhotoURL : String?
     
@@ -48,7 +49,7 @@ class messageVC: UIViewController {
     
     //MARK: - Send message
     @IBAction func sendBtnPressed(_ sender: Any) {
-        if let username = self.username, let profileImageURL = self.profilePhotoURL, let messageBody = messageTextField.text, let messageSender = Auth.auth().currentUser?.uid, let postID = self.postID {
+        if let username = self.username, let profileImageURL = self.profilePhotoURL, let messageBody = messageTextField.text, let messageSender = Auth.auth().currentUser?.uid, let postID = self.postID, let authorID = self.authorID  {
            
             let nowDate = Date()
             let df = DateFormatter()
@@ -73,6 +74,22 @@ class messageVC: UIViewController {
                     DispatchQueue.main.async {
                          self.messageTextField.text = ""
                     }
+                    
+                    // get author fcmToken
+                    self.db.collection("users_table").document(authorID).getDocument { docSnapshot, error in
+                        if let e = error {
+                            print("get fcmToken error \(e)")
+                            return
+                        }
+                        guard let document = docSnapshot else {return}
+                        
+                        if let data = document.data(){
+                            guard let fcmToken = data["fcmToken"] as? String else {return}
+                            let sender = PushNotificationSender()
+                            sender.sendPushNotification(to: fcmToken , title: "MapMemo地圖筆記", body: "Someone add a comment on your post!")
+                        }
+                    }
+
                 }
             }
         }

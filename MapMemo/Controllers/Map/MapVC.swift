@@ -66,7 +66,9 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     
     //MARK: - typeFilter
     @IBAction func typeFilterBarBtnPressed(_ sender: Any) {
+        
         self.typeFilterStackView.isHidden = !self.typeFilterStackView.isHidden
+        
         if self.typeFilterStackView.isHidden {
             self.view.sendSubviewToBack(self.typeFilterStackView)
         }else{
@@ -114,6 +116,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
                 self.mapView.addAnnotation(annotation)
             }
         }
+        
     }
     
     @IBAction func typeFilterBtnPressed(_ sender: UIButton) {
@@ -137,6 +140,11 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
         default:
             break
         }
+        
+        // dismiss StackView
+        self.typeFilterStackView.isHidden = true
+        self.view.sendSubviewToBack(self.typeFilterStackView)
+
     }
     
     

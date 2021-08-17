@@ -115,6 +115,21 @@ class LoginVC: UIViewController,UITextFieldDelegate{
                     if let tabVC = self.storyboard?.instantiateViewController(identifier: "tabbarVC"){
                         self.view.window?.rootViewController = tabVC
                     }
+                    
+                    // Update fcmToken
+                    Messaging.messaging().token { token, error in
+                      if let error = error {
+                        print("Error fetching FCM registration token: \(error)")
+                      } else if let token = token {
+                        print("FCM registration token: \(token)")
+                        
+                        if let userID = Auth.auth().currentUser?.uid {
+                                    let usersRef = Firestore.firestore().collection("users_table").document(userID)
+                                    usersRef.setData(["fcmToken": token], merge: true)
+                        }
+
+                      }
+                    }
                 }
             }
         }

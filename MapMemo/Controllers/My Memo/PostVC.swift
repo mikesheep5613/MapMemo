@@ -113,6 +113,7 @@ class PostVC: UIViewController {
         if segue.identifier == "messageSegue" {
             if let messageVC = segue.destination as? messageVC {
                 messageVC.postID = self.currentPost?.postID
+                messageVC.authorID = self.currentPost?.authorID
             }
         }
         

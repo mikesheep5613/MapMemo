@@ -10,13 +10,13 @@
 		7235B31226972A5E00BCB618 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7235B31126972A5E00BCB618 /* LoginVC.swift */; };
 		72387F362695A17F00598763 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72387F342695A17F00598763 /* TableViewCell.swift */; };
 		72493BD226B8FB5B00BC83DA /* KRProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 72493BD126B8FB5B00BC83DA /* KRProgressHUD */; };
+		724EAEF326CC00EB003F2DC8 /* PushNotificationSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724EAEF226CC00EB003F2DC8 /* PushNotificationSender.swift */; };
 		7256507D269DE21200A84649 /* PinMapVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7256507C269DE21200A84649 /* PinMapVC.swift */; };
 		7259375E26AA6E3900CD5922 /* popoverTableVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7259375D26AA6E3900CD5922 /* popoverTableVC.swift */; };
 		725AA80226A3220E0084B2BA /* UIImage+resize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725AA80126A3220E0084B2BA /* UIImage+resize.swift */; };
 		725D967926B3A80500143A91 /* UIKit+Shadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725D967826B3A80500143A91 /* UIKit+Shadow.swift */; };
 		725D967C26B3B30E00143A91 /* MemoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725D967A26B3B30E00143A91 /* MemoTableViewCell.swift */; };
 		725D967D26B3B30E00143A91 /* MemoTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 725D967B26B3B30E00143A91 /* MemoTableViewCell.xib */; };
-		7262EE4426CA3A180070EB38 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7262EE4326CA3A180070EB38 /* GoogleService-Info.plist */; };
 		7262EE4726CA667C0070EB38 /* MemoEmptyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7262EE4526CA667C0070EB38 /* MemoEmptyTableViewCell.swift */; };
 		7262EE4826CA667C0070EB38 /* MemoEmptyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7262EE4626CA667C0070EB38 /* MemoEmptyTableViewCell.xib */; };
 		7278E90F2690343D00875B33 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7278E90E2690343D00875B33 /* AppDelegate.swift */; };
@@ -33,6 +33,7 @@
 		7291E2FF26BECE0F003EA01C /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7291E2FE26BECE0F003EA01C /* Message.swift */; };
 		7296424C26B7E638008D518F /* ImagesPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7296424B26B7E638008D518F /* ImagesPageViewController.swift */; };
 		7296424E26B7EA76008D518F /* ImagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7296424D26B7EA76008D518F /* ImagesViewController.swift */; };
+		729F882B26CC226D0064CB19 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 729F882A26CC226D0064CB19 /* GoogleService-Info.plist */; };
 		72AEB4FB26BBC4250001DA5D /* DesignableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72AEB4FA26BBC4250001DA5D /* DesignableView.swift */; };
 		72B54EE1269C616A00C5FD2D /* RoundedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B54EE0269C616A00C5FD2D /* RoundedTextField.swift */; };
 		72B54EE3269C67B000C5FD2D /* NewPostTableVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B54EE2269C67B000C5FD2D /* NewPostTableVC.swift */; };
@@ -54,13 +55,13 @@
 		55D4254B261DA96BC6B59CCC /* Pods_MapMemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MapMemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7235B31126972A5E00BCB618 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		72387F342695A17F00598763 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
+		724EAEF226CC00EB003F2DC8 /* PushNotificationSender.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PushNotificationSender.swift; sourceTree = "<group>"; };
 		7256507C269DE21200A84649 /* PinMapVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinMapVC.swift; sourceTree = "<group>"; };
 		7259375D26AA6E3900CD5922 /* popoverTableVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = popoverTableVC.swift; sourceTree = "<group>"; };
 		725AA80126A3220E0084B2BA /* UIImage+resize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+resize.swift"; sourceTree = "<group>"; };
 		725D967826B3A80500143A91 /* UIKit+Shadow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIKit+Shadow.swift"; sourceTree = "<group>"; };
 		725D967A26B3B30E00143A91 /* MemoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoTableViewCell.swift; sourceTree = "<group>"; };
 		725D967B26B3B30E00143A91 /* MemoTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MemoTableViewCell.xib; sourceTree = "<group>"; };
-		7262EE4326CA3A180070EB38 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7262EE4526CA667C0070EB38 /* MemoEmptyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoEmptyTableViewCell.swift; sourceTree = "<group>"; };
 		7262EE4626CA667C0070EB38 /* MemoEmptyTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MemoEmptyTableViewCell.xib; sourceTree = "<group>"; };
 		7278E90B2690343D00875B33 /* MapMemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MapMemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -79,6 +80,8 @@
 		7291E2FE26BECE0F003EA01C /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		7296424B26B7E638008D518F /* ImagesPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesPageViewController.swift; sourceTree = "<group>"; };
 		7296424D26B7EA76008D518F /* ImagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesViewController.swift; sourceTree = "<group>"; };
+		729F882A26CC226D0064CB19 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		729F882C26CC2D4D0064CB19 /* MapMemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MapMemo.entitlements; sourceTree = "<group>"; };
 		72AEB4FA26BBC4250001DA5D /* DesignableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignableView.swift; sourceTree = "<group>"; };
 		72B54EE0269C616A00C5FD2D /* RoundedTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedTextField.swift; sourceTree = "<group>"; };
 		72B54EE2269C67B000C5FD2D /* NewPostTableVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostTableVC.swift; sourceTree = "<group>"; };
@@ -175,8 +178,10 @@
 		7278E90D2690343D00875B33 /* MapMemo */ = {
 			isa = PBXGroup;
 			children = (
+				729F882C26CC2D4D0064CB19 /* MapMemo.entitlements */,
 				7278E90E2690343D00875B33 /* AppDelegate.swift */,
 				7278E9102690343D00875B33 /* SceneDelegate.swift */,
+				724EAEF226CC00EB003F2DC8 /* PushNotificationSender.swift */,
 				72F3994B26B0390700802AD8 /* Extension */,
 				7278E922269037D500875B33 /* Models */,
 				7278E92626903A3800875B33 /* View */,
@@ -185,7 +190,7 @@
 				7278E9172690343E00875B33 /* Assets.xcassets */,
 				7278E9192690343E00875B33 /* LaunchScreen.storyboard */,
 				7278E91C2690343E00875B33 /* Info.plist */,
-				7262EE4326CA3A180070EB38 /* GoogleService-Info.plist */,
+				729F882A26CC226D0064CB19 /* GoogleService-Info.plist */,
 			);
 			path = MapMemo;
 			sourceTree = "<group>";
@@ -338,7 +343,7 @@
 				72E0BC7926C00F7A0096DE32 /* MyMessageCell.xib in Resources */,
 				7278E9162690343D00875B33 /* Main.storyboard in Resources */,
 				725D967D26B3B30E00143A91 /* MemoTableViewCell.xib in Resources */,
-				7262EE4426CA3A180070EB38 /* GoogleService-Info.plist in Resources */,
+				729F882B26CC226D0064CB19 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -427,6 +432,7 @@
 				7256507D269DE21200A84649 /* PinMapVC.swift in Sources */,
 				7291E2FF26BECE0F003EA01C /* Message.swift in Sources */,
 				7296424C26B7E638008D518F /* ImagesPageViewController.swift in Sources */,
+				724EAEF326CC00EB003F2DC8 /* PushNotificationSender.swift in Sources */,
 				7278E92826903A6C00875B33 /* MapVC.swift in Sources */,
 				72EFD7B426B1049D0032EA66 /* EditProfileVC.swift in Sources */,
 				7235B31226972A5E00BCB618 /* LoginVC.swift in Sources */,
@@ -590,6 +596,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MapMemo/MapMemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1.2.2;
 				DEVELOPMENT_TEAM = 7LVJW6YG74;
@@ -616,6 +623,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MapMemo/MapMemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1.2.2;
 				DEVELOPMENT_TEAM = 7LVJW6YG74;
