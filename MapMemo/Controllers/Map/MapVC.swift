@@ -308,7 +308,8 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     
     //MARK: - Place Pins on MapView
     func placePin(_ data: [PostModel]){
-
+        
+        
         if UserDefaults.standard.value(forKey: "username") as! String == "guest" {
             for post in data{
                 if switchDataSourceControl.selectedSegmentIndex == 1 {

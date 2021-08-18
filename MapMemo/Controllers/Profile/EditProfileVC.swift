@@ -54,11 +54,15 @@ class EditProfileVC: UIViewController {
             self.secondTextField.isSecureTextEntry = false
 
             
-            self.imageViewLabel.text = "Tap to Change"
-            self.firstTextFieldLabel.text = "USER EMAIL"
-            self.firstTextField.text = self.userEmail
+            self.imageViewLabel.text = "Tap photo to Change"
+//            self.firstTextFieldLabel.text = "USER EMAIL"
+//            self.firstTextField.text = self.userEmail
+            self.firstTextFieldLabel.isHidden = true
+            self.firstTextField.isHidden = true
+            
             self.secondTextFieldLabel.text = "USER NAME"
             self.secondTextField.text = self.userName
+            
         }
         
         

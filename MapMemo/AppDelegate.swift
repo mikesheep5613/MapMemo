@@ -7,8 +7,8 @@
 
 import UIKit
 import Firebase
-//import GoogleSignIn
-//import FBSDKCoreKit
+import GoogleSignIn
+
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
@@ -92,14 +92,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                                   withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
 
-        // ...
-
         // With swizzling disabled you must let Messaging know about the message, for Analytics
          Messaging.messaging().appDidReceiveMessage(userInfo)
 
         // Print full message.
         print(userInfo)
-
+        
         completionHandler()
       }
     
@@ -107,6 +105,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                      didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult)
                        -> Void) {
+        
       // If you are receiving a notification message while your app is in the background,
       // this callback will not be fired till the user taps on the notification launching the application.
       // TODO: Handle data of notification
@@ -136,14 +135,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
 
     //MARK: - Google Sign In
-//    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
-//        print("User email: \(user.profile.email ?? "No Email")")
-//    }
-//
-//    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-//        return GIDSignIn.sharedInstance().handle(url) ?? false
-//        || ApplicationDelegate.shared.application( app, open: url, sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String, annotation: options[UIApplication.OpenURLOptionsKey.annotation] )
-//    }
+    func application(_ application: UIApplication, open url: URL,
+                     options: [UIApplication.OpenURLOptionsKey: Any])
+      -> Bool {
+      return GIDSignIn.sharedInstance.handle(url)
+    }
+    
+
     
     // MARK: UISceneSession Lifecycle
 

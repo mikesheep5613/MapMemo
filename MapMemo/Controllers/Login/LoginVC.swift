@@ -8,17 +8,24 @@
 import UIKit
 import Firebase
 import AppTrackingTransparency
+import AuthenticationServices
+import CryptoKit
+import GoogleSignIn
 
 
 
 
 class LoginVC: UIViewController,UITextFieldDelegate{
-
+    
+    
     @IBOutlet weak var emailTextfield: UITextField!
     @IBOutlet weak var passwordTextfield: UITextField!
-    
     @IBOutlet weak var confirmBtn: UIButton!
     @IBOutlet weak var regiterBtn: UIButton!
+    
+    @IBOutlet weak var appleSignInBtn: UIButton!
+    @IBOutlet weak var googleSignInBtn: UIButton!
+    
     @IBOutlet weak var backgroundImageView: UIImageView!
     @IBOutlet weak var animateSwitch: UISwitch!
     
@@ -27,19 +34,20 @@ class LoginVC: UIViewController,UITextFieldDelegate{
     var loading_3: UIImage!
     var images: [UIImage]!
     var animatedImage: UIImage!
-
+    private var currentNonce: String?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let _ = AppTrackingPermission().requestAppTrackingPermission{ success, error in
-          if success == true {
-            print("User permit to track the user")
-          } else {
-            print("AppTrackingPermission:: ", error.debugDescription)
-          }
+            if success == true {
+                print("User permit to track the user")
+            } else {
+                print("AppTrackingPermission:: ", error.debugDescription)
+            }
         }
-
+        
         self.emailTextfield.delegate = self
         self.passwordTextfield.delegate = self
         
@@ -47,18 +55,23 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         self.confirmBtn.clipsToBounds = true
         self.regiterBtn.layer.cornerRadius = self.regiterBtn.bounds.height / 2
         self.regiterBtn.clipsToBounds = true
-
+        self.appleSignInBtn.layer.cornerRadius = self.confirmBtn.bounds.height / 2
+        self.appleSignInBtn.clipsToBounds = true
+        self.googleSignInBtn.layer.cornerRadius = self.regiterBtn.bounds.height / 2
+        self.googleSignInBtn.clipsToBounds = true
+        
+        
         loading_1 = UIImage(named: "S1")
         loading_2 = UIImage(named: "S2")
         loading_3 = UIImage(named: "S3")
         images = [loading_1, loading_2, loading_3]
         animatedImage = UIImage.animatedImage(with: images, duration: 0.8)
-
-
+        
+        
         //Autofill registered email
         NotificationCenter.default.addObserver(self, selector: #selector(finishRegister(notification:)), name: .passUserEmail, object: nil)
-
-
+        
+        
     }
     
     @objc func finishRegister(notification: Notification) {
@@ -71,7 +84,7 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = true
     }
-
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = false
@@ -99,7 +112,7 @@ class LoginVC: UIViewController,UITextFieldDelegate{
     @IBAction func signinBtnPressed(_ sender: UIButton) {
         
         // check format        
-    
+        
         if let email = emailTextfield.text, let password = passwordTextfield.text {
             Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
                 if let error = error {
@@ -107,7 +120,7 @@ class LoginVC: UIViewController,UITextFieldDelegate{
                     self.openAlert(title: "Alert", message: error.localizedDescription , alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
                         print("Okay clicked!")
                     }])
-
+                    
                 } else {
                     UserDefaults.standard.setValue("login", forKey: "username")
                     UserDefaults.standard.synchronize()
@@ -118,27 +131,25 @@ class LoginVC: UIViewController,UITextFieldDelegate{
                     
                     // Update fcmToken
                     Messaging.messaging().token { token, error in
-                      if let error = error {
-                        print("Error fetching FCM registration token: \(error)")
-                      } else if let token = token {
-                        print("FCM registration token: \(token)")
-                        
-                        if let userID = Auth.auth().currentUser?.uid {
-                                    let usersRef = Firestore.firestore().collection("users_table").document(userID)
-                                    usersRef.setData(["fcmToken": token], merge: true)
+                        if let error = error {
+                            print("Error fetching FCM registration token: \(error)")
+                        } else if let token = token {
+                            print("FCM registration token: \(token)")
+                            
+                            if let userID = Auth.auth().currentUser?.uid {
+                                let usersRef = Firestore.firestore().collection("users_table").document(userID)
+                                usersRef.setData(["fcmToken": token], merge: true)
+                            }
+                            
                         }
-
-                      }
                     }
                 }
             }
         }
-    
+        
     }
     
     //MARK: - Password forgot
-    
- 
     @IBAction func forgotPasswordBtnPressed(_ sender: Any) {
         Auth.auth().sendPasswordReset(withEmail: emailTextfield.text!) { error in
             if error == nil {
@@ -170,67 +181,224 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         askController.addAction(cancelAction)
         
         self.present(askController, animated: true, completion: nil)
-
+        
     }
     
+    //MARK: - Sign in with Google
+    @IBAction func signInWithGoogleBtnPressed(_ sender: UIButton) {
+        guard let clientID = FirebaseApp.app()?.options.clientID else { return }
+        
+        // Create Google Sign In configuration object.
+        let config = GIDConfiguration(clientID: clientID)
+        
+        // Start the sign in flow!
+        GIDSignIn.sharedInstance.signIn(with: config, presenting: self) { [unowned self] user, error in
+            if let e = error {
+                print("Google Sign in error \(e)")
+                return
+            }
+            guard
+                let authentication = user?.authentication,
+                let idToken = authentication.idToken
+            else {
+                return
+            }
+            
+            let credential = GoogleAuthProvider.credential(withIDToken: idToken,
+                                                           accessToken: authentication.accessToken)
+            // login process with the auth credential
+            Auth.auth().signIn(with: credential) { authResult, error in
+                if let error = error {
+                    print("Sign in error : \(error)")
+                    self.openAlert(title: "Alert", message: error.localizedDescription , alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
+                        print("Okay clicked!")
+                    }])
+                    
+                } else {
+                    UserDefaults.standard.setValue("google_login", forKey: "username")
+                    UserDefaults.standard.synchronize()
+                    if let tabVC = self.storyboard?.instantiateViewController(identifier: "tabbarVC"){
+                        self.view.window?.rootViewController = tabVC
+                    }
+                    
+                    // Update fcmToken
+                    Messaging.messaging().token { token, error in
+                        if let error = error {
+                            print("Error fetching FCM registration token: \(error)")
+                        } else if let token = token {
+                            print("FCM registration token: \(token)")
+                            
+                            if let userID = Auth.auth().currentUser?.uid {
+                                let usersRef = Firestore.firestore().collection("users_table").document(userID)
+                                usersRef.setData(["fcmToken": token], merge: true)
+                            }
+                            
+                        }
+                    }
+                }
+            }
+            
+        }
+        
+        
+        
+    }
+    
+    //MARK: - Sign in with Apple
+    @available(iOS 13, *)
+    private func sha256(_ input: String) -> String {
+        let inputData = Data(input.utf8)
+        let hashedData = SHA256.hash(data: inputData)
+        let hashString = hashedData.compactMap {
+            return String(format: "%02x", $0)
+        }.joined()
+        
+        return hashString
+    }
+    
+    
+    // Adapted from https://auth0.com/docs/api-auth/tutorials/nonce#generate-a-cryptographically-random-nonce
+    private func randomNonceString(length: Int = 32) -> String {
+        precondition(length > 0)
+        let charset: Array<Character> =
+            Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+        var result = ""
+        var remainingLength = length
+        
+        while remainingLength > 0 {
+            let randoms: [UInt8] = (0 ..< 16).map { _ in
+                var random: UInt8 = 0
+                let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
+                if errorCode != errSecSuccess {
+                    fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
+                }
+                return random
+            }
+            
+            randoms.forEach { random in
+                if remainingLength == 0 {
+                    return
+                }
+                
+                if random < charset.count {
+                    result.append(charset[Int(random)])
+                    remainingLength -= 1
+                }
+            }
+        }
+        
+        return result
+    }
+    
+    @IBAction func signInWithAppleBtnPressed(_ sender: ASAuthorizationAppleIDButton) {
+        let provider = ASAuthorizationAppleIDProvider()
+        let request = provider.createRequest()
+        request.requestedScopes = [.email]
+        currentNonce = randomNonceString()
+        request.nonce = sha256(currentNonce!)
+        let controller = ASAuthorizationController(authorizationRequests: [request])
+        controller.delegate = self
+        controller.presentationContextProvider = self
+        controller.performRequests()
+        
+    }
 }
 
-
-//extension LoginVC {
-//    fileprivate func validationCode() {
-//        if let email = emailTextfield.text, let password = passwordTextfield.text{
-//            if !email.validateEmail(){
-//                openAlert(title: "Alert", message: "Please check your Email format.", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
-//                    print("Okay clicked!")
-//                }])
-//            }else if !password.validatePassword(){
-//                openAlert(title: "Alert", message: "Please enter valid password.", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
-//                    print("Okay clicked!")
-//                }])
-//            }else{
-//
-//            }
-//
-//        }else{
-//            openAlert(title: "Alert", message: "Please input your Email & Password", alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{_
-//                in
-//                print("OKay clicked")
-//            }])
-//        }
-//
-//
-//    }
-//
-//
-//
-//}
-
+//MARK: - AppTrackingPermissionError
 enum AppTrackingPermissionError: Error {
-  case denied
-  case notDetermined
-  case restricted
+    case denied
+    case notDetermined
+    case restricted
 }
 
 class AppTrackingPermission {
-  
-  func requestAppTrackingPermission(completion: @escaping (Bool, AppTrackingPermissionError?) -> ()) {
-    ATTrackingManager.requestTrackingAuthorization { trackingAuthorizationStatus in
-      switch trackingAuthorizationStatus {
-        case .authorized:
-          print(trackingAuthorizationStatus)
-          completion(true, nil)
-        case .denied:
-          print(trackingAuthorizationStatus)
-          completion(false, .denied)
-        case .notDetermined:
-          print(trackingAuthorizationStatus)
-          completion(false, .notDetermined)
-        case .restricted:
-          print(trackingAuthorizationStatus)
-          completion(false, .restricted)
-        @unknown default:
-          break
-      }
+    
+    func requestAppTrackingPermission(completion: @escaping (Bool, AppTrackingPermissionError?) -> ()) {
+        ATTrackingManager.requestTrackingAuthorization { trackingAuthorizationStatus in
+            switch trackingAuthorizationStatus {
+            case .authorized:
+                print(trackingAuthorizationStatus)
+                completion(true, nil)
+            case .denied:
+                print(trackingAuthorizationStatus)
+                completion(false, .denied)
+            case .notDetermined:
+                print(trackingAuthorizationStatus)
+                completion(false, .notDetermined)
+            case .restricted:
+                print(trackingAuthorizationStatus)
+                completion(false, .restricted)
+            @unknown default:
+                break
+            }
+        }
     }
-  }
 }
+
+//MARK: - ASAuthorizationControllerPresentationContextProviding
+extension LoginVC: ASAuthorizationControllerPresentationContextProviding {
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window!
+    }
+}
+
+//MARK: - ASAuthorizationControllerDelegate
+extension LoginVC: ASAuthorizationControllerDelegate {
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+            guard let nonce = currentNonce else {
+                fatalError("Invalid state: A login callback was received, but no login request was sent.")
+            }
+            guard let appleIDToken = appleIDCredential.identityToken else {
+                print("Unable to fetch identity token")
+                return
+            }
+            guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+                print("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
+                return
+            }
+            // Initialize a Firebase credential.
+            let credential = OAuthProvider.credential(withProviderID: "apple.com",
+                                                      idToken: idTokenString,
+                                                      rawNonce: nonce)
+            // Sign in with Firebase.
+            Auth.auth().signIn(with: credential) { (authResult, error) in
+                if let error = error {
+                    // Error. If error.code == .MissingOrInvalidNonce, make sure
+                    // you're sending the SHA256-hashed nonce as a hex string with
+                    // your request to Apple.
+                    print(error.localizedDescription)
+                    return
+                }
+                // User is signed in to Firebase with Apple.
+                UserDefaults.standard.setValue("apple_login", forKey: "username")
+                UserDefaults.standard.synchronize()
+                // Login Successfully
+                if let tabVC = self.storyboard?.instantiateViewController(identifier: "tabbarVC"){
+                    self.view.window?.rootViewController = tabVC
+                }
+                // Update fcmToken
+                Messaging.messaging().token { token, error in
+                    if let error = error {
+                        print("Error fetching FCM registration token: \(error)")
+                    } else if let token = token {
+                        print("FCM registration token: \(token)")
+                        
+                        if let userID = Auth.auth().currentUser?.uid {
+                            let usersRef = Firestore.firestore().collection("users_table").document(userID)
+                            usersRef.setData(["fcmToken": token], merge: true)
+                        }
+                        
+                    }
+                }
+            }
+            
+            
+        }
+    }
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        // Handle error.
+        print("Sign in with Apple errored: \(error)")
+    }
+}
+

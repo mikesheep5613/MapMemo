@@ -86,7 +86,7 @@ class messageVC: UIViewController {
                         if let data = document.data(){
                             guard let fcmToken = data["fcmToken"] as? String else {return}
                             let sender = PushNotificationSender()
-                            sender.sendPushNotification(to: fcmToken , title: "MapMemo地圖筆記", body: "Someone add a comment on your post!")
+                            sender.sendPushNotification(to: fcmToken , title: "MapMemo地圖筆記", body: "Someone add a comment on your post!", postID: postID)
                         }
                     }
 
