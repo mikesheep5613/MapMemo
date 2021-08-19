@@ -217,6 +217,17 @@ class TableVC: UIViewController {
         }
     }
     
+    var sortByDateSwtich = true
+    @IBAction func sortByDateBtnPressed(_ sender: Any) {
+        if self.sortByDateSwtich == true{
+            self.data = self.data.sorted(by: { ($0.date! ) < ($1.date!)})
+            self.sortByDateSwtich = false
+        }else{
+            self.data = self.data.sorted(by: { ($0.date! ) > ($1.date!)})
+            self.sortByDateSwtich = true
+        }
+        self.tableView.reloadData()
+    }
     
     // MARK: - Navigation
     

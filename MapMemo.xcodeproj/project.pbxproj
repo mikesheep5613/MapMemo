@@ -12,6 +12,7 @@
 		72493BD226B8FB5B00BC83DA /* KRProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 72493BD126B8FB5B00BC83DA /* KRProgressHUD */; };
 		724EAEF326CC00EB003F2DC8 /* PushNotificationSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724EAEF226CC00EB003F2DC8 /* PushNotificationSender.swift */; };
 		7252032926CCB40600E41673 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 7252032826CCB40600E41673 /* GoogleSignIn */; };
+		7252032B26CDF46000E41673 /* UIStackView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7252032A26CDF46000E41673 /* UIStackView+Extension.swift */; };
 		7256507D269DE21200A84649 /* PinMapVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7256507C269DE21200A84649 /* PinMapVC.swift */; };
 		7259375E26AA6E3900CD5922 /* popoverTableVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7259375D26AA6E3900CD5922 /* popoverTableVC.swift */; };
 		725AA80226A3220E0084B2BA /* UIImage+resize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725AA80126A3220E0084B2BA /* UIImage+resize.swift */; };
@@ -57,6 +58,7 @@
 		7235B31126972A5E00BCB618 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		72387F342695A17F00598763 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		724EAEF226CC00EB003F2DC8 /* PushNotificationSender.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PushNotificationSender.swift; sourceTree = "<group>"; };
+		7252032A26CDF46000E41673 /* UIStackView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+Extension.swift"; sourceTree = "<group>"; };
 		7256507C269DE21200A84649 /* PinMapVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinMapVC.swift; sourceTree = "<group>"; };
 		7259375D26AA6E3900CD5922 /* popoverTableVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = popoverTableVC.swift; sourceTree = "<group>"; };
 		725AA80126A3220E0084B2BA /* UIImage+resize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+resize.swift"; sourceTree = "<group>"; };
@@ -247,6 +249,7 @@
 			isa = PBXGroup;
 			children = (
 				72F3994C26B039E100802AD8 /* UIViewController + Extension.swift */,
+				7252032A26CDF46000E41673 /* UIStackView+Extension.swift */,
 				72AEB4FA26BBC4250001DA5D /* DesignableView.swift */,
 				725AA80126A3220E0084B2BA /* UIImage+resize.swift */,
 				72F3994E26B03E7700802AD8 /* String+Extension.swift */,
@@ -432,6 +435,7 @@
 				72823D13269A29B5005F109B /* LoginSwitch.swift in Sources */,
 				72B54EE3269C67B000C5FD2D /* NewPostTableVC.swift in Sources */,
 				72F64F8F26A1AD1300AD48D0 /* NetworkController.swift in Sources */,
+				7252032B26CDF46000E41673 /* UIStackView+Extension.swift in Sources */,
 				725D967926B3A80500143A91 /* UIKit+Shadow.swift in Sources */,
 				7256507D269DE21200A84649 /* PinMapVC.swift in Sources */,
 				7291E2FF26BECE0F003EA01C /* Message.swift in Sources */,

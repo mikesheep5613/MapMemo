@@ -76,8 +76,6 @@ class PostVC: UIViewController {
             self.dislikeBtnOutlet.isEnabled = false
             self.likeBtnOutlet.isEnabled = false
             self.commentLabel.isEnabled = false
-            self.userNameLabel.text = "User Name"
-            self.userProfileImage.image = UIImage(systemName: "nosign")
         }
 
     }
@@ -114,6 +112,8 @@ class PostVC: UIViewController {
             if let messageVC = segue.destination as? messageVC {
                 messageVC.postID = self.currentPost?.postID
                 messageVC.authorID = self.currentPost?.authorID
+                messageVC.postTitle = self.currentPost?.title
+
             }
         }
         

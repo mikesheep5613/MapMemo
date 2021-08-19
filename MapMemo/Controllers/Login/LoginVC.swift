@@ -28,6 +28,7 @@ class LoginVC: UIViewController,UITextFieldDelegate{
     
     @IBOutlet weak var backgroundImageView: UIImageView!
     @IBOutlet weak var animateSwitch: UISwitch!
+    @IBOutlet weak var bottomStackView: UIStackView!
     
     var loading_1: UIImage!
     var loading_2: UIImage!
@@ -55,11 +56,15 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         self.confirmBtn.clipsToBounds = true
         self.regiterBtn.layer.cornerRadius = self.regiterBtn.bounds.height / 2
         self.regiterBtn.clipsToBounds = true
-        self.appleSignInBtn.layer.cornerRadius = self.confirmBtn.bounds.height / 2
+        self.appleSignInBtn.layer.cornerRadius = self.appleSignInBtn.bounds.height / 2
         self.appleSignInBtn.clipsToBounds = true
-        self.googleSignInBtn.layer.cornerRadius = self.regiterBtn.bounds.height / 2
+        self.googleSignInBtn.layer.cornerRadius = self.googleSignInBtn.bounds.height / 2
         self.googleSignInBtn.clipsToBounds = true
         
+        // add sepearate line of bottom Stackview
+        self.bottomStackView.addSeparators(at: [1], color: .systemBlue)
+        self.bottomStackView.addSeparators(at: [3], color: .systemBlue)
+
         
         loading_1 = UIImage(named: "S1")
         loading_2 = UIImage(named: "S2")
@@ -72,6 +77,7 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         NotificationCenter.default.addObserver(self, selector: #selector(finishRegister(notification:)), name: .passUserEmail, object: nil)
         
         
+        
     }
     
     @objc func finishRegister(notification: Notification) {
@@ -79,17 +85,19 @@ class LoginVC: UIViewController,UITextFieldDelegate{
             self.emailTextfield.text = email
         }
     }
-    
+    // nav invisible
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.isNavigationBarHidden = true
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.isNavigationBarHidden = false
-    }
-    
+        // Make the navigation bar background clear
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.isTranslucent = true
+      }
+      override func viewWillDisappear(_ animated: Bool) {
+        // Restore the navigation bar to default
+        navigationController?.navigationBar.setBackgroundImage(nil, for: .default)
+        navigationController?.navigationBar.shadowImage = nil
+      }
+
     
     //MARK: - UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -169,11 +177,17 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         let askController = UIAlertController(title: "Sign In As Guest?", message: "Guest should not be able to use entire function and access profile information of other users." , preferredStyle: .alert)
         
         let okAction = UIAlertAction(title: "Sign In", style: .default) { (action) -> Void in
+            
             UserDefaults.standard.setValue("guest", forKey: "username")
             UserDefaults.standard.synchronize()
             if let tabVC = self.storyboard?.instantiateViewController(identifier: "tabbarVC"){
                 self.view.window?.rootViewController = tabVC
             }
+
+            // Call the signInAnonymouslyWithCompletion: method
+//            Auth.auth().signInAnonymously { authResult, error in
+//            }
+
         }
         askController.addAction(okAction)
         

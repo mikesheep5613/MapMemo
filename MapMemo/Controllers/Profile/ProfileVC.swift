@@ -9,6 +9,7 @@ import UIKit
 import Firebase
 import StoreKit
 import MessageUI
+import GoogleSignIn
 
 
 class ProfileVC: UIViewController, UITableViewDelegate,  MFMailComposeViewControllerDelegate {
@@ -47,6 +48,9 @@ class ProfileVC: UIViewController, UITableViewDelegate,  MFMailComposeViewContro
         
         // load data from Firebase
         db = Firestore.firestore()
+        
+ 
+
         montitorProfileData()
     }
     
@@ -78,6 +82,11 @@ class ProfileVC: UIViewController, UITableViewDelegate,  MFMailComposeViewContro
     
     // Get Profile Data
     func montitorProfileData() {
+        
+        if UserDefaults.standard.value(forKey: "username") as! String == "guest" {
+            return
+        }
+        
         self.userEmail = Auth.auth().currentUser?.email
         
         guard let userID = Auth.auth().currentUser?.uid else {return}
@@ -177,28 +186,31 @@ extension ProfileVC : UITableViewDataSource {
                     }
                     return
                 }
-
+                
                 // set fcmToken Id as 0 (null)
                 if let userID = Auth.auth().currentUser?.uid {
                     let usersRef = Firestore.firestore().collection("users_table").document(userID)
-//                    usersRef.setData(["fcmToken": "0"], merge: true)
+                    //                    usersRef.setData(["fcmToken": "0"], merge: true)
                     usersRef.setData(["fcmToken": "0"], merge: true) { error in
                         if let e = error {
                             print("set fcmToken Id as 0 (null) error: \(e)")
                         }
                         
                         // Log Out
+                        let firebaseAuth = Auth.auth()
                         do {
-                            try Auth.auth().signOut()
+                            try firebaseAuth.signOut()
+                            GIDSignIn.sharedInstance.signOut()
                             UserDefaults.standard.removeObject(forKey: "username")
                             UserDefaults.standard.synchronize()
-                            if let window = self.view.window {
-                                checkLogin(window : window)
-                            }
                         } catch let signOutError as NSError {
-                            print("Signing out error : \(signOutError)")
+                            print("Error signing out: %@", signOutError)
                         }
-
+                        if let window = self.view.window {
+                            checkLogin(window: window)
+                        }
+                        
+                        
                     }
                     
                     

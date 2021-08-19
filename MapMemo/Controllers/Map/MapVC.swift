@@ -160,6 +160,8 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
             
             if let e = error {
                 print("error snapshot listener \(e)")
+                self.activityIndicator.stopAnimating()
+                self.activityIndicator.isHidden = true
                 return
             }
             guard let documentsChange = qSnapshot?.documentChanges else {return}
@@ -342,7 +344,7 @@ class MapVC: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDel
     func testplacePin(_ post: PostModel){
         
         // Guest Login In
-        if UserDefaults.standard.value(forKey: "username") as! String == "guest" {
+        if UserDefaults.standard.value(forKey: "username") as? String == "guest" {
             for post in data{
                 if switchDataSourceControl.selectedSegmentIndex == 1 {
                     self.mapView.addAnnotation(post)
