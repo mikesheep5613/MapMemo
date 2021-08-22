@@ -443,6 +443,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
         
     }
     
+    
     // Upload mutiple images.
     func startUploading(completion: @escaping FileCompletionBlock) {
         if self.images.count == 0 {

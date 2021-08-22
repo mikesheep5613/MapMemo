@@ -1095,19 +1095,11 @@
         <!--Edit ProfileVC-->
         <scene sceneID="RzD-Ti-2ho">
             <objects>
-                <viewController id="mYg-4O-ZBN" customClass="EditProfileVC" customModule="MapMemo" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="editProfile" id="mYg-4O-ZBN" customClass="EditProfileVC" customModule="MapMemo" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="OZf-v1-oxE">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="person.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="VvM-fM-OdL">
-                                <rect key="frame" x="142" y="108.5" width="130" height="129"/>
-                                <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="130" id="Lsi-CQ-4zZ"/>
-                                    <constraint firstAttribute="width" constant="130" id="h3y-7Y-dQG"/>
-                                </constraints>
-                            </imageView>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" alignment="top" spacing="30" translatesAutoresizingMaskIntoConstraints="NO" id="1ga-VP-b6v">
                                 <rect key="frame" x="82" y="426" width="250" height="223.5"/>
                                 <subviews>
@@ -1178,18 +1170,26 @@
                                 </constraints>
                             </stackView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Username" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TbX-WI-Qcy">
-                                <rect key="frame" x="178" y="87.5" width="58" height="14.5"/>
+                                <rect key="frame" x="178" y="253.5" width="58" height="14.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="person.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="VvM-fM-OdL">
+                                <rect key="frame" x="142" y="276.5" width="130" height="129"/>
+                                <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="130" id="Lsi-CQ-4zZ"/>
+                                    <constraint firstAttribute="width" constant="130" id="h3y-7Y-dQG"/>
+                                </constraints>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="XDg-aU-kBL"/>
                         <color key="backgroundColor" red="0.46274509800000002" green="0.76862745099999996" blue="0.85882352939999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="1ga-VP-b6v" firstAttribute="top" secondItem="VvM-fM-OdL" secondAttribute="bottom" constant="20" id="4oU-ZB-0Q2"/>
                             <constraint firstItem="1ga-VP-b6v" firstAttribute="centerX" secondItem="OZf-v1-oxE" secondAttribute="centerX" id="CeT-Aj-Nho"/>
-                            <constraint firstItem="VvM-fM-OdL" firstAttribute="top" secondItem="XDg-aU-kBL" secondAttribute="top" constant="20" id="DTg-e2-egF"/>
+                            <constraint firstItem="VvM-fM-OdL" firstAttribute="top" secondItem="TbX-WI-Qcy" secondAttribute="bottom" constant="8" id="QGf-jo-VUG"/>
                             <constraint firstItem="VvM-fM-OdL" firstAttribute="centerX" secondItem="OZf-v1-oxE" secondAttribute="centerX" id="nMH-fd-axn"/>
-                            <constraint firstItem="VvM-fM-OdL" firstAttribute="top" secondItem="TbX-WI-Qcy" secondAttribute="bottom" constant="6" id="pgF-TF-oqV"/>
                             <constraint firstItem="TbX-WI-Qcy" firstAttribute="centerX" secondItem="OZf-v1-oxE" secondAttribute="centerX" id="vXb-OV-svY"/>
                             <constraint firstItem="1ga-VP-b6v" firstAttribute="centerY" secondItem="OZf-v1-oxE" secondAttribute="centerY" multiplier="1.2" id="zhT-X3-Pej"/>
                         </constraints>
@@ -1369,8 +1369,9 @@
                                                             <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="967-PD-eKI">
                                                                 <rect key="frame" x="10" y="5" width="394" height="98.5"/>
                                                                 <subviews>
-                                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Y4W-4H-ykp">
-                                                                        <rect key="frame" x="0.0" y="14.5" width="70" height="70"/>
+                                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="person.crop.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="Y4W-4H-ykp">
+                                                                        <rect key="frame" x="0.0" y="15" width="70" height="69"/>
+                                                                        <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                         <constraints>
                                                                             <constraint firstAttribute="width" constant="70" id="1fc-9f-XwU"/>
                                                                             <constraint firstAttribute="height" constant="70" id="AZ6-FG-T5M"/>
@@ -1379,7 +1380,7 @@
                                                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="fR2-ef-TnK">
                                                                         <rect key="frame" x="90" y="24" width="234" height="51"/>
                                                                         <subviews>
-                                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MO3-K9-vO9">
+                                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Unknown User" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MO3-K9-vO9">
                                                                                 <rect key="frame" x="0.0" y="0.0" width="234" height="21.5"/>
                                                                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
                                                                                 <nil key="textColor"/>
@@ -1776,7 +1777,7 @@
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="1IW-0v-W9a"/>
-        <segue reference="kjz-Rz-pe3"/>
+        <segue reference="nXa-Bq-ZOv"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="AppLogo" width="356" height="262.5"/>
@@ -1797,6 +1798,7 @@
         <image name="minus.circle" catalog="system" width="128" height="121"/>
         <image name="ok" width="25" height="23.5"/>
         <image name="person.circle.fill" catalog="system" width="128" height="121"/>
+        <image name="person.crop.circle" catalog="system" width="128" height="121"/>
         <image name="person.crop.circle.fill" catalog="system" width="128" height="121"/>
         <image name="photo" catalog="system" width="128" height="93"/>
         <image name="plus.circle" catalog="system" width="128" height="121"/>

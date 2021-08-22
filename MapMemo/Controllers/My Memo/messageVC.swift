@@ -50,6 +50,15 @@ class messageVC: UIViewController {
     
     //MARK: - Send message
     @IBAction func sendBtnPressed(_ sender: Any) {
+        
+        if self.username == nil || self.profilePhotoURL == nil {
+            let alert = UIAlertController(title: "Opps!!", message: "Since like your profile is incomplete, please go to Profile and edit first.", preferredStyle: .alert)
+            let cancel = UIAlertAction(title: "Continue", style: .cancel, handler: nil)
+            alert.addAction(cancel)
+            self.present(alert, animated: true, completion: nil)
+            return
+        }
+
         if let username = self.username, let profileImageURL = self.profilePhotoURL, let messageBody = messageTextField.text, let messageSender = Auth.auth().currentUser?.uid, let postID = self.postID, let authorID = self.authorID  {
            
             let nowDate = Date()
@@ -203,15 +212,13 @@ extension messageVC: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MyMessageCell", for: indexPath) as! MyMessageCell
         cell.label.text = message.body
         cell.userNameLabel.text = message.username
-        cell.dateLabel.text = message.date
         cell.leftImageView.image = message.profileImage
-
-        //This is a message from the current user.
-//        if message.sender == Auth.auth().currentUser?.uid {
-//            cell.leftImageView.isHidden = true
-//        } else {
-//            cell.leftImageView.isHidden = false
-//        }
+        
+//        cell.dateLabel.text = message.date
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        let date = dateFormatter.date(from: message.date)
+        cell.dateLabel.text =  date?.timeAgoDisplay()
         return cell
 
     }

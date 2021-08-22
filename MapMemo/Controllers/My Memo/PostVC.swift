@@ -61,7 +61,8 @@ class PostVC: UIViewController {
         
         // If current user is not the author, disable the edit button
         if Auth.auth().currentUser?.uid != self.currentPost?.authorID {
-            navigationItem.rightBarButtonItem?.isEnabled = false
+            let reportBtn = UIBarButtonItem(image: UIImage(systemName: "exclamationmark.triangle"), style: .plain, target: self, action: #selector(self.reportButtonAction))
+            navigationItem.rightBarButtonItem = reportBtn
         }
         
         // check Like Btn status
@@ -76,6 +77,7 @@ class PostVC: UIViewController {
             self.dislikeBtnOutlet.isEnabled = false
             self.likeBtnOutlet.isEnabled = false
             self.commentLabel.isEnabled = false
+            self.navigationItem.rightBarButtonItem?.isEnabled = false
         }
 
     }
@@ -100,6 +102,40 @@ class PostVC: UIViewController {
         performSegue(withIdentifier: "editSegue", sender: self)
     }
     
+    
+    @objc func reportButtonAction(_ sender:UIButton!){
+        var textField = UITextField()
+        
+        let reportController = UIAlertController(title: "Report this post?", message: "Please explain the reasons you report this post, we will handle it soonly.",  preferredStyle: .alert)
+        
+        let reportAction = UIAlertAction(title: "Report", style: .default) { (action) -> Void in
+            if let report = textField.text, let userID = Auth.auth().currentUser?.uid, let postID = self.currentPost?.postID{
+                self.db.collection("posts").document(postID).collection("reports").document("\(userID)").setData(["report" : report], completion: { error in
+                    if let e = error {
+                        print("error \(e)")
+                        return
+                    }
+                    self.openAlert(title: "Report Successfully!!", message: "Thanks for your help." , alertStyle: .alert, actionTitles: ["Okay"], actionStyles: [.default], actions: [{ _ in
+                    }])
+                    
+                    
+                })
+            }
+            
+        }
+        
+        reportController.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Report this post because ..."
+            textField = alertTextField
+        }
+        
+        reportController.addAction(reportAction)
+        
+        let laterAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        reportController.addAction(laterAction)
+        
+        self.present(reportController, animated: true, completion: nil)
+    }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "editSegue" {

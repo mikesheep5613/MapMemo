@@ -38,7 +38,7 @@ class UploadToStorage : NSObject {
         
         // Upload the file to the path
         self.currentUploadTask = path.putData(data, metadata: nil) { (metaData, error) in
-            guard let metadata = metaData else {
+            guard let _ = metaData else {
                 // Uh-oh, an error occurred!
                 block(nil)
                 return

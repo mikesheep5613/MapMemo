@@ -34,6 +34,11 @@ class ProfileVC: UIViewController, UITableViewDelegate,  MFMailComposeViewContro
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Guest Login
+        if UserDefaults.standard.value(forKey: "username") as! String == "guest" {
+            self.userNameLabel.text = "Guest"
+        }
+
         // Update App Version
         guard let version = Bundle.main.versionNumber else {return}
         sectionContent[2][0].text = version

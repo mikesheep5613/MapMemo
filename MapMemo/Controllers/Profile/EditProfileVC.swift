@@ -19,6 +19,7 @@ class EditProfileVC: UIViewController {
     @IBOutlet weak var confirmBtn: UIButton!
     
     var isEditMode : Bool = false
+    var isNewUser : Bool = false
     var userEmail : String?
     var userName : String?
     var userImage : UIImage?
@@ -34,6 +35,13 @@ class EditProfileVC: UIViewController {
         self.firstTextField.delegate = self
         self.secondTextField.delegate = self
         
+        // new user sign up
+        if self.isNewUser {
+            self.userEmail = "new user email"
+            self.secondTextField.placeholder = "Your Username is ..."
+            self.userImage = UIImage(systemName: "person.crop.circle")
+        }
+        
         self.confirmBtn.layer.cornerRadius = self.confirmBtn.bounds.height / 2
         self.confirmBtn.clipsToBounds = true
         self.imageViewLabel.text = self.userName
@@ -47,23 +55,26 @@ class EditProfileVC: UIViewController {
         self.imageView.clipsToBounds = true
 
         
-        // Do any additional setup after loading the view.
-        if userEmail != nil {
+        // If userEmail not nil, become profile editing mode
+        if self.userEmail != nil {
             self.isEditMode = true
             self.firstTextField.isSecureTextEntry = false
             self.secondTextField.isSecureTextEntry = false
 
             
             self.imageViewLabel.text = "Tap photo to Change"
-//            self.firstTextFieldLabel.text = "USER EMAIL"
-//            self.firstTextField.text = self.userEmail
             self.firstTextFieldLabel.isHidden = true
             self.firstTextField.isHidden = true
-            
+            self.secondTextField.placeholder = "Your Username is ..."
             self.secondTextFieldLabel.text = "USER NAME"
             self.secondTextField.text = self.userName
             
         }
+        
+        if self.userImage == nil {
+            self.imageView.image = UIImage(systemName: "person.crop.circle")
+        }
+
         
         
     }
@@ -84,49 +95,85 @@ class EditProfileVC: UIViewController {
     
     @IBAction func saveBtnPressed(_ sender: Any) {
         if self.isEditMode == true {
-            if let userEmail = self.firstTextField.text, let username = self.secondTextField.text, let image = self.imageView.image {
-                
-                Auth.auth().currentUser?.updateEmail(to: userEmail, completion: { error in
-                    if let e = error {
-                        print("Update email error \(e)")
-                        return
-                    }
-                    print("user email change")
-                })
-                
-                //1. upload profile image to storage
-                self.uploadProfileImage(image: image) { url in
-                    
-                    guard let url = url else {return}
-                    
-                    let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
-                    changeRequest?.displayName = username
-                    changeRequest?.photoURL = url
-                    
-                    changeRequest?.commitChanges(completion: { error in
-                        if let e = error {
-                            print("error \(e)")
-                            return
-                        } else {
-                            print("user name change")
-                            //2. save profile data to firebase database
-                            self.saveProfile(username: username, profileImageURL: url) { success in
-                                if success {
-                                    //3. dismiss the view
-                                    self.dismiss(animated: true, completion: nil)
-                                }
-                            }
-                        }
-                    })
-                }
-                
-                let alert = UIAlertController(title: "SUCCESS", message: "Your account has been successfully updated.", preferredStyle: .alert)
-                let cancel = UIAlertAction(title: "Continue", style: .cancel) { action in
-                    self.navigationController?.popViewController(animated: true)
-                }
+            
+            // 如果沒輸入以下欄位會跳alert
+            if self.secondTextField.text == "" {
+                let alert = UIAlertController(title: "Alert", message: "Please enter your Username.", preferredStyle: .alert)
+                let cancel = UIAlertAction(title: "Continue", style: .cancel, handler: nil)
                 alert.addAction(cancel)
                 self.present(alert, animated: true, completion: nil)
+                return
             }
+            
+            if self.imageView.image == UIImage(systemName: "person.crop.circle") {
+                let alert = UIAlertController(title: "Alert", message: "Please upload your Profile image.", preferredStyle: .alert)
+                let cancel = UIAlertAction(title: "Continue", style: .cancel, handler: nil)
+                alert.addAction(cancel)
+                self.present(alert, animated: true, completion: nil)
+                return
+            }
+            
+            // check user name is exist or not
+            if let username = self.secondTextField.text{
+
+                checkUsername(username: username) { bool in
+                    if bool == true{
+                        // 如果Username已重複會return
+                        let alert = UIAlertController(title: "Alert", message: "Sorry, the username has already been taken.", preferredStyle: .alert)
+                        let cancel = UIAlertAction(title: "Continue", style: .cancel, handler: nil)
+                        alert.addAction(cancel)
+                        self.present(alert, animated: true, completion: nil)
+                        return
+                    }else{
+                        
+                        if let image = self.imageView.image {
+                                            
+                            //1. upload profile image to storage
+                            self.uploadProfileImage(image: image) { url in
+                                
+                                guard let url = url else {return}
+                                
+                                let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
+                                changeRequest?.displayName = username
+                                changeRequest?.photoURL = url
+                                
+                                changeRequest?.commitChanges(completion: { error in
+                                    if let e = error {
+                                        print("error \(e)")
+                                        return
+                                    } else {
+                                        print("user name change")
+                                        //2. save profile data to firebase database
+                                        self.saveProfile(username: username, profileImageURL: url) { success in
+                                            if success {
+                                                //3. dismiss the view
+                                                self.dismiss(animated: true, completion: nil)
+                                            }
+                                        }
+                                    }
+                                })
+                            }
+                            
+                            let alert = UIAlertController(title: "SUCCESS", message: "Your account has been successfully updated.", preferredStyle: .alert)
+                            let cancel = UIAlertAction(title: "Continue", style: .cancel) { action in
+                                if self.isNewUser{
+                                    if let tabVC = self.storyboard?.instantiateViewController(identifier: "tabbarVC"){
+                                        self.view.window?.rootViewController = tabVC
+                                    }
+
+                                }else{
+                                    self.navigationController?.popViewController(animated: true)
+                                }
+                            }
+                            alert.addAction(cancel)
+                            self.present(alert, animated: true, completion: nil)
+                        }
+                        
+                    }
+                }
+            }
+
+ 
         } else{
             // Password validation
             validationCode()
@@ -189,6 +236,31 @@ class EditProfileVC: UIViewController {
         }
         
     }
+    
+    
+    // check user name duplication
+    func checkUsername(username: String, completion: @escaping (Bool) -> Void) {
+        
+        // Get your Firebase collection
+        let collectionRef = self.db.collection("users")
+
+        // Get all the documents where the field username is equal to the String you pass, loop over all the documents.
+
+        collectionRef.whereField("username", isEqualTo: username).getDocuments { (snapshot, err) in
+            if let err = err {
+                print("Error getting document: \(err)")
+            } else if (snapshot?.isEmpty)! {
+                completion(false)
+            } else {
+                for document in (snapshot?.documents)! {
+                    if document.data()["username"] != nil {
+                        completion(true)
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 //MARK: - UITextFieldDelegate

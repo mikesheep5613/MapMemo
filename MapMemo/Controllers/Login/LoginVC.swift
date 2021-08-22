@@ -132,11 +132,22 @@ class LoginVC: UIViewController,UITextFieldDelegate{
                 } else {
                     UserDefaults.standard.setValue("login", forKey: "username")
                     UserDefaults.standard.synchronize()
-                    print(NSHomeDirectory())
-                    if let tabVC = self.storyboard?.instantiateViewController(identifier: "tabbarVC"){
-                        self.view.window?.rootViewController = tabVC
+                    guard let bool = authResult?.additionalUserInfo?.isNewUser else { return }
+                    print("is New User: \(bool)")
+                    if bool {
+                        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                        if let editProfileVC = storyboard.instantiateViewController(identifier: "editProfile") as? EditProfileVC {
+                            editProfileVC.isNewUser = true
+                            self.present(editProfileVC, animated: true, completion: nil)
+                        }
+
+                    }else{
+                        // Login Successfully
+                        if let tabVC = self.storyboard?.instantiateViewController(identifier: "tabbarVC"){
+                            self.view.window?.rootViewController = tabVC
+                        }
                     }
-                    
+
                     // Update fcmToken
                     Messaging.messaging().token { token, error in
                         if let error = error {
@@ -231,9 +242,21 @@ class LoginVC: UIViewController,UITextFieldDelegate{
                 } else {
                     UserDefaults.standard.setValue("google_login", forKey: "username")
                     UserDefaults.standard.synchronize()
-                    if let tabVC = self.storyboard?.instantiateViewController(identifier: "tabbarVC"){
-                        self.view.window?.rootViewController = tabVC
+                    guard let bool = authResult?.additionalUserInfo?.isNewUser else { return }
+                    print("is New User: \(bool)")
+                    if bool {
+                        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                        if let editProfileVC = storyboard.instantiateViewController(identifier: "editProfile") as? EditProfileVC {
+                            editProfileVC.isNewUser = true
+                            self.present(editProfileVC, animated: true, completion: nil)
+                        }
+
+                    }else{
+                        if let tabVC = self.storyboard?.instantiateViewController(identifier: "tabbarVC"){
+                            self.view.window?.rootViewController = tabVC
+                        }
                     }
+
                     
                     // Update fcmToken
                     Messaging.messaging().token { token, error in
@@ -316,6 +339,20 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         controller.performRequests()
         
     }
+    
+    // New user redirect to Profile VC for sign up
+    func showProfileVC (bool: Bool, email: String) -> EditProfileVC? {
+        
+        if bool {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            if let editProfileVC = storyboard.instantiateViewController(identifier: "editProfile") as? EditProfileVC {
+                editProfileVC.userEmail = email
+                return editProfileVC
+            }
+        }
+        return nil
+    }
+
 }
 
 //MARK: - AppTrackingPermissionError
@@ -387,9 +424,20 @@ extension LoginVC: ASAuthorizationControllerDelegate {
                 // User is signed in to Firebase with Apple.
                 UserDefaults.standard.setValue("apple_login", forKey: "username")
                 UserDefaults.standard.synchronize()
-                // Login Successfully
-                if let tabVC = self.storyboard?.instantiateViewController(identifier: "tabbarVC"){
-                    self.view.window?.rootViewController = tabVC
+                guard let bool = authResult?.additionalUserInfo?.isNewUser else { return }
+                print("is New User: \(bool)")
+                if bool {
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    if let editProfileVC = storyboard.instantiateViewController(identifier: "editProfile") as? EditProfileVC {
+                        editProfileVC.isNewUser = true
+                        self.present(editProfileVC, animated: true, completion: nil)
+                    }
+
+                }else{
+                    // Login Successfully
+                    if let tabVC = self.storyboard?.instantiateViewController(identifier: "tabbarVC"){
+                        self.view.window?.rootViewController = tabVC
+                    }
                 }
                 // Update fcmToken
                 Messaging.messaging().token { token, error in
