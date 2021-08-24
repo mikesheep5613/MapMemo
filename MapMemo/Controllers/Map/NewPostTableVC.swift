@@ -105,7 +105,7 @@ class NewPostTableVC: UITableViewController, UITextFieldDelegate, UITextViewDele
     @IBAction func addPhotoBtn(_ sender: Any) {
         var configuration = PHPickerConfiguration()
         configuration.filter = .images
-        configuration.selectionLimit = 3
+        configuration.selectionLimit = 4
         
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = self

@@ -241,16 +241,6 @@ class TableVC: UIViewController {
                 postVC.currentPost = post
             }
         }
-        
-        if segue.identifier == "sortingSegue"{
-            if let popoverVC = segue.destination as? popoverTableVC {
-                popoverVC.preferredContentSize = CGSize(width: 180, height: 90)
-                popoverVC.popoverPresentationController?.delegate = self
-                popoverVC.delegate = self
-                
-            }
-        }
-        
     }
 }
 
@@ -358,20 +348,4 @@ extension TableVC : UIPopoverPresentationControllerDelegate {
         return .none
         
     }
-}
-
-extension TableVC : PopoverViewControllerDelegate {
-    func didSelectData(_ result: String) {
-        
-        if result == "Date:New->Old" {
-            self.data = self.data.sorted(by: { ($0.date! ) < ($1.date!)})
-        } else if result == "Date:Old->New" {
-            self.data = self.data.sorted(by: { ($0.date! ) > ($1.date!)})
-        }
-        
-        self.tableView.reloadData()
-        
-    }
-    
-    
 }

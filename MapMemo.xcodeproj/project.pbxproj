@@ -15,7 +15,6 @@
 		7252032926CCB40600E41673 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 7252032826CCB40600E41673 /* GoogleSignIn */; };
 		7252032B26CDF46000E41673 /* UIStackView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7252032A26CDF46000E41673 /* UIStackView+Extension.swift */; };
 		7256507D269DE21200A84649 /* PinMapVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7256507C269DE21200A84649 /* PinMapVC.swift */; };
-		7259375E26AA6E3900CD5922 /* popoverTableVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7259375D26AA6E3900CD5922 /* popoverTableVC.swift */; };
 		725AA80226A3220E0084B2BA /* UIImage+resize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725AA80126A3220E0084B2BA /* UIImage+resize.swift */; };
 		725D967926B3A80500143A91 /* UIKit+Shadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725D967826B3A80500143A91 /* UIKit+Shadow.swift */; };
 		725D967C26B3B30E00143A91 /* MemoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 725D967A26B3B30E00143A91 /* MemoTableViewCell.swift */; };
@@ -62,7 +61,6 @@
 		724EAEF226CC00EB003F2DC8 /* PushNotificationSender.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PushNotificationSender.swift; sourceTree = "<group>"; };
 		7252032A26CDF46000E41673 /* UIStackView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+Extension.swift"; sourceTree = "<group>"; };
 		7256507C269DE21200A84649 /* PinMapVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinMapVC.swift; sourceTree = "<group>"; };
-		7259375D26AA6E3900CD5922 /* popoverTableVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = popoverTableVC.swift; sourceTree = "<group>"; };
 		725AA80126A3220E0084B2BA /* UIImage+resize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+resize.swift"; sourceTree = "<group>"; };
 		725D967826B3A80500143A91 /* UIKit+Shadow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIKit+Shadow.swift"; sourceTree = "<group>"; };
 		725D967A26B3B30E00143A91 /* MemoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoTableViewCell.swift; sourceTree = "<group>"; };
@@ -148,7 +146,6 @@
 				7278E92926903A9500875B33 /* TableVC.swift */,
 				7278E92B26903AD600875B33 /* PostVC.swift */,
 				7296424F26B7F097008D518F /* ImagesPage */,
-				7259375D26AA6E3900CD5922 /* popoverTableVC.swift */,
 				7291E2FC26BECC71003EA01C /* messageVC.swift */,
 			);
 			path = "My Memo";
@@ -455,7 +452,6 @@
 				72FDE352269A13EC008BB9BA /* RegisterVC.swift in Sources */,
 				72B8982A26B58B9900C03A24 /* UploadToStorage.swift in Sources */,
 				72B54EE1269C616A00C5FD2D /* RoundedTextField.swift in Sources */,
-				7259375E26AA6E3900CD5922 /* popoverTableVC.swift in Sources */,
 				7278E92A26903A9500875B33 /* TableVC.swift in Sources */,
 				7278E924269037EB00875B33 /* PostModel.swift in Sources */,
 			);
@@ -610,7 +606,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MapMemo/MapMemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.3.1;
+				CURRENT_PROJECT_VERSION = 1.3.2;
 				DEVELOPMENT_TEAM = 7LVJW6YG74;
 				EXCLUDED_ARCHS = "";
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
@@ -637,7 +633,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MapMemo/MapMemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1.3.1;
+				CURRENT_PROJECT_VERSION = 1.3.2;
 				DEVELOPMENT_TEAM = 7LVJW6YG74;
 				INFOPLIST_FILE = MapMemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.1;

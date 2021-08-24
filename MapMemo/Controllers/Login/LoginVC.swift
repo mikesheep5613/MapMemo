@@ -21,7 +21,7 @@ class LoginVC: UIViewController,UITextFieldDelegate{
     @IBOutlet weak var emailTextfield: UITextField!
     @IBOutlet weak var passwordTextfield: UITextField!
     @IBOutlet weak var confirmBtn: UIButton!
-    @IBOutlet weak var regiterBtn: UIButton!
+//    @IBOutlet weak var regiterBtn: UIButton!
     
     @IBOutlet weak var appleSignInBtn: UIButton!
     @IBOutlet weak var googleSignInBtn: UIButton!
@@ -29,6 +29,8 @@ class LoginVC: UIViewController,UITextFieldDelegate{
     @IBOutlet weak var backgroundImageView: UIImageView!
     @IBOutlet weak var animateSwitch: UISwitch!
     @IBOutlet weak var bottomStackView: UIStackView!
+    @IBOutlet weak var buttonContainerView: UIView!
+    @IBOutlet weak var textFieldContainerView: UIView!
     
     var loading_1: UIImage!
     var loading_2: UIImage!
@@ -54,13 +56,32 @@ class LoginVC: UIViewController,UITextFieldDelegate{
         
         self.confirmBtn.layer.cornerRadius = self.confirmBtn.bounds.height / 2
         self.confirmBtn.clipsToBounds = true
-        self.regiterBtn.layer.cornerRadius = self.regiterBtn.bounds.height / 2
-        self.regiterBtn.clipsToBounds = true
+//        self.regiterBtn.layer.cornerRadius = self.regiterBtn.bounds.height / 2
+//        self.regiterBtn.clipsToBounds = true
         self.appleSignInBtn.layer.cornerRadius = self.appleSignInBtn.bounds.height / 2
         self.appleSignInBtn.clipsToBounds = true
         self.googleSignInBtn.layer.cornerRadius = self.googleSignInBtn.bounds.height / 2
         self.googleSignInBtn.clipsToBounds = true
         
+        NSLayoutConstraint.activate([
+            self.emailTextfield.widthAnchor.constraint(equalTo: self.textFieldContainerView.widthAnchor , multiplier: 0.9),
+            self.emailTextfield.heightAnchor.constraint(equalTo: self.textFieldContainerView.heightAnchor , multiplier: 0.2),
+
+            self.passwordTextfield.widthAnchor.constraint(equalTo: self.textFieldContainerView.widthAnchor , multiplier: 0.9),
+            self.passwordTextfield.heightAnchor.constraint(equalTo: self.textFieldContainerView.heightAnchor , multiplier: 0.2),
+
+            self.confirmBtn.widthAnchor.constraint(equalTo: self.textFieldContainerView.widthAnchor , multiplier: 0.9),
+            self.confirmBtn.heightAnchor.constraint(equalTo: self.textFieldContainerView.heightAnchor , multiplier: 0.2),
+
+            
+            
+            self.appleSignInBtn.widthAnchor.constraint(equalTo: self.buttonContainerView.widthAnchor , multiplier: 0.9),
+            self.appleSignInBtn.heightAnchor.constraint(equalTo: self.buttonContainerView.heightAnchor , multiplier: 0.4),
+
+            self.googleSignInBtn.widthAnchor.constraint(equalTo: self.buttonContainerView.widthAnchor , multiplier: 0.9),
+            self.googleSignInBtn.heightAnchor.constraint(equalTo: self.buttonContainerView.heightAnchor , multiplier: 0.4)
+        ])
+
         // add sepearate line of bottom Stackview
         self.bottomStackView.addSeparators(at: [1], color: .systemBlue)
         self.bottomStackView.addSeparators(at: [3], color: .systemBlue)
